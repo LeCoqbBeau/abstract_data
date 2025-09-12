@@ -1,8 +1,4 @@
 .idea/
-build/
-cmake-build-debug/
-computorv1
-computorv1.exe
-computorv1.pdb
-.clang-format
+.build/
+abstract_data
 obj/

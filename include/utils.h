@@ -36,9 +36,9 @@ inline uint getTerminalWidth();
 # define CENDL AND CLR ENDL
 # define SHOW(var) PRINT #var AND " = " AND var
 # define SHOWL(var) SHOW(var) ENDL
-# define TRY_OPER(expr, excp) try { expr; } catch (std::exception REF e) { excp; }
-# define TRY(expr) TRY_OPER(expr, ERROR RED BOLD AND e.what() CENDL)
-# define TRY_RETURN(expr) TRY_OPER(expr, ERROR RED BOLD AND e.what() CENDL; return (1);)
+// # define TRY_OPER(expr, excp) try { expr; } catch (std::exception REF e) { excp; }
+// # define TRY(expr) TRY_OPER(expr, ERROR RED BOLD AND e.what() CENDL)
+// # define TRY_RETURN(expr) TRY_OPER(expr, ERROR RED BOLD AND e.what() CENDL; return (1);)
 
 # define CLR "\033[0m"
 # define BOLD "\033[1m"
