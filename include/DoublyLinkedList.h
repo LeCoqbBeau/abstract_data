@@ -33,6 +33,10 @@ TEMPLATE_T struct DoublyLinkedList {
 	DoublyLinkedList*	duplicate() const throw();
 	void				clear() const throw();
 	void				rclear() const throw();
+	void				reserveFront(size_type n, const_reference val = value_type());
+	void				reserveBack(size_type n, const_reference val = value_type());
+	void				toNext() throw();
+	void				toPrev() throw();
 
 	// Attributes
 	T					value;
@@ -141,17 +145,16 @@ DoublyLinkedList<T>* DoublyLinkedList<T>::clone() const throw() {
 	DoublyLinkedList *cloned = NULL;
 
 	try {
-		cloned = new DoublyLinkedList(this);
+		cloned = new DoublyLinkedList(*this);
 	} catch (...) {}
 	return cloned;
 }
 
 TEMPLATE_T DoublyLinkedList<T>* DoublyLinkedList<T>::duplicate() const throw() {
-	DoublyLinkedList *it		= this;
+	DoublyLinkedList const* it		= this;
 	DoublyLinkedList *newNode	= NULL;
 	DoublyLinkedList *newPrev	= NULL;
 
-	it = this;
 	while (it) {
 		newNode = it->clone();
 		if (!newNode) {
@@ -178,6 +181,16 @@ TEMPLATE_T void DoublyLinkedList<T>::rclear() const throw() {
 	if (this->prev)
 		this->prev->clear();
 	delete this;
+}
+
+TEMPLATE_T void DoublyLinkedList<T>::reserveFront(size_type n, const_reference val) {
+	while (n--)
+		addFront(new DoublyLinkedList(val));
+}
+
+TEMPLATE_T void DoublyLinkedList<T>::reserveBack(size_type n, const_reference val) {
+	while (n--)
+		addBack(new DoublyLinkedList(val));
 }
 
 #endif //DOUBLYLINKEDLIST_H
