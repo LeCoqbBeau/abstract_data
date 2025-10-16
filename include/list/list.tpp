@@ -1,0 +1,519 @@
+
+#ifndef LIST_TPP
+# define LIST_TPP
+
+#include "../ftexcept.h"
+
+template <class T, class Allocator>
+ft::list<T, Allocator>::list(allocator_type CREF alloc)
+	: _sentinel(_createNode(value_type())), _allocator(alloc), _size(0)
+{
+	_sentinel->next = _sentinel;
+	_sentinel->prev = _sentinel;
+}
+
+template <class T, class Allocator>
+ft::list<T, Allocator>::list(size_type n, value_type CREF val, allocator_type CREF alloc)
+	: _sentinel(_createNode(value_type())), _allocator(alloc), _size(0)
+{
+	_sentinel->next = _sentinel;
+	_sentinel->prev = _sentinel;
+	_assignHelper(n, val);
+}
+
+template <class T, class Allocator>
+template <class InputIt>
+ft::list<T, Allocator>::list(InputIt first, InputIt last, allocator_type CREF alloc)
+	: _sentinel(_createNode(value_type())), _allocator(alloc), _size(0)
+{
+	_sentinel->next = _sentinel;
+	_sentinel->prev = _sentinel;
+	_assignHelper(first, last);
+}
+
+template <class T, class Allocator>
+ft::list<T, Allocator>::list(list CREF x) {
+	*this = x;
+}
+
+template <class T, class Allocator>
+ft::list<T, Allocator> REF ft::list<T, Allocator>::operator = (list CREF rhs) {
+	if (this != &rhs) {
+		this->_clearHelper();
+		this->_sentinel = rhs._duplicate();
+		this->_allocator = rhs._allocator;
+		this->_size = rhs._size;
+	}
+	return *this;
+}
+
+template <class T, class Allocator>
+ft::list<T, Allocator>::~list() {
+	_clearHelper();
+	_allocator.destroy(_sentinel);
+	_allocator.deallocate(_sentinel, 1);
+}
+
+// Iterators
+template <class T, class Allocator>
+typename ft::list<T, Allocator>::iterator ft::list<T, Allocator>::begin() {
+	return iterator(_sentinel->next);
+}
+
+template <class T, class Allocator>
+typename ft::list<T, Allocator>::const_iterator ft::list<T, Allocator>::begin() const {
+	return const_iterator(_sentinel->next);
+}
+
+template <class T, class Allocator>
+typename ft::list<T, Allocator>::iterator ft::list<T, Allocator>::end() {
+	return iterator(_sentinel);
+}
+
+template <class T, class Allocator>
+typename ft::list<T, Allocator>::const_iterator ft::list<T, Allocator>::end() const {
+	return const_iterator(_sentinel);
+}
+
+template <class T, class Allocator>
+typename ft::list<T, Allocator>::reverse_iterator ft::list<T, Allocator>::rbegin() {
+	return reverse_iterator(_sentinel);
+}
+
+template <class T, class Allocator>
+typename ft::list<T, Allocator>::const_reverse_iterator ft::list<T, Allocator>::rbegin() const {
+	return const_reverse_iterator(_sentinel);
+}
+
+template <class T, class Allocator>
+typename ft::list<T, Allocator>::reverse_iterator ft::list<T, Allocator>::rend() {
+	return reverse_iterator(_sentinel->next);
+}
+
+template <class T, class Allocator>
+typename ft::list<T, Allocator>::const_reverse_iterator ft::list<T, Allocator>::rend() const {
+	return const_reverse_iterator(_sentinel->next);
+}
+
+// Capacity
+template <class T, class Allocator>
+bool ft::list<T, Allocator>::empty() const {
+	return (_sentinel == _sentinel->next);
+}
+
+template <class T, class Allocator>
+typename ft::list<T, Allocator>::size_type ft::list<T, Allocator>::size() const {
+	return this->_size;
+}
+
+template <class T, class Allocator>
+typename ft::list<T, Allocator>::size_type ft::list<T, Allocator>::max_size() const {
+	return _allocator.max_size();
+}
+
+// Element Access
+template <class T, class Allocator>
+typename ft::list<T, Allocator>::reference ft::list<T, Allocator>::front() {
+	return _sentinel->next->value;
+}
+
+template <class T, class Allocator>
+typename ft::list<T, Allocator>::const_reference ft::list<T, Allocator>::front() const {
+	return _sentinel->next->value;
+}
+
+template <class T, class Allocator>
+typename ft::list<T, Allocator>::reference ft::list<T, Allocator>::back() {
+	return _sentinel->prev->value;
+}
+
+template <class T, class Allocator>
+typename ft::list<T, Allocator>::const_reference ft::list<T, Allocator>::back() const {
+	return _sentinel->prev->value;
+}
+
+// Modifiers
+template <class T, class Allocator>
+void ft::list<T, Allocator>::assign(size_type count, value_type CREF value) {
+	_clearHelper();
+	_assignHelper(count, value);
+}
+
+template <class T, class Allocator>
+template <class InputIt>
+void ft::list<T, Allocator>::assign(InputIt first, InputIt last) {
+	_clearHelper();
+	_assignHelper(first, last);
+}
+
+template <class T, class Allocator>
+void ft::list<T, Allocator>::push_front(value_type CREF val) {
+	_node insertedNode = _createNode(val);
+	_sentinel->next->prev = insertedNode;
+	insertedNode->next = _sentinel->next;
+	insertedNode->prev = _sentinel;
+	_sentinel->next = insertedNode;
+	++_size;
+}
+
+template <class T, class Allocator>
+void ft::list<T, Allocator>::pop_front() {
+	if (empty())
+		return;
+	_node toDel = _sentinel->next;
+	_sentinel->next = _sentinel->next->next;
+	_sentinel->next->prev = _sentinel;
+	_allocator.destroy(toDel);
+	_allocator.deallocate(toDel, 1);
+	--_size;
+}
+
+template <class T, class Allocator>
+void ft::list<T, Allocator>::push_back(value_type CREF val) {
+	_node insertedNode = _createNode(val);
+	_sentinel->prev->next = insertedNode;
+	insertedNode->prev = _sentinel->prev;
+	insertedNode->next = _sentinel;
+	_sentinel->prev = insertedNode;
+	++_size;
+}
+
+template <class T, class Allocator>
+void ft::list<T, Allocator>::pop_back() {
+	if (empty())
+		return;
+	_node toDel = _sentinel->prev;
+	_sentinel->prev = _sentinel->prev->prev;
+	_sentinel->prev->next = _sentinel;
+	_allocator.destroy(toDel);
+	_allocator.deallocate(toDel, 1);
+	--_size;
+}
+
+template <class T, class Allocator>
+typename ft::list<T, Allocator>::iterator
+ft::list<T, Allocator>::insert(iterator position, value_type CREF value) {
+	_node insertedNode = _createNode(value);
+	insertedNode->next = position._currentNode;
+	insertedNode->prev = position._currentNode->prev;
+	insertedNode->next->prev = insertedNode;
+	insertedNode->prev->next = insertedNode;
+	++_size;
+	return insertedNode;
+}
+
+template <class T, class Allocator>
+typename ft::list<T, Allocator>::iterator
+ft::list<T, Allocator>::insert(iterator position, size_type count, value_type CREF value) {
+	list tmp(count, value, _allocator);
+	_node frontInserted = tmp._sentinel->next;
+	_node backInserted = tmp._sentinel->prev;
+	frontInserted->prev = position._currentNode->prev;
+	backInserted->next = position._currentNode;
+	frontInserted->prev->next = frontInserted;
+	backInserted->next->prev = backInserted;
+	_size += count;
+	tmp._sentinel->next = tmp._sentinel;
+	tmp._sentinel->prev = tmp._sentinel;
+	return frontInserted;
+}
+
+template <class T, class Allocator>
+template<class InputIt> typename ft::list<T, Allocator>::iterator
+ft::list<T, Allocator>::insert(iterator position, InputIt first, InputIt last) {
+	list tmp(first, last, this->get_allocator());
+	_node frontInserted = tmp._sentinel->next;
+	_node backInserted = tmp._sentinel->prev;
+	frontInserted->prev = position._currentNode->prev;
+	backInserted->next = position._currentNode;
+	frontInserted->prev->next = frontInserted;
+	backInserted->next->prev = backInserted;
+	_size += tmp._size;
+	tmp._sentinel->next = tmp._sentinel;
+	tmp._sentinel->prev = tmp._sentinel;
+	return frontInserted;
+}
+
+template <class T, class Allocator>
+typename ft::list<T, Allocator>::iterator ft::list<T, Allocator>::erase(iterator position) {
+	position._currentNode->prev->next = position._currentNode->next;
+	position._currentNode->next->prev = position._currentNode->prev;
+	--_size;
+	position._currentNode = position._currentNode->next;
+	_allocator.destroy(position._currentNode.prev);
+	_allocator.deallocate(position._currentNode.prev, 1);
+	return (position._currentNode);
+}
+
+template <class T, class Allocator>
+typename ft::list<T, Allocator>::iterator ft::list<T, Allocator>::erase(iterator first, iterator last) {
+	_node startingNode = first._currentNode;
+	startingNode->prev->next = last._currentNode;
+	last._currentNode->prev = startingNode->prev;
+	while (startingNode != last._currentNode) {
+		_node CREF nextNode = startingNode->next;
+		_allocator.destroy(startingNode);
+		_allocator.deallocate(startingNode, 1);
+		startingNode = nextNode;
+		_size--;
+	}
+	return last._currentNode;
+}
+
+template <class T, class Allocator>
+void ft::list<T, Allocator>::swap(list REF x) {
+	_node		tmpSentinel = this->_sentinel;
+	size_type	tmpSize  = this->_size;
+
+	this->_sentinel = x._sentinel;
+	this->_size = x._size;
+	x._sentinel = tmpSentinel;
+	x._size = tmpSize;
+}
+
+template <class T, class Allocator>
+void ft::list<T, Allocator>::resize(size_type n, value_type CREF val) {
+	if (n < _size)
+		return _shrinkHelper(n);
+	list tmp(n - _size, val, _allocator);
+	_node tmpNodesFront = tmp._sentinel->next;
+	_node tmpNodesBack = tmp._sentinel->prev;
+	_sentinel->prev->next = tmpNodesFront;
+	tmpNodesFront->prev = _sentinel->prev;
+	tmpNodesBack->next = _sentinel;
+	tmpNodesBack->next->prev = tmpNodesBack;
+	_size = n;
+	tmp._sentinel->next = tmp._sentinel;
+	tmp._sentinel->prev = tmp._sentinel;
+}
+
+template <class T, class Allocator>
+void ft::list<T, Allocator>::clear() {
+	_clearHelper();
+	_size = 0;
+}
+
+// Operations
+template <class T, class Allocator>
+void ft::list<T, Allocator>::splice(iterator position, list REF other) {
+	_node frontInserted = other._sentinel->next;
+	_node backInserted = other._sentinel->prev;
+	frontInserted->prev = position._currentNode->prev;
+	backInserted->next = position._currentNode;
+	frontInserted->prev->next = frontInserted;
+	backInserted->next->prev = backInserted;
+	_size += other.size();
+	other._size = 0;
+	other._sentinel->next = other._sentinel;
+	other._sentinel->prev = other._sentinel;
+}
+
+template <class T, class Allocator>
+void ft::list<T, Allocator>::splice(iterator position, list REF other, iterator it) {
+	it._currentNode->prev->next = it._currentNode->next;
+	it._currentNode->next->prev = it._currentNode->prev;
+	it._currentNode->next = NULL;
+	it._currentNode->prev = NULL;
+	position._currentNode->prev->next = it._currentNode;
+	it._currentNode->prev = position._currentNode->prev;
+	position._currentNode->prev = it._currentNode;
+	it._currentNode->next = position._currentNode;
+	++_size;
+	--other._size;
+}
+
+template <class T, class Allocator>
+void ft::list<T, Allocator>::splice(iterator position, list REF other, iterator first, iterator last) {
+	_node firstInserted = first._currentNode;
+	_node lastInserted = last._currentNode->prev;
+
+	while (first != last) {
+		++_size;
+		--other._size;
+		++first;
+	}
+	firstInserted->prev->next = last._currentNode;
+	last._currentNode->prev = firstInserted->prev;
+	position._currentNode->prev->next = firstInserted;
+	firstInserted->prev = position._currentNode->prev;
+	lastInserted->next = position._currentNode;
+	position._currentNode->prev = lastInserted;
+}
+
+template <class T, class Allocator>
+void ft::list<T, Allocator>::remove(value_type CREF val) {
+	_node it = _sentinel->next;
+
+	if (it == _sentinel)
+		return ;
+	while (it != _sentinel) {
+		if (it->value == val) {
+			it = _delBackHelper(it);
+			_size--;
+		}
+		it = it->next;
+	}
+}
+
+template <class T, class Allocator>
+template <class Predicate> void ft::list<T, Allocator>::remove_if(Predicate pred) {
+	_node it = _sentinel->next;
+
+	while (it != _sentinel) {
+		if (pred(it->value)) {
+			it = _delBackHelper(it);
+			_size--;
+		}
+		it = it->next;
+	}
+}
+
+template <class T, class Allocator>
+void ft::list<T, Allocator>::unique() {
+	unique(_isNotUnique);
+}
+
+template <class T, class Allocator>
+template <class BinaryPredicate> void ft::list<T, Allocator>::unique(BinaryPredicate binary_pred) {
+	_node it = _sentinel->next->next;
+
+	while (it->next != _sentinel) {
+		if (binary_pred(it->value, it->prev->value)) {
+			it = _delBackHelper(it);
+			_size--;
+		}
+		it = it->next;
+	}
+}
+
+// Observers
+template <class T, class Allocator>
+typename ft::list<T, Allocator>::allocator_type ft::list<T, Allocator>::get_allocator() const {
+	return _allocator;
+}
+
+// Private Helper Methods
+template <class T, class Allocator>
+typename ft::list<T, Allocator>::_node ft::list<T, Allocator>::_createNode(value_type CREF val) {
+	_node node;
+	try {
+		node = _allocator.allocate(1);
+	} catch (...) {
+		throw ft::bad_alloc();
+	}
+	_allocator.construct(node, DoublyLinkedList<value_type>(val));
+	return node;
+}
+
+template <class T, class Allocator>
+void ft::list<T, Allocator>::_assignHelper(size_type n, value_type CREF val) {
+	_node nodeIterator = NULL;
+
+	if (!n)
+		return;
+	_size = n;
+	_sentinel->next = _createNode(val);
+	_sentinel->next->prev = _sentinel;
+	nodeIterator = _sentinel->next;
+	while (--n) {
+		nodeIterator->next = _createNode(val);
+		nodeIterator->next->prev = nodeIterator;
+		nodeIterator = nodeIterator->next;
+	}
+	nodeIterator->next = _sentinel;
+	_sentinel->prev = nodeIterator;
+}
+
+template <class T, class Allocator>
+template <class InputIt> void ft::list<T, Allocator>::_assignHelper(InputIt first, InputIt last) {
+	_node nodeIterator = _sentinel;
+	_size = 0;
+	do {
+		nodeIterator->next = _createNode(*first);
+		nodeIterator->next->prev = nodeIterator;
+		nodeIterator = nodeIterator->next;
+		++first;
+		++_size;
+	} while (first != last);
+	nodeIterator->next = _sentinel;
+	_sentinel->prev = nodeIterator;
+}
+
+template <class T, class Allocator>
+typename ft::list<T, Allocator>::_node ft::list<T, Allocator>::_duplicate() {
+	_node newSentinel = _createNode();
+	_node newIt = newSentinel;
+	_node srcIt = _sentinel->next;
+
+	while (srcIt != _sentinel) {
+		newIt->next = _createNode(srcIt->value);
+		newIt->next->prev = newIt;
+		newIt = newIt->next;
+		srcIt = srcIt->next;
+	}
+	newIt->next = newSentinel;
+	newSentinel->prev = newIt;
+	return newSentinel;
+}
+
+template <class T, class Allocator>
+void ft::list<T, Allocator>::_shrinkHelper(size_type n) {
+	_node nodeIterator;
+	_node nextNode;
+	if (n < _size / 2) {
+		nodeIterator = _sentinel->prev;
+		for (size_type i = 0; i < _size - n - 1; ++i)
+			nodeIterator = nodeIterator->prev;
+	} else {
+		nodeIterator = _sentinel->next;
+		for (size_type i = 0; i < n; ++i)
+			nodeIterator = nodeIterator->next;
+	}
+	_sentinel->prev = nodeIterator->prev;
+	_sentinel->prev->next = _sentinel;
+	nodeIterator->prev = NULL;
+	while (nodeIterator != _sentinel) {
+		nextNode = nodeIterator->next;
+		_allocator.destroy(nodeIterator);
+		_allocator.deallocate(nodeIterator, 1);
+		nodeIterator = nextNode;
+	}
+}
+
+template <class T, class Allocator>
+void ft::list<T, Allocator>::_clearHelper() {
+	_node	nodeIterator;
+	_node	nextNode = NULL;
+
+	nodeIterator = _sentinel->next;
+	while (nodeIterator != _sentinel) {
+		nextNode = nodeIterator->next;
+		_allocator.destroy(nodeIterator);
+		_allocator.deallocate(nodeIterator, 1);
+		nodeIterator = nextNode;
+	}
+	_sentinel->next = _sentinel;
+	_sentinel->prev = _sentinel;
+}
+
+template <class T, class Allocator>
+typename ft::list<T, Allocator>::_node ft::list<T, Allocator>::_delBackHelper(_node node) {
+	if (!node)
+		return NULL;
+	_node prev = node->prev;
+	_allocator.destroy(node);
+	_allocator.deallocate(node, 1);
+	return prev;
+}
+
+template <class T, class Allocator>
+bool ft::list<T, Allocator>::_isNotUnique(value_type CREF curr, value_type CREF prev) {
+	return curr == prev;
+}
+
+template <class T, class Allocator>
+typename ft::list<T, Allocator>::_nodeAllocator ft::list<T, Allocator>::_getNodeAllocator() {
+	return _allocator;
+}
+
+#endif

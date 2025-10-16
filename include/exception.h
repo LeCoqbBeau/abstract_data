@@ -10,7 +10,7 @@
 class ft::exception {
 	public:
 		// Constructors
-		exception() throw() : _emsg("") {}
+		exception() throw() : _emsg("ft::exception") {}
 		exception(exception CREF other) throw() : _emsg(other._emsg) {}
 		exception REF operator = (exception CREF other) throw() {if (this != &other) _emsg = what(); return (*this);}
 		virtual ~exception() {}
