@@ -5,17 +5,13 @@
 #ifndef FT_NAMESPACE_H
 #define FT_NAMESPACE_H
 
-#include "utils.h"
+#include "helper/utils.h"
 
 namespace ft {
 	// Typedef
 	typedef long int ptrdiff_t;
 
-	// list.h
-	template<class T, class Allocator>
-	class list;
-
-	// iterator.h
+	// helper/iterator.h
 	typedef std::input_iterator_tag input_iterator_tag;
 	typedef std::output_iterator_tag output_iterator_tag;
 	typedef std::forward_iterator_tag forward_iterator_tag;
@@ -32,10 +28,10 @@ namespace ft {
 	template < class Iter >
 	class reverse_iterator;
 
-	// exception.h
+	// helper/exception.h
 	class exception;
 
-	// ftexcept.h
+	// helper/ftexcept.h
 	class logic_error;
 	class invalid_argument;
     class domain_error;
@@ -46,6 +42,25 @@ namespace ft {
 	class overflow_error;
 	class underflow_error;
 	class bad_alloc;
+
+	// helper/algorithm.h
+	TEMPLATE_T void swap(T REF x, T REF y);
+	template<class InputIt, class T>
+	InputIt find( InputIt first, InputIt last, T CREF value );
+	template<class InputIt, class UnaryPred>
+	InputIt find_if( InputIt first, InputIt last, UnaryPred pred );
+	template<class ForwardIt, class T>
+	ForwardIt remove(ForwardIt first, ForwardIt last, T CREF value);
+	template<class ForwardIt, class UnaryPred>
+	ForwardIt remove_if(ForwardIt first, ForwardIt last, UnaryPred pred);
+	template<class ForwardIt>
+	ForwardIt unique(ForwardIt first, ForwardIt last);
+	template<class ForwardIt, class BinaryPred>
+	ForwardIt unique(ForwardIt first, ForwardIt last, BinaryPred pred);
+
+	// list.h
+	template<class T, class Allocator>
+	class list;
 }
 
 #endif //FT_NAMESPACE_H

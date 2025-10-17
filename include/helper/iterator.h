@@ -81,7 +81,7 @@ template< class Iter >
 typename ft::reverse_iterator<Iter>::difference_type operator - ( ft::reverse_iterator<Iter> CREF lhs,
 																  ft::reverse_iterator<Iter> CREF rhs );
 
-# include "reverse_iterator.tpp"
+#include "helper/reverse_iterator.tpp"
 
 # undef REVERSE_ITERATOR_RELATIONAL_PROTOTYPE
 

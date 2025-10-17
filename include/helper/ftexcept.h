@@ -6,7 +6,7 @@
 #define FTEXCEPT_H
 
 #include "ft_namespace.h"
-#include "exception.h"
+#include "helper/exception.h"
 
 class ft::logic_error : public ft::exception {
 	public:

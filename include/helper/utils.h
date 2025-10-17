@@ -20,7 +20,7 @@ typedef unsigned int uint;
 # define AUTO __auto_type
 
 // Prototypes
-inline uint getTerminalWidth();
+// inline uint getTerminalWidth();
 
 // toString
 #define TOSTR( x )	static_cast< std::ostringstream & >( \
@@ -30,7 +30,7 @@ inline uint getTerminalWidth();
 # define AND <<
 # define PRINT std::cout AND
 # define RPRINT(len) PRINT std::setw(len) AND
-# define TERMLEN getTerminalWidth()
+// # define TERMLEN getTerminalWidth()
 # define ERROR std::cerr AND
 # define ENDL AND std::endl
 # define TAB "\t"
@@ -61,10 +61,10 @@ inline uint getTerminalWidth();
 
 # define RGB(r, g, b) "\033[38;2;" #r ";" #g ";" #b "m"
 
-inline uint getTerminalWidth() {
-	winsize w = {};
-	ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
-	return w.ws_col;
-}
+// inline uint getTerminalWidth() {
+// 	winsize w = {};
+// 	ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
+// 	return w.ws_col;
+// }
 
 #endif

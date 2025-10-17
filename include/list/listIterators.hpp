@@ -5,7 +5,7 @@
 #ifndef ITERATOR_HPP
 # define ITERATOR_HPP
 
-#include "../iterator.h"
+#include "helper/iterator.h"
 
 template<class T, class Allocator>
 class ft::list<T, Allocator>::iterator : public ft::iterator<bidirectional_iterator_tag, value_type> {
@@ -28,8 +28,8 @@ class ft::list<T, Allocator>::iterator : public ft::iterator<bidirectional_itera
 		iterator operator ++ (int) { iterator tmp = *this; _currentNode = _currentNode->next; return tmp; }
 		iterator REF operator -- () { _currentNode = _currentNode->prev; return *this; }
 		iterator operator -- (int) { iterator tmp = *this; _currentNode = _currentNode->prev; return tmp; }
-		iterator REF operator + (int i) { while (--i) _currentNode = _currentNode->next; return *this; }
-		iterator REF operator - (int i) { while (--i) _currentNode = _currentNode->prev; return *this; }
+		iterator REF operator + (size_t i) { while (i--) _currentNode = _currentNode->next; return *this; }
+		iterator REF operator - (size_t i) { while (i--) _currentNode = _currentNode->prev; return *this; }
 
 		// Attributes
 		_node	_currentNode;

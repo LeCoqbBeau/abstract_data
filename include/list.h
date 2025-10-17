@@ -8,8 +8,6 @@
 #include "ft_namespace.h"
 #include "list/DoublyLinkedList.h"
 
-#include <memory>
-
 template<class T, class Allocator = std::allocator<T> >
 class ft::list {
 	public:
@@ -81,13 +79,17 @@ class ft::list {
 		void clear();
 
 		// Operations
+		void merge(list REF other);
 		void splice(iterator position, list REF other);
 		void splice(iterator position, list REF other, iterator it);
 		void splice(iterator position, list REF other, iterator first, iterator last);
 		void remove(value_type CREF val);
 		template <class Predicate> void remove_if(Predicate pred);
 		void unique();
-		template <class BinaryPredicate> void unique(BinaryPredicate binary_pred);
+		template <class BinaryPredicate> void unique(BinaryPredicate pred);
+		void sort();
+		template <class Compare> void sort(Compare comp);
+		void reverse();
 
 		// Observers
 		allocator_type get_allocator() const;
@@ -105,7 +107,9 @@ class ft::list {
 		void										_shrinkHelper(size_type n);
 		void										_clearHelper();
 		_node										_delBackHelper(_node node);
-		static bool									_isNotUnique(value_type CREF curr, value_type CREF prev);
+		void										_swapNodes(_node a, _node b);
+		void										_sort(size_type left, size_type right);
+		void										_cleanList(_node removed);
 		_nodeAllocator								_getNodeAllocator();
 
 		// Attributes

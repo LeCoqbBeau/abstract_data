@@ -2,7 +2,8 @@
 #ifndef LIST_TPP
 # define LIST_TPP
 
-#include "../ftexcept.h"
+#include "helper/ftexcept.h"
+#include "helper/algorithm.h"
 
 template <class T, class Allocator>
 ft::list<T, Allocator>::list(allocator_type CREF alloc)
@@ -342,48 +343,81 @@ void ft::list<T, Allocator>::splice(iterator position, list REF other, iterator 
 
 template <class T, class Allocator>
 void ft::list<T, Allocator>::remove(value_type CREF val) {
-	_node it = _sentinel->next;
-
-	if (it == _sentinel)
-		return ;
-	while (it != _sentinel) {
-		if (it->value == val) {
-			it = _delBackHelper(it);
-			_size--;
-		}
-		it = it->next;
-	}
+	_cleanList(
+		ft::remove(begin(), end(), val)._currentNode
+	);
 }
 
 template <class T, class Allocator>
 template <class Predicate> void ft::list<T, Allocator>::remove_if(Predicate pred) {
-	_node it = _sentinel->next;
-
-	while (it != _sentinel) {
-		if (pred(it->value)) {
-			it = _delBackHelper(it);
-			_size--;
-		}
-		it = it->next;
-	}
+	_cleanList(
+		ft::remove_if(begin(), end(), pred)._currentNode
+	);
 }
 
 template <class T, class Allocator>
 void ft::list<T, Allocator>::unique() {
-	unique(_isNotUnique);
+	_cleanList(
+		ft::unique(begin(), end())._currentNode
+	);
 }
 
 template <class T, class Allocator>
-template <class BinaryPredicate> void ft::list<T, Allocator>::unique(BinaryPredicate binary_pred) {
-	_node it = _sentinel->next->next;
+template <class BinaryPredicate> void ft::list<T, Allocator>::unique(BinaryPredicate pred) {
+	_cleanList(
+		ft::unique(begin(), end(), pred)._currentNode
+	);
+}
 
-	while (it->next != _sentinel) {
-		if (binary_pred(it->value, it->prev->value)) {
-			it = _delBackHelper(it);
-			_size--;
+template <class T, class Allocator>
+void ft::list<T, Allocator>::sort() {
+	_sort(0, _size - 1);
+}
+
+template <class T, class Allocator>
+void ft::list<T, Allocator>::reverse() {
+	_node curr = _sentinel;
+	do {
+		_node tmp = curr->next;
+		curr->next = curr->prev;
+		curr->prev = tmp;
+		curr = tmp;
+	} while (curr != _sentinel);
+}
+
+template <class T, class Allocator>
+void ft::list<T, Allocator>::merge(list REF other) {
+	_node thisNode = _sentinel->next;
+	_node otherNode = other._sentinel->next;
+
+	if (other.empty())
+		return;
+	if (this->empty())
+		return _swapNodes(this->_sentinel, other._sentinel);
+	while (otherNode != other._sentinel && thisNode != _sentinel) {
+		if (otherNode->value < thisNode->value) {
+			_node nextOther = otherNode->next;
+			// Makes otherNode orphan
+			otherNode->prev->next = otherNode->next;
+			otherNode->next->prev = otherNode->prev;
+			// Links otherNode inside this
+			otherNode->prev = thisNode->prev;
+			otherNode->prev->next = otherNode;
+			otherNode->next = thisNode;
+			thisNode->prev = otherNode;
+			otherNode = nextOther;
+			++_size;
+			--other._size;
+		} else {
+			thisNode = thisNode->next;
 		}
-		it = it->next;
 	}
+	if (other.empty())
+		return;
+	this->_sentinel->prev->next = other._sentinel->next;
+
+
+
 }
 
 // Observers
@@ -507,8 +541,43 @@ typename ft::list<T, Allocator>::_node ft::list<T, Allocator>::_delBackHelper(_n
 }
 
 template <class T, class Allocator>
-bool ft::list<T, Allocator>::_isNotUnique(value_type CREF curr, value_type CREF prev) {
-	return curr == prev;
+void ft::list<T, Allocator>::_swapNodes(_node a, _node b) {
+	_node prev = a->prev;
+	_node next = b->next;
+	prev->next = b;
+	b->prev = prev;
+	b->next = a;
+	a->prev = b;
+	a->next = next;
+	next->prev = a;
+}
+
+template <class T, class Allocator>
+void ft::list<T, Allocator>::_sort(size_type left, size_type right) {
+	if (left >= right)
+		return ;
+	const size_type mid = left + (right - left) / 2;
+	_sort(left, mid);
+	_sort(mid + 1, right);
+	iterator first = begin() + left;
+	iterator last = begin() + right + 1;
+	PRINT "lr (" AND left AND "-" AND right AND "): " ENDL;
+	while (first != last) {
+
+	}
+}
+
+template <class T, class Allocator>
+void ft::list<T, Allocator>::_cleanList(_node removed) {
+	removed->prev->next = _sentinel;
+	_sentinel->prev = removed->prev;
+	while (removed != _sentinel) {
+		_node nextNode = removed->next;
+		_allocator.destroy(removed);
+		_allocator.deallocate(removed, 1);
+		removed = nextNode;
+		_size--;
+	}
 }
 
 template <class T, class Allocator>
