@@ -5,16 +5,16 @@
 #ifndef ALGORITHM_H
 #define ALGORITHM_H
 
-#include "ft_namespace.h"
+namespace ft {
 
-TEMPLATE_T void ft::swap(T REF x, T REF y) {
-	T tmp = x;
+TEMPLATE_T void swap(T REF x, T REF y) {
+	T tmp(x);
 	x = y;
 	y = tmp;
 }
 
 template<class InputIt, class T>
-InputIt ft::find(InputIt first, InputIt last, T CREF value) {
+InputIt find(InputIt first, InputIt last, T CREF value) {
 	for (; first != last; ++first)
 		if (*first == value)
 			return first;
@@ -22,7 +22,7 @@ InputIt ft::find(InputIt first, InputIt last, T CREF value) {
 }
 
 template<class InputIt, class UnaryPred>
-InputIt ft::find_if(InputIt first, InputIt last, UnaryPred pred) {
+InputIt find_if(InputIt first, InputIt last, UnaryPred pred) {
 	for (; first != last; ++first)
 		if (pred(*first))
 			return first;
@@ -30,8 +30,8 @@ InputIt ft::find_if(InputIt first, InputIt last, UnaryPred pred) {
 }
 
 template< class ForwardIt, class T >
-ForwardIt ft::remove(ForwardIt first, ForwardIt last, T CREF value) {
-	first = ft::find(first, last, value);
+ForwardIt remove(ForwardIt first, ForwardIt last, T CREF value) {
+	first = find(first, last, value);
 	for (ForwardIt it = first; ++it != last;)
 		if (!(*it == value))
 			*first++ = *it;
@@ -39,8 +39,8 @@ ForwardIt ft::remove(ForwardIt first, ForwardIt last, T CREF value) {
 }
 
 template< class ForwardIt, class UnaryPred >
-ForwardIt ft::remove_if(ForwardIt first, ForwardIt last, UnaryPred pred) {
-	first = ft::find_if(first, last, pred);
+ForwardIt remove_if(ForwardIt first, ForwardIt last, UnaryPred pred) {
+	first = find_if(first, last, pred);
 	for (ForwardIt it = first; ++it != last;)
 		if (!pred(*it))
 			*first++ = *it;
@@ -48,7 +48,7 @@ ForwardIt ft::remove_if(ForwardIt first, ForwardIt last, UnaryPred pred) {
 }
 
 template< class ForwardIt >
-ForwardIt ft::unique(ForwardIt first, ForwardIt last) {
+ForwardIt unique(ForwardIt first, ForwardIt last) {
 	if (first == last)
 		return last;
 
@@ -61,7 +61,7 @@ ForwardIt ft::unique(ForwardIt first, ForwardIt last) {
 }
 
 template< class ForwardIt, class BinaryPred >
-ForwardIt ft::unique(ForwardIt first, ForwardIt last, BinaryPred pred) {
+ForwardIt unique(ForwardIt first, ForwardIt last, BinaryPred pred) {
 	if (first == last)
 		return last;
 
@@ -71,6 +71,8 @@ ForwardIt ft::unique(ForwardIt first, ForwardIt last, BinaryPred pred) {
 			*result = *first;
 
 	return ++result;
+}
+
 }
 
 #endif //ALGORITHM_H

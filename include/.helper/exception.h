@@ -5,9 +5,9 @@
 #ifndef EXCEPTION_H
 #define EXCEPTION_H
 
-#include "ft_namespace.h"
+namespace ft {
 
-class ft::exception {
+class exception {
 	public:
 		// Constructors
 		exception() throw() : _emsg("ft::exception") {}
@@ -25,5 +25,8 @@ class ft::exception {
 		// Attributes
 		std::string _emsg;
 };
+
+}
+
 
 #endif //EXCEPTION_H

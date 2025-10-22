@@ -5,7 +5,7 @@
 #ifndef DOUBLYLINKEDLIST_H
 # define DOUBLYLINKEDLIST_H
 
-#include "helper/utils.h"
+#include ".helper/utils.h"
 
 TEMPLATE_T struct DoublyLinkedList {
 	// Constructors
