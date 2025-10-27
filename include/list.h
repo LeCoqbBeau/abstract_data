@@ -113,7 +113,6 @@ class list {
 		void										_shrinkHelper(size_type n);
 		void										_clearHelper();
 		_node										_delBackHelper(_node node);
-		void										_swapNodes(_node a, _node b);
 		template <class Compare> void				_initMergeSort(Compare comp);
 		template <class Compare> _node				_split(Compare comp, _node head, size_type size);
 		template <class Compare> _node				_merge( Compare comp,

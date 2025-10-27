@@ -5,6 +5,9 @@
 #ifndef LIST_TESTS_TPP
 # define LIST_TESTS_TPP
 
+#include <algorithm>
+#include <fstream>
+
 #include ".helper/utils.h"
 
 TEMPLATE(class func) void benchmark(func f) {
@@ -94,6 +97,7 @@ REG_UNIT_TEST(Iterators) {
 			PRINT *crit AND " - ";
 			++crit;
 		}
+		NEWL;
 	}
 }
 
@@ -180,6 +184,7 @@ REG_UNIT_TEST(Modifiers) {
 	}
 	list.clear();
 	NEWL;
+	// insert
 	{
 		typename List::iterator it = list.begin();
 		list.insert(it, 10, 50);
@@ -194,6 +199,7 @@ REG_UNIT_TEST(Modifiers) {
 	}
 	list.clear();
 	NEWL;
+	// erase
 	{
 		for (int i = 0; i < 10; ++i)
 			list.push_back(i + 1);
@@ -215,6 +221,7 @@ REG_UNIT_TEST(Modifiers) {
 	}
 	// no list.clear() because we did list.erase(beg..end);
 	NEWL;
+	// swap & resize
 	{
 		list.assign(68, 86);
 		List otherList(86, 68);
@@ -232,12 +239,181 @@ REG_UNIT_TEST(Modifiers) {
 	}
 }
 
-TEMPLATE(class List) void testLists() {
-	// INVOKE_UNIT_TEST(Iterators);
-	// INVOKE_UNIT_TEST(Capacity);
-	// INVOKE_UNIT_TEST(ElementAccess);
-	INVOKE_UNIT_TEST(Modifiers);
+TEMPLATE_T bool isEven(T num) {
+	return !(num % 2);
+}
 
+TEMPLATE_T bool isOdd(T num) {
+	return (num % 2);
+}
+
+TEMPLATE_T bool isNotUnique(T curr, T prev) {
+	return curr == prev;
+}
+
+TEMPLATE_T bool isGreater(T x, T y) {
+	return x > y;
+}
+TEMPLATE_TU bool isSorted(T begin, T end, U Comp) {
+	T isSorted = std::adjacent_find(begin, end, Comp);
+	return isSorted == end;
+}
+
+REG_UNIT_TEST(Operations) {
+	List list;
+	// Splice
+	{
+		List otherList;
+		{
+			for (int i = 0; i < 9; ++i)
+				list.push_back(i + 1);
+			for (int i = 0; i < 9; ++i)
+				otherList.push_back((i + 1) * 10);
+			LIST_STATE(list);
+			LIST_STATE(otherList);
+			list.splice(list.begin(), otherList);
+			LIST_STATE(list);
+			LIST_STATE(otherList);
+		}
+		list.clear();
+		otherList.clear();
+		NEWL;
+		{
+			for (int i = 0; i < 9; ++i)
+				list.push_back(i + 1);
+			for (int i = 0; i < 9; ++i)
+				otherList.push_back((i + 1) * 10);
+			typename List::iterator it = otherList.begin();
+			for (int i = 0; i < 5; ++i)
+				++it;
+			LIST_STATE(list);
+			LIST_STATE(otherList);
+			list.splice(list.begin(), otherList, it);
+			LIST_STATE(list);
+			LIST_STATE(otherList);
+		}
+		list.clear();
+		otherList.clear();
+		NEWL;
+		{
+			for (int i = 0; i < 9; ++i)
+				list.push_back(i + 1);
+			for (int i = 0; i < 9; ++i)
+				otherList.push_back((i + 1) * 10);
+			typename List::iterator it = otherList.begin();
+			for (int i = 0; i < 5; ++i)
+				++it;
+			LIST_STATE(list);
+			LIST_STATE(otherList);
+			list.splice(list.begin(), otherList, otherList.begin(), it);
+			LIST_STATE(list);
+			LIST_STATE(otherList);
+		}
+	}
+	list.clear();
+	NEWL;
+	// Remove
+	{
+		for (int i = 0; i < 9; ++i)
+			list.push_back(i + 1);
+		LIST_STATE(list);
+		list.remove(1);
+		LIST_STATE(list);
+		list.remove(9);
+		LIST_STATE(list);
+		list.remove_if(isEven<typename List::value_type>);
+		LIST_STATE(list);
+		list.remove_if(isOdd<typename List::value_type>);
+		LIST_STATE(list);
+	}
+	list.clear();
+	NEWL;
+	// Unique
+	{
+		for (int i = 0; i < 20; ++i)
+			list.push_back(i/2 + 1);
+		LIST_STATE(list);
+		list.unique();
+		LIST_STATE(list);
+		list.clear();
+		for (int i = 0; i < 20; ++i)
+			list.push_back(i/2 + 1);
+		list.unique(isNotUnique<typename List::value_type>);
+	}
+	list.clear();
+	NEWL;
+	// Merge
+	{
+		List otherList;
+		for (int i = 0; i < 9; ++i)
+			list.push_back(i + 1);
+		for (int i = 0; i < 9; ++i)
+			otherList.push_back(i/2 - 2);
+		LIST_STATE(list);
+		LIST_STATE(otherList);
+		list.merge(otherList);
+		LIST_STATE(list);
+		LIST_STATE(otherList);
+		list.clear();
+		for (int i = 0; i < 9; ++i)
+			otherList.push_back(i/2 - 2);
+		list.merge(otherList, isGreater<typename List::value_type>);
+		LIST_STATE(list);
+		LIST_STATE(otherList);
+	}
+	list.clear();
+	NEWL;
+	// Sort & Reverse
+	{
+		std::ifstream input;
+		input.open("numbers.rand");
+		if (!input.is_open()) {
+			PRINT RED BOLD "Failed to open file :(" ENDL;
+			return;
+		}
+		while (!input.eof()) {
+			str buffer;
+			std::getline(input, buffer);
+			list.push_back(std::strtol(buffer.c_str(), NULL, 10));
+		}
+		input.close();
+		LIST_STATE(list);
+		list.sort();
+		LIST_STATE(list);
+		bool sorted = isSorted(list.begin(), list.end(), std::greater<typename List::value_type>());
+		SHOWL(sorted);
+		list.clear();
+		input.open("numbers.rand");
+		if (!input.is_open()) {
+			PRINT RED BOLD "Failed to open file :(" ENDL;
+			return;
+		}
+		while (!input.eof()) {
+			str buffer;
+			std::getline(input, buffer);
+			list.push_back(std::strtol(buffer.c_str(), NULL, 10));
+		}
+		input.close();
+		list.sort(std::greater<typename List::value_type>());
+		LIST_STATE(list);
+		sorted = isSorted(list.begin(), list.end(), std::less<typename List::value_type>());
+		SHOWL(sorted);
+		list.reverse();
+		LIST_STATE(list);
+		sorted = isSorted(list.begin(), list.end(), std::less<typename List::value_type>());
+		SHOWL(sorted);
+		sorted = isSorted(list.begin(), list.end(), std::greater<typename List::value_type>());
+		SHOWL(sorted);
+		list.clear();
+	}
+}
+
+TEMPLATE(class List) void testLists() {
+	INVOKE_UNIT_TEST(Iterators);
+	INVOKE_UNIT_TEST(Capacity);
+	INVOKE_UNIT_TEST(ElementAccess);
+	INVOKE_UNIT_TEST(Modifiers);
+	INVOKE_UNIT_TEST(Operations);
 }
 
 #undef LIST_STATE

@@ -317,6 +317,7 @@ void ft::list<T, Allocator>::splice(iterator position, list REF other) {
 	_size += other.size();
 	_sentinel->value += other.size();
 	other._size = 0;
+	other._sentinel->value = 0;
 	other._sentinel->next = other._sentinel;
 	other._sentinel->prev = other._sentinel;
 }
@@ -418,8 +419,12 @@ template <class Compare> void ft::list<T, Allocator>::merge(list REF other, Comp
 
 	if (other.empty())
 		return;
-	if (this->empty())
-		return _swapNodes(this->_sentinel, other._sentinel);
+	if (this->empty()) {
+		ft::swap(_size, other._size);
+		ft::swap(this->_sentinel, other._sentinel);
+		_sentinel->value = 0;
+		return ;
+	}
 	while (otherNode != other._sentinel && thisNode != _sentinel) {
 		if (comp(otherNode->value, thisNode->value)) {
 			_node nextOther = otherNode->next;
@@ -440,8 +445,12 @@ template <class Compare> void ft::list<T, Allocator>::merge(list REF other, Comp
 			thisNode = thisNode->next;
 		}
 	}
-	if (other.empty())
+	if (other.empty()) {
+		other._sentinel->value = 0;
+		other._sentinel->next = other._sentinel;
+		other._sentinel->prev = other._sentinel;
 		return;
+	}
 	this->_sentinel->prev->next = other._sentinel->next;
 	other._sentinel->prev->next = this->_sentinel;
 	this->_sentinel->prev = other._sentinel->prev;
@@ -617,18 +626,6 @@ typename ft::list<T, Allocator>::_node ft::list<T, Allocator>::_delBackHelper(_n
 	_allocator.destroy(node);
 	_allocator.deallocate(node, 1);
 	return prev;
-}
-
-template <class T, class Allocator>
-void ft::list<T, Allocator>::_swapNodes(_node a, _node b) {
-	_node prev = a->prev;
-	_node next = b->next;
-	prev->next = b;
-	b->prev = prev;
-	b->next = a;
-	a->prev = b;
-	a->next = next;
-	next->prev = a;
 }
 
 template <class T, class Allocator>

@@ -14,7 +14,7 @@ typedef unsigned int uint;
 
 # define CREF const&
 # define REF &
-# define TEMPLATE(tp) template <tp>
+# define TEMPLATE(...) template <__VA_ARGS__>
 # define TEMPLATE_T TEMPLATE(typename T)
 # define TEMPLATE_TU TEMPLATE(typename T, typename U)
 # define AUTO __auto_type
