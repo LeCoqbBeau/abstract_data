@@ -6,12 +6,49 @@
 #define ALGORITHM_H
 
 namespace ft {
+namespace algo {
 
 TEMPLATE_T void swap(T REF x, T REF y) {
 	T tmp(x);
 	x = y;
 	y = tmp;
 }
+
+
+TEMPLATE_T T abs(T CREF x) {
+	return (x < 0) ? -x : x;
+}
+
+
+TEMPLATE_T T CREF min(T CREF x, T CREF y) {
+	return (x < y) ? x : y;
+}
+
+
+TEMPLATE_TU T CREF min(T CREF x, T CREF y, U comp) {
+	return (comp(x, y)) ? x : y;
+}
+
+
+TEMPLATE_T T CREF max(T CREF x, T CREF y) {
+	return (x < y) ? y : x;
+}
+
+
+TEMPLATE_TU T CREF max(T CREF x, T CREF y, U comp) {
+	return (comp(x, y)) ? y : x;
+}
+
+
+TEMPLATE_T T CREF clamp(T CREF x, T CREF min, T CREF max) {
+	return algo::max(min, algo::min(x, max));
+}
+
+
+TEMPLATE_TU T CREF clamp(T CREF x, T CREF min, T CREF max, U comp) {
+	return algo::max(min, algo::min(x, max, comp), comp);
+}
+
 
 template<class InputIt, class T>
 InputIt find(InputIt first, InputIt last, T CREF value) {
@@ -21,6 +58,7 @@ InputIt find(InputIt first, InputIt last, T CREF value) {
 	return last;
 }
 
+
 template<class InputIt, class UnaryPred>
 InputIt find_if(InputIt first, InputIt last, UnaryPred pred) {
 	for (; first != last; ++first)
@@ -28,6 +66,7 @@ InputIt find_if(InputIt first, InputIt last, UnaryPred pred) {
 			return first;
 	return last;
 }
+
 
 template< class ForwardIt, class T >
 ForwardIt remove(ForwardIt first, ForwardIt last, T CREF value) {
@@ -38,6 +77,7 @@ ForwardIt remove(ForwardIt first, ForwardIt last, T CREF value) {
 	return first;
 }
 
+
 template< class ForwardIt, class UnaryPred >
 ForwardIt remove_if(ForwardIt first, ForwardIt last, UnaryPred pred) {
 	first = find_if(first, last, pred);
@@ -46,6 +86,7 @@ ForwardIt remove_if(ForwardIt first, ForwardIt last, UnaryPred pred) {
 			*first++ = *it;
 	return first;
 }
+
 
 template< class ForwardIt >
 ForwardIt unique(ForwardIt first, ForwardIt last) {
@@ -56,9 +97,9 @@ ForwardIt unique(ForwardIt first, ForwardIt last) {
 	while (++first != last)
 		if (!(*result == *first) && ++result != first)
 			*result = *first;
-
 	return ++result;
 }
+
 
 template< class ForwardIt, class BinaryPred >
 ForwardIt unique(ForwardIt first, ForwardIt last, BinaryPred pred) {
@@ -73,6 +114,30 @@ ForwardIt unique(ForwardIt first, ForwardIt last, BinaryPred pred) {
 	return ++result;
 }
 
+
+template<class InputIt, class OutputIt>
+OutputIt copy(InputIt first, InputIt last,
+			  OutputIt d_first) {
+	for (; first != last; (void)++first, (void)++d_first)
+		*d_first = *first;
+	return d_first;
+}
+
+
+template<class InputIt, class Size, class OutputIt>
+OutputIt copy_n(InputIt first, Size count, OutputIt result) {
+	if (count > 0)
+	{
+		*result = *first;
+		++result;
+		for (Size i = 1; i != count; ++i, (void)++result)
+			*result = *++first;
+	}
+	return result;
+}
+
+
+}
 }
 
 #endif //ALGORITHM_H

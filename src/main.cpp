@@ -4,11 +4,14 @@
 #include ".helper/utils.h"
 #include "./listTests.tpp"
 
+#include <deque>
+#include ".deque/block.h"
+
+#include <typeinfo>
 
 int main() {
-	// PRINT CYN "std::list" CENDL;
-	// benchmark(testLists<std::list<int> >);
-	// PRINT GRN "ft::list" CENDL;
-	// benchmark(testLists<ft::list<int> >);
+	ft::ListIterator<int> test;
+
+	return 0;
 }
 

@@ -12,14 +12,72 @@
 
 namespace ft {
 
+struct ListNodeBase {
+	ListNodeBase *mpNext;
+	ListNodeBase *mpPrev;
+
+	void insert(ListNodeBase *pNext) FT_NOTHROW;
+	void remove() FT_NOTHROW;
+	void splice(ListNodeBase *pFirst, ListNodeBase *pLast) FT_NOTHROW;
+	void reverse() FT_NOTHROW;
+	static void swap(ListNodeBase REF a, ListNodeBase REF b) FT_NOTHROW;
+
+	void insert_range(ListNodeBase *pFirst, ListNodeBase *pLast) FT_NOTHROW;
+	static void remove_range(ListNodeBase *pFirst, ListNodeBase *pLast) FT_NOTHROW;
+};
+
+template<typename T> struct ListNode : public ListNodeBase {
+	T mValue;
+};
+
+template<typename T, typename Pointer = T*, typename Reference = T REF>
+struct ListIterator : public ft::iterator<bidirectional_iterator_tag, T> {
+	typedef ListIterator<T, Pointer, Reference>		this_type;
+	typedef ListIterator<T, T*, T REF>				iterator;
+	typedef ListIterator<T, T const*, T CREF>		const_iterator;
+	typedef ft::size_t								size_type;
+	typedef ft::ptrdiff_t							difference_type;
+	typedef T										value_type;
+	typedef Pointer									pointer;
+	typedef Reference								reference;
+	typedef	ListNodeBase							base_node_type;
+	typedef ListNode<T>								node_type;
+
+	public:
+		base_node_type *mpNode;
+
+	public:
+		ListIterator() FT_NOTHROW;
+		ListIterator(ListNodeBase CPTR pNode) FT_NOTHROW;
+		template <typename Iterator>
+		ListIterator(
+			Iterator CREF x,
+			ENABLE_IF_TT(
+				IS_SAME_V(Iterator, iterator) && !IS_SAME_V(this_type, iterator),
+				void*
+			) = 0
+		) : mpNode(x.mpNode)
+		{}
+
+		this_type	next() const FT_NOTHROW;
+		this_type	prev() const FT_NOTHROW;
+
+		reference	operator * () const FT_NOTHROW;
+		pointer		operator -> () const FT_NOTHROW;
+
+		this_type REF	operator++() FT_NOTHROW;
+		this_type		operator++(int) FT_NOTHROW;
+
+		this_type REF	operator--() FT_NOTHROW;
+		this_type		operator--(int) FT_NOTHROW;
+};
+
 template<class T, class Allocator = std::allocator<T> >
 class list {
 	public:
 		// Friend
 		class iterator;
 		class const_iterator;
-		friend class iterator;
-		friend class const_iterator;
 
 		// Typedefs
 		typedef T										value_type;
@@ -40,7 +98,7 @@ class list {
 		explicit list(size_type n, value_type CREF val = value_type(), allocator_type CREF alloc = allocator_type());
 		template<class InputIt> list (InputIt first, InputIt last, allocator_type CREF alloc = allocator_type());
 		list(list CREF x);
-		list REF operator = (list CREF rhs);
+		list REF operator = (list CREF x);
 		~list();
 
 		// Iterators
@@ -119,7 +177,6 @@ class list {
 															_node left, size_type leftSize,
 															_node right, size_type rightSize );
 		void										_cleanList(_node removed);
-		_nodeAllocator								_getNodeAllocator();
 
 		// Attributes
 		_node										_sentinel;
@@ -182,7 +239,9 @@ LIST_RELATIONAL_OPERATOR(>=) {
 
 # undef LIST_RELATIONAL_OPERATOR
 
-#include ".list/listIterators.hpp"
+#include ".list/listIterators.h"
+#include ".list/listNodeBase.tpp"
+#include ".list/listIterator.tpp"
 #include ".list/list.tpp"
 
 #endif //LIST_H

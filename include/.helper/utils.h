@@ -14,6 +14,8 @@ typedef unsigned int uint;
 
 # define CREF const&
 # define REF &
+# define PTR *
+# define CPTR const*
 # define TEMPLATE(...) template <__VA_ARGS__>
 # define TEMPLATE_T TEMPLATE(typename T)
 # define TEMPLATE_TU TEMPLATE(typename T, typename U)
@@ -37,7 +39,7 @@ typedef unsigned int uint;
 # define NEWL PRINT "" ENDL
 # define CENDL AND CLR ENDL
 # define SHOW(var) PRINT #var AND " = " AND var
-# define SHOWL(var) SHOW(var) ENDL
+# define SHOWL(var) PRINT #var AND " = " AND var ENDL
 // # define TRY_OPER(expr, excp) try { expr; } catch (std::exception REF e) { excp; }
 // # define TRY(expr) TRY_OPER(expr, ERROR RED BOLD AND e.what() CENDL)
 // # define TRY_RETURN(expr) TRY_OPER(expr, ERROR RED BOLD AND e.what() CENDL; return (1);)

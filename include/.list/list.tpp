@@ -29,10 +29,9 @@ template <class InputIt>
 ft::list<T, Allocator>::list(InputIt first, InputIt last, allocator_type CREF alloc)
 	: _sentinel(_createNode(0)), _allocator(alloc), _size(0)
 {
-	typedef typename ft::traits::is_integer<InputIt>::type is_integral;
 	_sentinel->next = _sentinel;
 	_sentinel->prev = _sentinel;
-	_assignHelper(first, last, is_integral());
+	_assignHelper(first, last, IS_INTEGRAL_V(InputIt));
 }
 
 template <class T, class Allocator>
@@ -43,14 +42,14 @@ ft::list<T, Allocator>::list(list CREF x)
 }
 
 template <class T, class Allocator>
-ft::list<T, Allocator> REF ft::list<T, Allocator>::operator = (list CREF rhs) {
-	if (this != &rhs) {
+ft::list<T, Allocator> REF ft::list<T, Allocator>::operator = (list CREF x) {
+	if (this != &x) {
 		this->_clearHelper();
 		_allocator.destroy(this->_sentinel);
 		_allocator.deallocate(this->_sentinel, 1);
-		this->_sentinel = rhs._duplicate();
-		this->_allocator = rhs._allocator;
-		this->_size = rhs._size;
+		this->_sentinel = x._duplicate();
+		this->_allocator = x._allocator;
+		this->_size = x._size;
 	}
 	return *this;
 }
@@ -150,9 +149,8 @@ void ft::list<T, Allocator>::assign(size_type count, value_type CREF value) {
 template <class T, class Allocator>
 template <class InputIt>
 void ft::list<T, Allocator>::assign(InputIt first, InputIt last) {
-	typedef typename ft::traits::is_integer<InputIt>::type is_integral;
 	_clearHelper();
-	_assignHelper(first, last, is_integral());
+	_assignHelper(first, last, IS_INTEGRAL_V(InputIt));
 }
 
 template <class T, class Allocator>
@@ -228,9 +226,8 @@ ft::list<T, Allocator>::insert(iterator position, size_type count, value_type CR
 template <class T, class Allocator>
 template<class InputIt> typename ft::list<T, Allocator>::iterator
 ft::list<T, Allocator>::insert(iterator position, InputIt first, InputIt last) {
-	typedef typename ft::traits::is_integer<InputIt>::type is_integral;
 	list tmp(_allocator);
-	tmp._assignHelper(first, last, is_integral());
+	tmp._assignHelper(first, last, IS_INTEGRAL_V(InputIt));
 	iterator ret = _insertHelper(position, tmp);
 	return ret;
 }
@@ -729,11 +726,6 @@ void ft::list<T, Allocator>::_cleanList(_node removed) {
 		--_size;
 		--_sentinel->value;
 	}
-}
-
-template <class T, class Allocator>
-typename ft::list<T, Allocator>::_nodeAllocator ft::list<T, Allocator>::_getNodeAllocator() {
-	return _allocator;
 }
 
 #endif
