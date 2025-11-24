@@ -6,15 +6,70 @@
 #define ITERATOR_H
 
 #include "ftdef.h"
+#include "type_traits.h"
 
 namespace ft {
 
-// helper/iterator.h
+// Iterator tags
 typedef std::input_iterator_tag input_iterator_tag;
 typedef std::output_iterator_tag output_iterator_tag;
 typedef std::forward_iterator_tag forward_iterator_tag;
 typedef std::bidirectional_iterator_tag bidirectional_iterator_tag;
 typedef std::random_access_iterator_tag random_access_iterator_tag;
+
+// Iterator Traits
+namespace internal {
+
+template <typename Iterator, class = void>
+struct default_iterator_traits {};
+
+template <typename Iterator>
+struct default_iterator_traits<
+	Iterator,
+	MAKE_VOID_T5(
+		typename Iterator::iterator_category,
+		typename Iterator::value_type,
+		typename Iterator::difference_type,
+		typename Iterator::pointer,
+		typename Iterator::reference
+	)
+> {
+	typedef typename Iterator::iterator_category	iterator_category;
+	typedef typename Iterator::value_type			value_type;
+	typedef typename Iterator::difference_type		difference_type;
+	typedef typename Iterator::pointer				pointer;
+	typedef typename Iterator::reference			reference;
+};
+
+
+}
+
+
+template <typename Iterator>
+struct iterator_traits : internal::default_iterator_traits<Iterator> {};
+
+
+template <typename T>
+struct iterator_traits<T*>
+{
+	typedef ft::random_access_iterator_tag	iterator_category;
+	typedef T								value_type;
+	typedef ptrdiff_t						difference_type;
+	typedef T*								pointer;
+	typedef T REF							reference;
+};
+
+
+template <typename T>
+struct iterator_traits<T const*>
+{
+	typedef ft::random_access_iterator_tag	iterator_category;
+	typedef T								value_type;
+	typedef ptrdiff_t						difference_type;
+	typedef T const*						pointer;
+	typedef T CREF							reference;
+};
+
 
 // Iterator
 template<
@@ -32,7 +87,7 @@ template<
 };
 
 // Reverse Iterator
-template < class Iter >
+template <class Iter>
 class reverse_iterator {
 	public:
 		// Typedefs
@@ -74,36 +129,44 @@ class reverse_iterator {
 		Iter _current;
 };
 
-}
 
 // Relational Operator Overload
-# define REVERSE_ITERATOR_RELATIONAL_PROTOTYPE(op)	template< class Iter1, class Iter2 >											\
-													bool operator op (	ft::reverse_iterator<Iter1> CREF lhs,		\
-																		ft::reverse_iterator<Iter2> CREF rhs )
+# define REVERSE_ITERATOR_RELATIONAL_PROTOTYPE(op)	template< class Iter1, class Iter2 >						\
+													bool operator op (	ft::reverse_iterator<Iter1> CREF lhs,	\
+													ft::reverse_iterator<Iter2> CREF rhs )
+
 
 REVERSE_ITERATOR_RELATIONAL_PROTOTYPE(==) {
 	return lhs.base() == rhs.base();
 }
 
+
 REVERSE_ITERATOR_RELATIONAL_PROTOTYPE(!=) {
 	return lhs.base() != rhs.base();
 }
+
 
 REVERSE_ITERATOR_RELATIONAL_PROTOTYPE(<)  {
 	return lhs.base() > rhs.base();
 }
 
+
 REVERSE_ITERATOR_RELATIONAL_PROTOTYPE(<=) {
 	return lhs.base() >= rhs.base();
 }
+
 
 REVERSE_ITERATOR_RELATIONAL_PROTOTYPE(>)  {
 	return lhs.base() < rhs.base();
 }
 
+
 REVERSE_ITERATOR_RELATIONAL_PROTOTYPE(>=) {
 	return lhs.base() <= rhs.base();
 }
+
+
+# undef REVERSE_ITERATOR_RELATIONAL_PROTOTYPE
 
 // Non-member Operator overloads
 template< class Iter >
@@ -112,6 +175,8 @@ ft::reverse_iterator<Iter> operator + ( typename ft::reverse_iterator<Iter>::dif
 {
 	return ft::reverse_iterator<Iter>(it.base() - n);
 }
+
+
 template< class Iter >
 typename ft::reverse_iterator<Iter>::difference_type operator - ( ft::reverse_iterator<Iter> CREF lhs,
 																  ft::reverse_iterator<Iter> CREF rhs )
@@ -119,6 +184,40 @@ typename ft::reverse_iterator<Iter>::difference_type operator - ( ft::reverse_it
 	return rhs.base() - lhs.base();
 }
 
-# undef REVERSE_ITERATOR_RELATIONAL_PROTOTYPE
+// Functions
+template <typename InputIterator>
+typename ft::iterator_traits<InputIterator>::difference_type
+distance_impl(InputIterator first, InputIterator last, ft::input_iterator_tag)
+{
+	typename ft::iterator_traits<InputIterator>::difference_type n = 0;
+
+	while(first != last)
+	{
+		++first;
+		++n;
+	}
+	return n;
+}
+
+
+template <typename RandomAccessIterator>
+typename ft::iterator_traits<RandomAccessIterator>::difference_type
+distance_impl(RandomAccessIterator first, RandomAccessIterator last, ft::random_access_iterator_tag)
+{
+	return last - first;
+}
+
+
+template <typename InputIterator>
+typename ft::iterator_traits<InputIterator>::difference_type
+distance(InputIterator first, InputIterator last)
+{
+	typedef typename ft::iterator_traits<InputIterator>::iterator_category IC;
+
+	return ft::distance_impl(first, last, IC());
+}
+
+
+}
 
 #endif //ITERATOR_H

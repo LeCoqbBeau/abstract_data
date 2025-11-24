@@ -2,15 +2,12 @@
 #include "list.h"
 #include <list>
 #include ".helper/utils.h"
-#include "./listTests.tpp"
-
-#include <deque>
-#include ".deque/block.h"
-
-#include <typeinfo>
+// #include "./listTests.tpp"
 
 int main() {
-	ft::ListIterator<int> test;
+	std::list<str> l;
+
+	SHOW(l.front());
 
 	return 0;
 }

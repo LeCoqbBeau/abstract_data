@@ -5,6 +5,8 @@
 #ifndef LIST_NODE_BASE_TPP
 #define LIST_NODE_BASE_TPP
 
+#include ".helper/algorithm.h"
+
 inline void ft::ListNodeBase::insert(ListNodeBase *pNext) FT_NOTHROW {
 	mpNext = pNext;
 	mpPrev = pNext->mpPrev;
@@ -40,27 +42,37 @@ inline void ft::ListNodeBase::reverse() FT_NOTHROW {
 
 
 inline void ft::ListNodeBase::swap(ListNodeBase REF a, ListNodeBase REF b) FT_NOTHROW {
-	ft::swap(a, b);
+	algo::swap(a, b);
 
-	if(a.mpNext == &b)
-		a.mpNext = a.mpPrev = &a;
-	else
-		a.mpNext->mpPrev = a.mpPrev->mpNext = &a;
+	if (a.mpNext == &b) {
+		a.mpPrev = &a;
+		a.mpNext = a.mpPrev;
+	} else {
+		a.mpPrev->mpNext = &a;
+		a.mpNext->mpPrev = a.mpPrev->mpNext;
+	}
 
-	if(b.mpNext == &a)
-		b.mpNext = b.mpPrev = &b;
-	else
-		b.mpNext->mpPrev = b.mpPrev->mpNext = &b;
+	if (b.mpNext == &a) {
+		b.mpPrev = &b;
+		b.mpNext = b.mpPrev;
+	} else {
+		b.mpPrev->mpNext = &b;
+		b.mpNext->mpPrev = b.mpPrev->mpNext;
+	}
 }
 
 
 inline void ft::ListNodeBase::insert_range(ListNodeBase *pFirst, ListNodeBase *pLast) FT_NOTHROW {
-
+	mpPrev->mpNext = pFirst;
+	pFirst->mpPrev = mpPrev;
+	mpPrev         = pLast;
+	pLast->mpNext = this;
 }
 
 
 inline void ft::ListNodeBase::remove_range(ListNodeBase *pFirst, ListNodeBase *pLast) FT_NOTHROW {
-
+	pLast->mpNext->mpPrev = pFirst->mpPrev;
+	pFirst->mpPrev->mpNext = pLast->mpNext;
 }
 
 

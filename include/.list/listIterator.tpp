@@ -81,7 +81,7 @@ ft::ListIterator<T, Pointer, Reference>::operator -- (int) FT_NOTHROW
 
 
 template <typename T, typename Pointer, typename Reference>
-ft::ListIterator<T, Pointer, Reference>::ListIterator(ListNodeBase CPTR pNode) FT_NOTHROW
+ft::ListIterator<T, Pointer, Reference>::ListIterator(ListNodeBase const* pNode) FT_NOTHROW
 	: mpNode(const_cast<base_node_type*>(pNode))
 {}
 

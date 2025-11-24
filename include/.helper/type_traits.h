@@ -104,6 +104,19 @@ template <typename T>						struct is_integral : public is_integral_helper<REMOVE
 #define										IS_INTEGRAL_T(T) ft::traits::is_integral<T>::type
 #define										IS_INTEGRAL_TT(T) typename ft::traits::is_integral<T>::type
 
+template <typename T1 = void, typename T2 = void, typename T3 = void, typename T4 = void, typename T5 = void, typename T6 = void, typename T7 = void, typename T8 = void>
+struct make_void {
+	typedef void type;
+};
+# define MAKE_VOID_T1(T1) typename ft::traits::make_void<T1>::type
+# define MAKE_VOID_T2(T1, T2) typename ft::traits::make_void<T1, T2>::type
+# define MAKE_VOID_T3(T1, T2, T3) typename ft::traits::make_void<T1, T2, T3>::type
+# define MAKE_VOID_T4(T1, T2, T3, T4) typename ft::traits::make_void<T1, T2, T3, T4>::type
+# define MAKE_VOID_T5(T1, T2, T3, T4, T5) typename ft::traits::make_void<T1, T2, T3, T4, T5>::type
+# define MAKE_VOID_T6(T1, T2, T3, T4, T5, T6) typename ft::traits::make_void<T1, T2, T3, T4, T5, T6>::type
+# define MAKE_VOID_T7(T1, T2, T3, T4, T5, T6, T7) typename ft::traits::make_void<T1, T2, T3, T4, T5, T6, T7>::type
+# define MAKE_VOID_T8(T1, T2, T3, T4, T5, T6, T7, T8) typename ft::traits::make_void<T1, T2, T3, T4, T5, T6, T7, T8>::type
+
 }
 }
 
