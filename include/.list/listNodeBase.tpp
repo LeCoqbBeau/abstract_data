@@ -25,6 +25,11 @@ inline void ft::ListNodeBase::splice(ListNodeBase *pFirst, ListNodeBase *pLast) 
 	pLast->mpPrev->mpNext  = this;
 	pFirst->mpPrev->mpNext = pLast;
 	this->mpPrev->mpNext  = pFirst;
+
+	ListNodeBase* const pTemp = this->mpPrev;
+	this->mpPrev  = pLast->mpPrev;
+	pLast->mpPrev  = pFirst->mpPrev;
+	pFirst->mpPrev = pTemp;
 }
 
 
@@ -42,7 +47,7 @@ inline void ft::ListNodeBase::reverse() FT_NOTHROW {
 
 
 inline void ft::ListNodeBase::swap(ListNodeBase REF a, ListNodeBase REF b) FT_NOTHROW {
-	algo::swap(a, b);
+	ft::swap(a, b);
 
 	if (a.mpNext == &b) {
 		a.mpPrev = &a;

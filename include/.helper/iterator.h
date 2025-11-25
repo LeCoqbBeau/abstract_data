@@ -218,6 +218,76 @@ distance(InputIterator first, InputIterator last)
 }
 
 
+template <typename InputIterator, typename Distance>
+void advance_impl(InputIterator& i, Distance n, ft::input_iterator_tag)
+{
+	while(n--)
+		++i;
+}
+
+
+template <bool signedDistance>
+struct advance_bi_impl
+{
+	template <typename BidirectionalIterator, typename Distance>
+	static void advance_impl(BidirectionalIterator REF i, Distance n) // Specialization for unsigned distance type.
+	{
+		while(n--)
+			++i;
+	}
+};
+
+
+template <>
+struct advance_bi_impl<true>
+{
+	template <typename BidirectionalIterator, typename Distance>
+	static void advance_impl(BidirectionalIterator REF i, Distance n) // Specialization for signed distance type.
+	{
+		if(n > 0)
+		{
+			while(n--)
+				++i;
+		}
+		else
+		{
+			while(n++)
+				--i;
+		}
+	}
+};
+
+
+template <typename BidirectionalIterator, typename Distance>
+void advance_impl(BidirectionalIterator& i, Distance n, ft::bidirectional_iterator_tag)
+{
+	advance_bi_impl<traits::is_signed<Distance>::value>::advance_impl(i, n);
+}
+
+
+template <typename RandomAccessIterator, typename Distance>
+void advance_impl(RandomAccessIterator& i, Distance n, ft::random_access_iterator_tag)
+{
+	i += n;
+}
+
+template <typename InputIterator, typename Distance>
+void advance(InputIterator REF i, Distance n)
+{
+	typedef typename ft::iterator_traits<InputIterator>::iterator_category IC;
+
+	ft::advance_impl(i, n, IC());
+}
+
+
+template<class InputIt>
+InputIt next(InputIt it, typename ft::iterator_traits<InputIt>::difference_type n = 1)
+{
+	ft::advance(it, n);
+	return it;
+}
+
+
 }
 
 #endif //ITERATOR_H

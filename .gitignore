@@ -3,3 +3,4 @@
 abstract_data
 obj/
 output.txt
+*.diff

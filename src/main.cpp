@@ -1,13 +1,14 @@
 
 #include "list.h"
 #include <list>
-#include ".helper/utils.h"
-// #include "./listTests.tpp"
+#include "./listTests.tpp"
 
 int main() {
-	std::list<str> l;
-
-	SHOW(l.front());
+	PRINT "std::list<int>" ENDL;
+	benchmark(testLists<std::list<int> >);
+	NEWL;
+	PRINT "ft::list<int>" ENDL;
+	benchmark(testLists<ft::list<int> >);
 
 	return 0;
 }

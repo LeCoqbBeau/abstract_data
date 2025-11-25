@@ -6,7 +6,6 @@
 #define LIST_H
 
 #include ".helper/algorithm.h"
-#include ".list/DoublyLinkedList.h"
 #include ".helper/ftdef.h"
 #include ".helper/iterator.h"
 #include ".helper/pair.h"
@@ -28,9 +27,11 @@ struct ListNodeBase {
 	static void remove_range(ListNodeBase *pFirst, ListNodeBase *pLast) FT_NOTHROW;
 };
 
+
 template<typename T> struct ListNode : public ListNodeBase {
 	T mValue;
 };
+
 
 template<typename T, typename Pointer = T*, typename Reference = T REF>
 struct ListIterator : public ft::iterator<bidirectional_iterator_tag, T> {
@@ -74,6 +75,35 @@ struct ListIterator : public ft::iterator<bidirectional_iterator_tag, T> {
 		this_type		operator--(int) FT_NOTHROW;
 };
 
+	template <typename T, typename PointerA, typename ReferenceA, typename PointerB, typename ReferenceB>
+	bool operator != (
+		ft::ListIterator<T, PointerA, ReferenceA> CREF a,
+		ft::ListIterator<T, PointerB, ReferenceB> CREF b
+	) FT_NOTHROW
+	{
+		return a.mpNode != b.mpNode;
+	}
+
+
+	template <typename T, typename Pointer, typename Reference>
+	bool operator != (
+		ft::ListIterator<T, Pointer, Reference> CREF a,
+		ft::ListIterator<T, Pointer, Reference> CREF b
+	) FT_NOTHROW
+	{
+		return a.mpNode != b.mpNode;
+	}
+
+
+	template <typename T, typename PointerA, typename ReferenceA, typename PointerB, typename ReferenceB>
+	bool operator == (
+		ft::ListIterator<T, PointerA, ReferenceA> CREF a,
+		ft::ListIterator<T, PointerB, ReferenceB> CREF b
+	) FT_NOTHROW
+	{
+		return a.mpNode == b.mpNode;
+	}
+
 
 template <typename T, typename Allocator>
 class ListBase {
@@ -98,8 +128,7 @@ class ListBase {
 		void		DoClear() FT_NOTHROW;
 
 	public:
-		allocator_type REF get_allocator() FT_NOTHROW;
-		allocator_type CREF get_allocator() const FT_NOTHROW;
+		allocator_type get_allocator() const FT_NOTHROW;
 
 	protected:
 		ft::pair<base_node_type, allocator_type>	mNodeAllocator;
@@ -109,7 +138,7 @@ class ListBase {
 		allocator_type REF internalAllocator() FT_NOTHROW { return mNodeAllocator.second(); }
 		allocator_type CREF internalAllocator() const FT_NOTHROW { return mNodeAllocator.second(); }
 		node_allocator_type internalNodeAllocator() { return node_allocator_type(internalAllocator()); }
-		node_allocator_type CREF internalNodeAllocator() const { return node_allocator_type(internalAllocator()); }
+		node_allocator_type internalNodeAllocator() const { return node_allocator_type(internalAllocator()); }
 };
 
 
@@ -154,7 +183,9 @@ class list : public ListBase<T, Allocator> {
 
 		this_type REF operator = (this_type CREF other);
 
-		void assign(size_type n, value_type CREF value);
+		void swap(this_type REF x);
+
+		void assign(size_type n, value_type CREF value = value_type());
 		template <class InputIterator> void assign(InputIterator first, InputIterator last);
 
 		iterator				begin() FT_NOTHROW;
@@ -173,7 +204,7 @@ class list : public ListBase<T, Allocator> {
 		size_type	size() const FT_NOTHROW;
 		size_type	max_size() const FT_NOTHROW;
 
-		void resize(size_type n, value_type val = value_type());
+		void resize(size_type n, value_type CREF value = value_type());
 
 		reference		front();
 		const_reference	front() const;
@@ -181,8 +212,8 @@ class list : public ListBase<T, Allocator> {
 		reference		back();
 		const_reference	back() const;
 
-		void push_front(value_type CREF val);
-		void push_back(value_type CREF val);
+		void push_front(value_type CREF value);
+		void push_back(value_type CREF value);
 
 		void pop_front();
 		void pop_back();
@@ -196,9 +227,9 @@ class list : public ListBase<T, Allocator> {
 
 		void clear() FT_NOTHROW;
 
-		void remove(value_type CREF val);
+		void remove(value_type CREF value);
 
-		template <class Predicate> void remove_if(Predicate pred);
+		template <class Predicate> void remove_if(Predicate predicate);
 
 		void reverse() FT_NOTHROW;
 
@@ -209,15 +240,15 @@ class list : public ListBase<T, Allocator> {
 	public:
 		void merge(this_type REF other);
 
-		template <class Compare> void merge(this_type REF x, Compare compare);
+		template <class Compare> void merge(this_type REF other, Compare compare);
 
 		void unique();
 
-		template <class BinaryPredicate> void unique(BinaryPredicate pred);
+		template <class BinaryPredicate> void unique(BinaryPredicate predicate);
 
 		void sort();
 
-		template <class Compare> void sort(Compare comp);
+		template <class Compare> void sort(Compare compare);
 
 	protected:
 		node_type*	DoCreateNode(value_type CREF value = value_type());
@@ -248,125 +279,9 @@ class list : public ListBase<T, Allocator> {
 		iterator DoSort(iterator i1, iterator end2, size_type n, Compare REF compare);
 };
 
-// template<class T, class Allocator = std::allocator<T> >
-// class list {
-// 	public:
-// 		// Friend
-// 		class iterator;
-// 		class const_iterator;
-//
-// 		// Typedefs
-// 		typedef T										value_type;
-// 		typedef Allocator								allocator_type;
-// 		typedef	size_t									size_type;
-// 		typedef ptrdiff_t								difference_type;
-// 		typedef typename Allocator::reference			reference;
-// 		typedef typename Allocator::const_reference		const_reference;
-// 		typedef typename Allocator::pointer				pointer;
-// 		typedef typename Allocator::const_pointer		const_pointer;
-// 		typedef iterator								iterator;
-// 		typedef const_iterator							const_iterator;
-// 		typedef ft::reverse_iterator<iterator>			reverse_iterator;
-// 		typedef ft::reverse_iterator<const_iterator>	const_reverse_iterator;
-//
-// 		// Constructors & Destructors
-// 		explicit list(allocator_type CREF alloc = allocator_type());
-// 		explicit list(size_type n, value_type CREF val = value_type(), allocator_type CREF alloc = allocator_type());
-// 		template<class InputIt> list (InputIt first, InputIt last, allocator_type CREF alloc = allocator_type());
-// 		list(list CREF x);
-// 		list REF operator = (list CREF x);
-// 		~list();
-//
-// 		// Iterators
-// 		iterator begin();
-// 		const_iterator begin() const;
-// 		iterator end();
-// 		const_iterator end() const;
-// 		reverse_iterator rbegin();
-// 		const_reverse_iterator rbegin() const;
-// 		reverse_iterator rend();
-// 		const_reverse_iterator rend() const;
-//
-// 		// Capacity
-// 		bool empty() const;
-// 		size_type size() const;
-// 		size_type max_size() const;
-//
-// 		// Element Access
-// 		reference front();
-// 		const_reference front() const;
-// 		reference back();
-// 		const_reference back() const;
-//
-// 		// Modifiers
-// 		void assign(size_type count, value_type CREF value);
-// 		template<class InputIt> void assign(InputIt first, InputIt last);
-// 		void push_front(value_type CREF val);
-// 		void pop_front();
-// 		void push_back(value_type CREF val);
-// 		void pop_back();
-// 		iterator insert(iterator position, value_type CREF value);
-// 		iterator insert(iterator position, size_type count, value_type CREF value);
-// 		template<class InputIt> iterator insert(iterator position, InputIt first, InputIt last);
-// 		iterator erase(iterator position);
-// 		iterator erase(iterator first, iterator last);
-// 		void swap(list REF x);
-// 		void resize(size_type n, value_type CREF val = value_type());
-// 		void clear();
-//
-// 		// Operations
-// 		void splice(iterator position, list REF other);
-// 		void splice(iterator position, list REF other, iterator it);
-// 		void splice(iterator position, list REF other, iterator first, iterator last);
-// 		void remove(value_type CREF val);
-// 		template <class Predicate> void remove_if(Predicate pred);
-// 		void unique();
-// 		template <class BinaryPredicate> void unique(BinaryPredicate pred);
-// 		void merge(list REF other);
-// 		template <class Compare> void merge(list REF other, Compare comp);
-// 		void sort();
-// 		template <class Compare> void sort(Compare comp);
-// 		void reverse();
-//
-// 		// Observers
-// 		allocator_type get_allocator() const;
-//
-// 	private:
-// 		// Typedef
-// 		typedef DoublyLinkedList<value_type>		*_node;
-// 		typedef typename Allocator::template rebind<DoublyLinkedList<value_type> >::other _nodeAllocator;
-//
-// 		// Helper methods
-// 		_node										_createNode(value_type CREF val = value_type()) const;
-// 		void										_assignHelper(size_type n, value_type CREF val, traits::true_type);
-// 		template <class InputIt> void				_assignHelper(InputIt first, InputIt last, traits::false_type);
-// 		iterator									_insertHelper(iterator position, list REF other);
-// 		list										_insertHelper(size_type n, value_type CREF val, traits::true_type);
-// 		template <class InputIt> list				_insertHelper(InputIt first, InputIt last, traits::false_type);
-// 		_node										_duplicate() const;
-// 		void										_shrinkHelper(size_type n);
-// 		void										_clearHelper();
-// 		_node										_delBackHelper(_node node);
-// 		template <class Compare> void				_initMergeSort(Compare comp);
-// 		template <class Compare> _node				_split(Compare comp, _node head, size_type size);
-// 		template <class Compare> _node				_merge( Compare comp,
-// 															_node left, size_type leftSize,
-// 															_node right, size_type rightSize );
-// 		void										_cleanList(_node removed);
-//
-// 		// Attributes
-// 		_node										_sentinel;
-// 		mutable _nodeAllocator						_allocator;
-// 		size_type									_size;
-//
-// };
-
-// template <typename T, typename Allocator>
-// void swap(list<T, Allocator> REF x, list<T, Allocator> REF y) {
-// 	x.swap(y);
-// }
 
 }
+
 
 # define LIST_RELATIONAL_OPERATOR(op) template <class T, class Allocator> bool operator op					\
 										(ft::list<T, Allocator> CREF lhs, ft::list<T, Allocator> CREF rhs)
@@ -392,7 +307,7 @@ LIST_RELATIONAL_OPERATOR(!=) {
 
 
 LIST_RELATIONAL_OPERATOR(<) {
-	return ft::algo::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
+	return ft::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
 }
 
 
@@ -413,7 +328,13 @@ LIST_RELATIONAL_OPERATOR(>=) {
 
 # undef LIST_RELATIONAL_OPERATOR
 
-// #include ".list/listIterators.h"
+template <class T, class Allocator>
+void swap(ft::list<T, Allocator> REF a, ft::list<T, Allocator> REF b)
+{
+	a.swap(b);
+}
+
+
 #include ".list/listNodeBase.tpp"
 #include ".list/listIterator.tpp"
 #include ".list/listBase.tpp"

@@ -104,6 +104,23 @@ template <typename T>						struct is_integral : public is_integral_helper<REMOVE
 #define										IS_INTEGRAL_T(T) ft::traits::is_integral<T>::type
 #define										IS_INTEGRAL_TT(T) typename ft::traits::is_integral<T>::type
 
+template <typename T>	struct is_floating_point_helper					: public false_type{};
+template <>				struct is_floating_point_helper<float>			: public true_type{};
+template <>				struct is_floating_point_helper<double>			: public true_type{};
+template <>				struct is_floating_point_helper<long double>	: public true_type{};
+template <typename T>	struct is_floating_point : public is_floating_point_helper<REMOVE_CV_TT(T)>{};
+#define					IS_FLOATING_POINT_V(T) ft::traits::is_floating_point<T>::value
+
+template <typename T>
+struct		is_arithmetic : public integral_constant<bool, IS_INTEGRAL_V(T) || IS_FLOATING_POINT_V(T)>{};
+#define		IS_ARITHMETIC_V(T) ft::traits::is_arithmetic<T>::value
+
+template <typename T, bool = IS_ARITHMETIC_V(T)>
+struct							is_signed_helper			: public bool_constant<T(-1) < T(0)> {};
+template <typename T> struct	is_signed_helper<T, false>	: public false_type {};
+template <typename T> struct	is_signed					: public traits::is_signed_helper<T>::type {};
+#define							IS_SIGNED_V(T) ft::traits::is_signed<T>::value
+
 template <typename T1 = void, typename T2 = void, typename T3 = void, typename T4 = void, typename T5 = void, typename T6 = void, typename T7 = void, typename T8 = void>
 struct make_void {
 	typedef void type;

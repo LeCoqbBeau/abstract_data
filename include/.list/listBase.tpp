@@ -75,14 +75,7 @@ void ft::ListBase<T, Allocator>::DoClear() FT_NOTHROW {
 
 
 template <typename T, typename Allocator>
-typename ft::ListBase<T, Allocator>::allocator_type REF
-ft::ListBase<T,Allocator>::get_allocator() FT_NOTHROW {
-	return internalAllocator();
-}
-
-
-template <typename T, typename Allocator>
-typename ft::ListBase<T, Allocator>::allocator_type CREF
+typename ft::ListBase<T, Allocator>::allocator_type
 ft::ListBase<T,Allocator>::get_allocator() const FT_NOTHROW {
 	return internalAllocator();
 }

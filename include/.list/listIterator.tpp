@@ -10,6 +10,7 @@ ft::ListIterator<T, Pointer, Reference>::ListIterator() FT_NOTHROW
 	: mpNode()
 {}
 
+
 template <typename T, typename Pointer, typename Reference>
 typename ft::ListIterator<T, Pointer, Reference>::this_type
 ft::ListIterator<T, Pointer, Reference>::next() const FT_NOTHROW
@@ -84,36 +85,6 @@ template <typename T, typename Pointer, typename Reference>
 ft::ListIterator<T, Pointer, Reference>::ListIterator(ListNodeBase const* pNode) FT_NOTHROW
 	: mpNode(const_cast<base_node_type*>(pNode))
 {}
-
-
-template <typename T, typename PointerA, typename ReferenceA, typename PointerB, typename ReferenceB>
-bool operator == (
-	ft::ListIterator<T, PointerA, ReferenceA> CREF a,
-	ft::ListIterator<T, PointerB, ReferenceB> CREF b
-) FT_NOTHROW
-{
-	return a.mpNode == b.mpNode;
-}
-
-
-template <typename T, typename PointerA, typename ReferenceA, typename PointerB, typename ReferenceB>
-bool operator != (
-	ft::ListIterator<T, PointerA, ReferenceA> CREF a,
-	ft::ListIterator<T, PointerB, ReferenceB> CREF b
-) FT_NOTHROW
-{
-	return a.mpNode != b.mpNode;
-}
-
-
-template <typename T, typename Pointer, typename Reference>
-bool operator != (
-	ft::ListIterator<T, Pointer, Reference> CREF a,
-	ft::ListIterator<T, Pointer, Reference> CREF b
-) FT_NOTHROW
-{
-	return a.mpNode != b.mpNode;
-}
 
 
 #endif //LIST_ITERATOR_TPP

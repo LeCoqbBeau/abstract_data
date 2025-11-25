@@ -8,7 +8,7 @@
 #include "utils.h"
 
 namespace ft {
-namespace algo {
+// namespace algo {
 
 TEMPLATE_T void swap(T REF x, T REF y) {
 	T tmp(x);
@@ -43,12 +43,12 @@ TEMPLATE_TU T CREF max(T CREF x, T CREF y, U comp) {
 
 
 TEMPLATE_T T CREF clamp(T CREF x, T CREF min, T CREF max) {
-	return algo::max(min, algo::min(x, max));
+	return ft::max(min, ft::min(x, max));
 }
 
 
 TEMPLATE_TU T CREF clamp(T CREF x, T CREF min, T CREF max, U comp) {
-	return algo::max(min, algo::min(x, max, comp), comp);
+	return ft::max(min, ft::min(x, max, comp), comp);
 }
 
 
@@ -167,7 +167,7 @@ bool lexicographical_compare(InputIt1 first1, InputIt1 last1,
 }
 
 
-}
+// }
 }
 
 #endif //ALGORITHM_H

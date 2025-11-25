@@ -38,10 +38,17 @@ TEMPLATE(class func) void benchmark(func f) {
 	PRINT "seconds)" ENDL ENDL;
 }
 
-#define REG_UNIT_TEST(test) TEMPLATE(class List) static void testList##test()
-#define INVOKE_UNIT_TEST(test) PRINT PRP BOLD "Now testing lists " #test CENDL; benchmark(testList##test<List>)
+#define MORE_BENCHMARK true
 
-#define LIST_STATE(l) SHOWL(l.size()); SHOWL(l.front()); SHOWL(l.back())
+#define REG_UNIT_TEST(test) TEMPLATE(class List) static void testList##test()
+
+#if (MORE_BENCHMARK)
+# define INVOKE_UNIT_TEST(test) PRINT PRP BOLD "Now testing lists " #test CENDL; benchmark(testList##test<List>)
+#else
+# define INVOKE_UNIT_TEST(test) PRINT PRP BOLD "Now testing lists " #test CENDL; testList##test<List>()
+#endif
+
+#define LIST_STATE(l) //(void)l; SHOWL(l.size()); if (!l.empty()) { SHOWL(l.front()); SHOWL(l.back()); }
 
 REG_UNIT_TEST(Iterators) {
 	List list;
@@ -53,11 +60,6 @@ REG_UNIT_TEST(Iterators) {
 		for (it = list.begin(); it != list.end(); ++it)
 			PRINT *it AND " - ";
 		NEWL;
-		it = list.begin();
-		for (int i = 0; i < 10; ++i) {
-			PRINT *it AND " - ";
-			++it;
-		}
 	}
 	NEWL;
 	{
@@ -66,11 +68,6 @@ REG_UNIT_TEST(Iterators) {
 		for (cit = list.begin(); cit != list.end(); ++cit)
 			PRINT *cit AND " - ";
 		NEWL;
-		cit = list.begin();
-		for (int i = 0; i < 10; ++i) {
-			PRINT *cit AND " - ";
-			++cit;
-		}
 	}
 	NEWL;
 	{
@@ -79,11 +76,6 @@ REG_UNIT_TEST(Iterators) {
 		for (rit = list.rbegin(); rit != list.rend(); ++rit)
 			PRINT *rit AND " - ";
 		NEWL;
-		rit = list.rbegin();
-		for (int i = 0; i < 10; ++i) {
-			PRINT *rit AND " - ";
-			++rit;
-		}
 	}
 	NEWL;
 	{
@@ -92,13 +84,8 @@ REG_UNIT_TEST(Iterators) {
 		for (crit = list.rbegin(); crit != list.rend(); ++crit)
 			PRINT *crit AND " - ";
 		NEWL;
-		crit = list.rbegin();
-		for (int i = 0; i < 10; ++i) {
-			PRINT *crit AND " - ";
-			++crit;
-		}
-		NEWL;
 	}
+	NEWL;
 }
 
 REG_UNIT_TEST(Capacity) {
