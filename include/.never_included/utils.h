@@ -12,9 +12,7 @@
 typedef std::string str;
 typedef unsigned int uint;
 
-# define CREF const&
-# define REF &
-# define PTR *
+
 # define TEMPLATE(...) template <__VA_ARGS__>
 # define TEMPLATE_T TEMPLATE(typename T)
 # define TEMPLATE_TU TEMPLATE(typename T, typename U)

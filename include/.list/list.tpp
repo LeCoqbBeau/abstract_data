@@ -24,7 +24,7 @@ template <typename InputIterator>
 ft::list<T, Allocator>::list(InputIterator first, InputIterator last, allocator_type CREF allocator)
 	: base_type(allocator)
 {
-	DoInsert(&internalNode(), first, last, traits::is_integral<InputIterator>());
+	DoInsert(&internalNode(), first, last, ft::is_integral<InputIterator>());
 }
 
 
@@ -32,7 +32,7 @@ template <class T, class Allocator>
 ft::list<T, Allocator>::list(this_type CREF other)
 	: base_type(other.internalAllocator())
 {
-	DoInsert(&internalNode(), const_iterator(other.internalNode().mpNext), const_iterator(&other.internalNode()), traits::false_type());
+	DoInsert(&internalNode(), const_iterator(other.internalNode().mpNext), const_iterator(&other.internalNode()), ft::false_type());
 }
 
 
@@ -40,7 +40,7 @@ template <class T, class Allocator>
 typename ft::list<T, Allocator>::this_type REF
 ft::list<T, Allocator>::operator = (this_type CREF other) {
 	if (this != &other)
-		DoAssign(other.begin(), other.end(), traits::false_type());
+		DoAssign(other.begin(), other.end(), ft::false_type());
 	return *this;
 }
 
@@ -70,7 +70,7 @@ template <class T, class Allocator>
 template <typename InputIterator>
 void ft::list<T, Allocator>::assign(InputIterator first, InputIterator last)
 {
-	DoAssign(first, last, traits::is_integral<InputIterator>());
+	DoAssign(first, last, ft::is_integral<InputIterator>());
 }
 
 
@@ -491,7 +491,7 @@ void ft::list<T, Allocator>::unique(BinaryPredicate predicate)
 template <typename T, typename Allocator>
 void ft::list<T, Allocator>::sort()
 {
-	ft::func::less<value_type> compare;
+	ft::less<value_type> compare;
 	DoSort(begin(), end(), size(), compare);
 }
 
@@ -515,7 +515,7 @@ ft::list<T, Allocator>::DoCreateNode(value_type CREF value)
 
 template <typename T, typename Allocator>
 template <typename Integer>
-void ft::list<T, Allocator>::DoAssign(Integer n, Integer value, traits::true_type)
+void ft::list<T, Allocator>::DoAssign(Integer n, Integer value, ft::true_type)
 {
 	DoAssignValues(static_cast<size_type>(n), static_cast<value_type>(value));
 }
@@ -523,7 +523,7 @@ void ft::list<T, Allocator>::DoAssign(Integer n, Integer value, traits::true_typ
 
 template <class T, class Allocator>
 template <typename Integer>
-void ft::list<T, Allocator>::DoInsert(ListNodeBase *pNode, Integer n, Integer value, traits::true_type)
+void ft::list<T, Allocator>::DoInsert(ListNodeBase *pNode, Integer n, Integer value, ft::true_type)
 {
 	DoInsertValues(pNode, static_cast<size_type>(n), static_cast<value_type>(value));
 }
@@ -531,7 +531,7 @@ void ft::list<T, Allocator>::DoInsert(ListNodeBase *pNode, Integer n, Integer va
 
 template <typename T, typename Allocator>
 template <typename InputIterator>
-void ft::list<T, Allocator>::DoAssign(InputIterator first, InputIterator last, traits::false_type)
+void ft::list<T, Allocator>::DoAssign(InputIterator first, InputIterator last, ft::false_type)
 {
 	node_type *pNode = static_cast<node_type*>(internalNode().mpNext);
 
@@ -544,7 +544,7 @@ void ft::list<T, Allocator>::DoAssign(InputIterator first, InputIterator last, t
 	if (first == last)
 		erase(iterator(pNode), &internalNode());
 	else
-		DoInsert(&internalNode(), first, last, traits::false_type());
+		DoInsert(&internalNode(), first, last, ft::false_type());
 }
 
 
@@ -568,7 +568,7 @@ void ft::list<T, Allocator>::DoAssignValues(size_type n, value_type CREF value)
 
 template <class T, class Allocator>
 template <typename InputIterator>
-void ft::list<T, Allocator>::DoInsert(ListNodeBase *pNode, InputIterator first, InputIterator last, traits::false_type)
+void ft::list<T, Allocator>::DoInsert(ListNodeBase *pNode, InputIterator first, InputIterator last, ft::false_type)
 {
 	for (; first != last; ++first)
 		DoInsertValue(pNode, *first);

@@ -23,6 +23,7 @@ namespace internal {
 template <typename Iterator, class = void>
 struct default_iterator_traits {};
 
+
 template <typename Iterator>
 struct default_iterator_traits<
 	Iterator,
@@ -184,6 +185,7 @@ typename ft::reverse_iterator<Iter>::difference_type operator - ( ft::reverse_it
 	return rhs.base() - lhs.base();
 }
 
+
 // Functions
 template <typename InputIterator>
 typename ft::iterator_traits<InputIterator>::difference_type
@@ -261,7 +263,7 @@ struct advance_bi_impl<true>
 template <typename BidirectionalIterator, typename Distance>
 void advance_impl(BidirectionalIterator& i, Distance n, ft::bidirectional_iterator_tag)
 {
-	advance_bi_impl<traits::is_signed<Distance>::value>::advance_impl(i, n);
+	advance_bi_impl<ft::is_signed<Distance>::value>::advance_impl(i, n);
 }
 
 

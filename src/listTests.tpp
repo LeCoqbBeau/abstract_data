@@ -8,7 +8,7 @@
 #include <algorithm>
 #include <fstream>
 
-#include ".helper/utils.h"
+#include "../include/.never_included/utils.h"
 
 TEMPLATE(class func) void benchmark(func f) {
 	clock_t const start = clock();
