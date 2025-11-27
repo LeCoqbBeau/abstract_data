@@ -27,20 +27,17 @@
 # define REF &
 #endif
 
+#ifndef FT_NOMINMAX
+# define FT_NOMINMAX 1
+#endif
+
 # include <string>	// for std::string, might implement ft::string later
-# include <memory>	// for std::allocator, might implement ft::allocator later
-					// subjects ask for use of std::allocator ??? what does it mean?
 
 namespace ft {
 
 typedef long int	ptrdiff_t;
-
 typedef size_t		size_t;
-
 typedef std::string	string;
-typedef ft::string	str;
-
-# define FT_ALLOCATOR(T) std::allocator<T>
 
 }
 

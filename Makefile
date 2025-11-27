@@ -6,7 +6,7 @@ NAME			=	abstract_data
 
 INC				=	include
 
-INCLUDES		=	$(foreach d, $(INC), -I$d)
+INCLUDES		=	-I$(INC)#$(foreach d, $(INC), -I$d)
 
 CFLAGS			=	$(INCLUDES) -Wall -Werror -Wextra -g -std=c++98 -MMD -MP
 CXX				=	c++

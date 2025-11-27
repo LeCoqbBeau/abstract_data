@@ -80,14 +80,6 @@ class underflow_error : public exception {
 };
 
 
-class bad_alloc : public exception {
-	public:
-		explicit bad_alloc(str CREF error = "ft::bad_alloc") FT_NOTHROW : exception(error) {}
-		bad_alloc(bad_alloc CREF src) FT_NOTHROW : exception(src) {}
-		bad_alloc REF operator = (bad_alloc CREF rhs) FT_NOTHROW {if(this!=&rhs)mError=rhs.mError;return *this;}
-};
-
-
 }
 
 #endif //FTEXCEPT_H
