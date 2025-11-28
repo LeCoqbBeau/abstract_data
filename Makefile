@@ -41,4 +41,10 @@ fclean: clean
 
 re: fclean all
 
+run:
+	./$(NAME)
+
+bear:
+	bear -- make
+
 -include $(DEPS)

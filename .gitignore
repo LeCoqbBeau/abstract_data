@@ -3,4 +3,6 @@
 abstract_data
 obj/
 output.txt
+.cache/
+compile_commands.json
 *.diff
