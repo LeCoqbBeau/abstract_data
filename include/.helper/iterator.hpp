@@ -5,8 +5,8 @@
 #ifndef ITERATOR_H
 #define ITERATOR_H
 
-#include "ftdef.h"
-#include "type_traits.h"
+#include "ftdef.hpp"
+#include "type_traits.hpp"
 
 namespace ft {
 
@@ -76,7 +76,7 @@ struct iterator_traits<T const*>
 template<
 	class Category,
 	class T,
-	class Distance = ptrdiff_t,
+	class Distance = ft::ptrdiff_t,
 	class Pointer = T*,
 	class Reference = T REF
 > struct iterator {

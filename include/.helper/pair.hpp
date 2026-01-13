@@ -5,7 +5,7 @@
 #ifndef PAIR_H
 #define PAIR_H
 
-#include "ftdef.h"
+#include "ftdef.hpp"
 
 namespace ft {
 
@@ -34,6 +34,7 @@ struct pair {
 	second_type CREF second() const FT_NOTHROW { return mSecond; };
 
 };
+
 
 template <class T1, class T2>
 ft::pair<T1, T2> make_pair(T1 x, T2 y);
@@ -87,7 +88,7 @@ ft::pair<T1, T2> REF ft::pair<T1, T2>::operator = (pair<U1, U2> CREF rhs) {
 	return *this;
 }
 
-// Non member functions
+// Non-member functions
 template <class T1, class T2>
 ft::pair<T1, T2> ft::make_pair(T1 x, T2 y) {
 	return pair<T1, T2>(x, y);

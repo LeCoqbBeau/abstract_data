@@ -6,7 +6,7 @@
 #define DEF_H
 
 #ifndef FT_NOTHROW
-# define FT_NOTHROW throw()
+	#define FT_NOTHROW throw()
 #endif
 
 #ifndef FT_LIKELY
@@ -20,15 +20,15 @@
 #endif
 
 #ifndef CREF
-# define CREF const&
+	#define CREF const&
 #endif
 
 #ifndef REF
-# define REF &
+	#define REF &
 #endif
 
 #ifndef FT_NOMINMAX
-# define FT_NOMINMAX 1
+	#define FT_NOMINMAX 1
 #endif
 
 # include <string>	// for std::string, might implement ft::string later
@@ -38,6 +38,7 @@ namespace ft {
 typedef long int	ptrdiff_t;
 typedef size_t		size_t;
 typedef std::string	string;
+typedef ft::string	str;
 
 }
 

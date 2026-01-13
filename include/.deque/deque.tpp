@@ -10,8 +10,8 @@
 TTA ft::deque<T, Allocator>::deque(allocator_type CREF alloc)
 	: _allocator(alloc), _size(0)
 {
-	_map = _map_allocator.allocate(INIT_MAP_SIZE);
-	for (int i = 0; i < INIT_MAP_SIZE; ++i)
+	_map = _map_allocator.allocate(DEQUE_ARRAY_SIZE);
+	for (int i = 0; i < DEQUE_ARRAY_SIZE; ++i)
 		_map_allocator.construct(_map + i, NULL)
 
 }

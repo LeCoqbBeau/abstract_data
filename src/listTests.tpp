@@ -38,7 +38,7 @@ TEMPLATE(class func) void benchmark(func f) {
 	PRINT "seconds)" ENDL ENDL;
 }
 
-#define MORE_BENCHMARK true
+#define MORE_BENCHMARK false
 
 #define REG_UNIT_TEST(test) TEMPLATE(class List) static void testList##test()
 
@@ -65,8 +65,9 @@ REG_UNIT_TEST(Iterators) {
 	{
 		PRINT YLW BOLD "const_iterator:" CENDL;
 		typename List::const_iterator cit;
-		for (cit = list.begin(); cit != list.end(); ++cit)
+		for (cit = list.begin(); cit != list.end(); ++cit) {
 			PRINT *cit AND " - ";
+		}
 		NEWL;
 	}
 	NEWL;

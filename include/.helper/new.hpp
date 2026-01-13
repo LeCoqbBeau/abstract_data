@@ -5,8 +5,8 @@
 #ifndef NEW_H
 #define NEW_H
 
-#include "ftdef.h"
-#include "exception.h"
+#include "ftdef.hpp"
+#include "exception.hpp"
 
 namespace ft
 {

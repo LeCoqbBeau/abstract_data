@@ -5,7 +5,7 @@
 #ifndef EXCEPTION_H
 #define EXCEPTION_H
 
-#include "ftdef.h"
+#include "ftdef.hpp"
 
 namespace ft {
 

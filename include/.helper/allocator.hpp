@@ -5,7 +5,7 @@
 #ifndef ALLOCATOR_H
 #define ALLOCATOR_H
 
-#include "ftdef.h"
+#include "ftdef.hpp"
 #include "new.h"
 #include "limits.h"
 

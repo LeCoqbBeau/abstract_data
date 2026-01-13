@@ -5,7 +5,7 @@
 #ifndef ALGORITHM_H
 #define ALGORITHM_H
 
-#include "ftdef.h"
+#include "ftdef.hpp"
 
 namespace ft {
 

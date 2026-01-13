@@ -1,16 +1,12 @@
 
 #include ".never_included/utils.h"
-#include "list.h"
+#include "list.hpp"
 #include <list>
 #include "./listTests.tpp"
 
 int main() {
-	PRINT "std::list<int>" ENDL;
-	benchmark(testLists<std::list<int> >);
-	NEWL;
-	PRINT "ft::list<int>" ENDL;
-	benchmark(testLists<ft::list<int> >);
-	
-	return 0;
+	// PRINT CYN "std::list" CENDL;
+	// benchmark(testLists<std::list<int> >);
+	// PRINT GRN "ft::list" CENDL;
+	// benchmark(testLists<ft::list<int> >);
 }
-
