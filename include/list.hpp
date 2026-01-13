@@ -27,31 +27,26 @@ struct _doublyLinkedList {
 
 
 template <class T, class TRef, class TPtr>
-struct _list_iterator
-	: public ft::iterator<
-		ft::bidirectional_iterator_tag,
-		T,
-		ft::ptrdiff_t,
-		TRef,
-		TPtr
-> {
+struct _listIterator
+	: public ft::iterator<ft::bidirectional_iterator_tag, T, ft::ptrdiff_t, TRef, TPtr>
+{
 	// Typedef
-	typedef _list_iterator<T, TRef, TPtr>				this_type;
+	typedef _listIterator<T, TRef, TPtr>				this_type;
 	typedef T											value_type;
 	typedef TRef										reference;
 	typedef TPtr										pointer;
 	typedef typename ft::list<value_type>::node_type	node_type;
 
 	// Constructor
-	explicit _list_iterator(node_type node = 0) : _currentNode(node) {};
-	_list_iterator(_list_iterator<T, T REF, T*> CREF rhs) : _currentNode(rhs._currentNode) {};
-	~_list_iterator() {};
+	explicit _listIterator(node_type node = 0) : _currentNode(node) {};
+	_listIterator(_listIterator<T, T REF, T*> CREF rhs) : _currentNode(rhs._currentNode) {};
+	~_listIterator() {};
 
 	// In/Equality Operator
 	template <class U, class URef, class UPtr>
-	bool operator == (_list_iterator<U, URef, UPtr> CREF rhs) { return this->_currentNode == rhs._currentNode; }
+	bool operator == (_listIterator<U, URef, UPtr> CREF rhs) { return this->_currentNode == rhs._currentNode; }
 	template <class U, class URef, class UPtr>
-	bool operator != (_list_iterator<U, URef, UPtr> CREF rhs) { return this->_currentNode != rhs._currentNode; }
+	bool operator != (_listIterator<U, URef, UPtr> CREF rhs) { return this->_currentNode != rhs._currentNode; }
 
 	// Dereference Operator
 	reference	operator  * () { return _currentNode->value; }
@@ -74,14 +69,14 @@ class list {
 		// Typedefs
 		typedef T										value_type;
 		typedef Allocator								allocator_type;
-		typedef	size_t									size_type;
-		typedef ptrdiff_t								difference_type;
+		typedef	ft::size_t								size_type;
+		typedef ft::ptrdiff_t							difference_type;
 		typedef typename Allocator::reference			reference;
 		typedef typename Allocator::const_reference		const_reference;
 		typedef typename Allocator::pointer				pointer;
 		typedef typename Allocator::const_pointer		const_pointer;
-		typedef _list_iterator<T, T REF, T*>			iterator;
-		typedef _list_iterator<T, T CREF, T const*>		const_iterator;
+		typedef _listIterator<T, T REF, T*>			iterator;
+		typedef _listIterator<T, T CREF, T const*>		const_iterator;
 		typedef ft::reverse_iterator<iterator>			reverse_iterator;
 		typedef ft::reverse_iterator<const_iterator>	const_reverse_iterator;
 		typedef _doublyLinkedList<value_type>*			node_type;
