@@ -40,6 +40,9 @@ typedef size_t		size_t;
 typedef std::string	string;
 typedef ft::string	str;
 
+template <typename T>
+struct allocator : public std::allocator<T> {};
+
 }
 
 #endif //DEF_H

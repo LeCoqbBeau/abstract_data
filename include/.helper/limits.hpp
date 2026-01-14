@@ -10,7 +10,7 @@
 namespace ft
 {
 
-template<class T> class numeric_limits : public std::numeric_limits<T> {};
+template<class T> struct numeric_limits : public std::numeric_limits<T> {};
 
 }
 

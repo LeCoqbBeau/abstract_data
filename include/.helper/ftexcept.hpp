@@ -5,7 +5,7 @@
 #ifndef FTEXCEPT_H
 #define FTEXCEPT_H
 
-#include ".helper/exception.h"
+#include "exception.hpp"
 
 namespace ft {
 

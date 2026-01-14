@@ -38,15 +38,15 @@ struct _listIterator
 	typedef typename ft::list<value_type>::node_type	node_type;
 
 	// Constructor
-	explicit _listIterator(node_type node = 0) : _currentNode(node) {};
-	_listIterator(_listIterator<T, T REF, T*> CREF rhs) : _currentNode(rhs._currentNode) {};
-	~_listIterator() {};
+	explicit	_listIterator(node_type node = 0) : _currentNode(node) {};
+				_listIterator(_listIterator<T, T REF, T*> CREF rhs) : _currentNode(rhs._currentNode) {};
+				~_listIterator() {};
 
 	// In/Equality Operator
 	template <class U, class URef, class UPtr>
-	bool operator == (_listIterator<U, URef, UPtr> CREF rhs) { return this->_currentNode == rhs._currentNode; }
+	bool operator	== (_listIterator<U, URef, UPtr> CREF rhs) { return this->_currentNode == rhs._currentNode; }
 	template <class U, class URef, class UPtr>
-	bool operator != (_listIterator<U, URef, UPtr> CREF rhs) { return this->_currentNode != rhs._currentNode; }
+	bool operator	!= (_listIterator<U, URef, UPtr> CREF rhs) { return this->_currentNode != rhs._currentNode; }
 
 	// Dereference Operator
 	reference	operator  * () { return _currentNode->value; }
@@ -75,7 +75,7 @@ class list {
 		typedef typename Allocator::const_reference		const_reference;
 		typedef typename Allocator::pointer				pointer;
 		typedef typename Allocator::const_pointer		const_pointer;
-		typedef _listIterator<T, T REF, T*>			iterator;
+		typedef _listIterator<T, T REF, T*>				iterator;
 		typedef _listIterator<T, T CREF, T const*>		const_iterator;
 		typedef ft::reverse_iterator<iterator>			reverse_iterator;
 		typedef ft::reverse_iterator<const_iterator>	const_reverse_iterator;
@@ -145,7 +145,7 @@ class list {
 
 	protected:
 		// Typedef
-		typedef typename Allocator::template rebind<_doublyLinkedList<value_type> >::other _nodeAllocator;
+		typedef typename allocator_type::template rebind<_doublyLinkedList<value_type> >::other _nodeAllocator;
 
 		// Helper methods
 		node_type									_createNode() const;
@@ -182,10 +182,10 @@ void swap(list<T, Allocator> REF x, list<T, Allocator> REF y) {
 }
 
 
-# define LIST_RELATIONAL_OPERATOR(op) template <class T, class Allocator> bool operator op					\
+# define LIST_COMPARISON_OPERATOR(op) template <class T, class Allocator> bool operator op					\
 										(ft::list<T, Allocator> CREF lhs, ft::list<T, Allocator> CREF rhs)
 
-LIST_RELATIONAL_OPERATOR(==) {
+LIST_COMPARISON_OPERATOR(==) {
 	typedef typename ft::list<T, Allocator>::iterator iterator;
 	iterator	leftIt = lhs.begin();
 	iterator	rightIt = rhs.begin();
@@ -199,12 +199,12 @@ LIST_RELATIONAL_OPERATOR(==) {
 }
 
 
-LIST_RELATIONAL_OPERATOR(!=) {
+LIST_COMPARISON_OPERATOR(!=) {
 	return !(lhs == rhs);
 }
 
 
-LIST_RELATIONAL_OPERATOR(<) {
+LIST_COMPARISON_OPERATOR(<) {
 	typedef typename ft::list<T, Allocator>::iterator iterator;
 	iterator	leftIt = lhs.begin();
 	iterator	rightIt = rhs.begin();
@@ -218,22 +218,22 @@ LIST_RELATIONAL_OPERATOR(<) {
 }
 
 
-LIST_RELATIONAL_OPERATOR(<=) {
+LIST_COMPARISON_OPERATOR(<=) {
 	return !(rhs < lhs);
 }
 
 
-LIST_RELATIONAL_OPERATOR(>) {
+LIST_COMPARISON_OPERATOR(>) {
 	return (rhs < lhs);
 }
 
 
-LIST_RELATIONAL_OPERATOR(>=) {
+LIST_COMPARISON_OPERATOR(>=) {
 	return !(lhs < rhs);
 }
 
 
-# undef LIST_RELATIONAL_OPERATOR
+# undef LIST_COMPARISON_OPERATOR
 
 #include ".containers/list.tpp"
 
