@@ -32,10 +32,9 @@ template <class InputIt>
 ft::list<T, Allocator>::list(InputIt first, InputIt last, allocator_type CREF alloc)
 	: _sentinel(_createNode()), _allocator(alloc)
 {
-	typedef typename ft::is_integral<InputIt>::type is_integral;
 	_sentinel->next = _sentinel;
 	_sentinel->prev = _sentinel;
-	_assignHelper(first, last, is_integral());
+	_assignHelper(first, last, ft::is_integral<InputIt>());
 }
 
 
@@ -173,9 +172,8 @@ void ft::list<T, Allocator>::assign(size_type count, value_type CREF value) {
 template <class T, class Allocator>
 template <class InputIt>
 void ft::list<T, Allocator>::assign(InputIt first, InputIt last) {
-	typedef typename ft::is_integral<InputIt>::type is_integral;
 	_clearHelper();
-	_assignHelper(first, last, is_integral());
+	_assignHelper(first, last, ft::is_integral<InputIt>());
 }
 
 
@@ -248,9 +246,8 @@ ft::list<T, Allocator>::insert(iterator position, size_type count, value_type CR
 template <class T, class Allocator>
 template<class InputIt> typename ft::list<T, Allocator>::iterator
 ft::list<T, Allocator>::insert(iterator position, InputIt first, InputIt last) {
-	typedef typename ft::is_integral<InputIt>::type is_integral;
 	list tmp(_allocator);
-	tmp._assignHelper(first, last, is_integral());
+	tmp._assignHelper(first, last, ft::is_integral<InputIt>());
 	iterator ret = _insertHelper(position, tmp);
 	return ret;
 }

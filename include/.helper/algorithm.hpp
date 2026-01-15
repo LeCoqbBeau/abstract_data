@@ -86,7 +86,7 @@ T CREF clamp(
 }
 
 
-template<class InputIt, class T>
+template <class InputIt, class T>
 InputIt find(
 	InputIt first,
 	InputIt last,
@@ -99,7 +99,7 @@ InputIt find(
 }
 
 
-template<class InputIt, class UnaryPred>
+template <class InputIt, class UnaryPred>
 InputIt find_if(
 	InputIt first,
 	InputIt last,
@@ -112,7 +112,7 @@ InputIt find_if(
 }
 
 
-template< class ForwardIt, class T >
+template <class ForwardIt, class T>
 ForwardIt remove(
 	ForwardIt first,
 	ForwardIt last,
@@ -126,7 +126,7 @@ ForwardIt remove(
 }
 
 
-template< class ForwardIt, class UnaryPred >
+template <class ForwardIt, class UnaryPred>
 ForwardIt remove_if(
 	ForwardIt first,
 	ForwardIt last,
@@ -140,7 +140,7 @@ ForwardIt remove_if(
 }
 
 
-template< class ForwardIt >
+template <class ForwardIt>
 ForwardIt unique(ForwardIt first, ForwardIt last) {
 	if (first == last)
 		return last;
@@ -153,7 +153,7 @@ ForwardIt unique(ForwardIt first, ForwardIt last) {
 }
 
 
-template< class ForwardIt, class BinaryPred >
+template <class ForwardIt, class BinaryPred>
 ForwardIt unique(
 	ForwardIt first,
 	ForwardIt last,
@@ -170,7 +170,7 @@ ForwardIt unique(
 }
 
 
-template<class InputIt, class OutputIt>
+template <class InputIt, class OutputIt>
 OutputIt copy(
 	InputIt first,
 	InputIt last,
@@ -182,7 +182,7 @@ OutputIt copy(
 }
 
 
-template<class InputIt, class Size, class OutputIt>
+template <class InputIt, class Size, class OutputIt>
 OutputIt copy_n(
 	InputIt first,
 	Size count,
@@ -196,6 +196,59 @@ OutputIt copy_n(
 			*result = *++first;
 	}
 	return result;
+}
+
+
+template <class ForwardIt, class T>
+void fill(
+	ForwardIt first,
+	ForwardIt last,
+	T CREF value
+) {
+	for (; first != last; ++first)
+		*first = value;
+}
+
+
+template <class OutputIt, class Size, class T>
+OutputIt fill_n(OutputIt first, Size count, T CREF value)
+{
+	for (Size i = 0; i < count; ++i)
+		*first++ = value;
+	return first;
+}
+
+
+template <class InputIterator1, class InputIterator2>
+bool equal(
+	InputIterator1 first1,
+	InputIterator1 last1,
+	InputIterator2 first2
+) {
+	while (first1!=last1) {
+		if (!(*first1 == *first2))
+			return false;
+		++first1;
+		++first2;
+	}
+	return true;
+}
+
+
+template <class InputIterator1, class InputIterator2, class BinaryPred>
+bool equal(
+	InputIterator1 first1,
+	InputIterator1 last1,
+	InputIterator2 first2,
+	BinaryPred pred
+) {
+	while (first1!=last1) {
+		if (!pred(*first1,*first2))
+			return false;
+		++first1;
+		++first2;
+	}
+	return true;
 }
 
 

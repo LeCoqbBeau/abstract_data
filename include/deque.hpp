@@ -5,12 +5,14 @@
 #ifndef DEQUE_H
 #define DEQUE_H
 
+#include ".helper/algorithm.hpp"
 #include ".helper/ftdef.hpp"
 #include ".helper/iterator.hpp"
 #include ".helper/type_traits.hpp"
 
 # define DEQUE_ARRAY_SIZE 16
 # define DEQUE_INIT_ARRAY_NUM 8
+# define DEQUE_AT_EXCEPTION_MSG ("deque::at(): index n out of range")
 
 namespace ft
 {
@@ -39,14 +41,14 @@ struct _dequeIterator
 	pointer		operator		->() { return current; }
 
 	// Shift Operators
-	this_type REF	operator	++();
-	this_type		operator	++(int);
-	this_type REF	operator	+=(difference_type n);
-	this_type		operator	+ (difference_type n);
-	this_type REF	operator	--();
-	this_type		operator	--(int);
-	this_type REF	operator	-=(difference_type n);
-	this_type		operator	- (difference_type n);
+	this_type REF	operator	++ ();
+	this_type		operator	++ (int);
+	this_type REF	operator	+= (difference_type n);
+	this_type		operator	+  (difference_type n);
+	this_type REF	operator	-- ();
+	this_type		operator	-- (int);
+	this_type REF	operator	-= (difference_type n);
+	this_type		operator	-  (difference_type n);
 
 	// Attributes
 	value_type*		current;	// Current element in buffer
@@ -74,11 +76,11 @@ class deque {
 		typedef ft::reverse_iterator<const_iterator>	const_reverse_iterator;
 
 		// Constructor
-		explicit deque(allocator_type CREF allocator = allocator_type());
-		explicit deque(size_type n, value_type CREF val = value_type(), allocator_type CREF allocator = allocator_type());
-		//template <typename InputIt> deque(InputIt first, InputIt last, allocator_type CREF allocator = allocator_type());
-		deque(deque CREF rhs);
-		deque REF operator = (deque CREF rhs);
+		explicit					deque(allocator_type CREF allocator = allocator_type());
+		explicit					deque(size_type n, value_type CREF val = value_type(), allocator_type CREF allocator = allocator_type());
+		template <typename InputIt>	deque(InputIt first, InputIt last, allocator_type CREF allocator = allocator_type());
+									deque(deque CREF rhs);
+		deque REF operator			= (deque CREF rhs);
 		~deque();
 
 		// Iterators
@@ -91,29 +93,59 @@ class deque {
 		reverse_iterator		rend();
 		const_reverse_iterator	rend() const;
 
+		// Capacity
+		size_type	size() const;
+		size_type	max_size() const;
+		void		resize(size_type n, value_type CREF val = value_type());
+		bool		empty() const;
+
 		// Element Access
-		reference		front();
-		const_reference	front() const;
-		reference		back();
-		const_reference	back() const;
+		reference		operator	[] (size_type n);
+		const_reference operator	[] (size_type n) const;
+		reference 					at(size_type n);
+		const_reference 			at(size_type n) const;
+		reference					front();
+		const_reference				front() const;
+		reference					back();
+		const_reference				back() const;
 
 		// Modifiers
-		void	push_back(value_type CREF val);
-		void	push_front(value_type CREF val);
+		void								assign(size_type n, value_type CREF value);
+		template <typename InputIt> void	assign(InputIt first, InputIt last);
+		void								push_back(value_type CREF value);
+		void								push_front(value_type CREF value);
+		void								pop_back();
+		void								pop_front();
+		// iterator							insert(iterator position, value_type CREF value);
+		// void								insert(iterator position, size_type count, value_type CREF value);
+		// template <typename InputIt> void	insert(iterator position, InputIt first, InputIt last);
+		// iterator							erase(iterator position);
+		// iterator							erase(iterator first, iterator last);
+		void								swap(deque REF other);
+		void								clear();
+
+		// Allocator
+		allocator_type	get_allocator() const;
 
 	public:
 		// Typedefs
 		typedef typename allocator_type::template rebind<value_type*>::other _mapAllocator_type;
 
 		// Helper Functions
-		void					_init(size_type size);
-		void					_assignHelper(size_type n, value_type CREF val, ft::true_type);
-		void					_expandBack();
-		void					_expandFront();
-		void					_clearHelper();
-		value_type**			_allocateMap(size_type n);
-		value_type*				_allocateBuffer();
-		void					_reallocateMap(size_type n);
+		void									_init(size_type size);
+		void									_assignHelper(size_type n, value_type CREF val, ft::true_type);
+		template <typename InputIt> void		_assignHelper(InputIt first, InputIt last, ft::false_type);
+		void									_expandBack();
+		void									_expandFront();
+		void									_reserveBack(size_type n);
+		void									_reserveFront(size_type n);
+		// iterator								_insertHelper(iterator pos, value_type CREF val);
+		// iterator								_insertHelper(iterator pos, size_type n, value_type CREF val, ft::true_type);
+		// template <typename InputIt> iterator	_insertHelper(iterator pos, InputIt first, InputIt last, ft::false_type);
+		void									_clearHelper();
+		value_type**							_allocateMap(size_type n);
+		value_type*								_allocateBuffer();
+		void									_reallocateMap(size_type n);
 
 		// Attributes
 		value_type**			_map;
@@ -127,8 +159,58 @@ class deque {
 };
 
 
+template <typename T, typename Allocator>
+void swap(ft::deque<T, Allocator> x, ft::deque<T, Allocator> y) {
+	x.swap(y);
 }
 
+
+}
+
+
+# define DEQUE_COMPARISON_OPERATOR(op) template <class T, class Allocator> bool operator op						\
+												(ft::deque<T, Allocator> CREF lhs, ft::deque<T, Allocator> CREF rhs)
+
+DEQUE_COMPARISON_OPERATOR(==) {
+	if (lhs.size() != rhs.size())
+		return false;
+	return ft::equal(lhs.begin(), lhs.end(), rhs.begin());
+}
+
+
+DEQUE_COMPARISON_OPERATOR(!=) {
+	return !(lhs == rhs);
+}
+
+
+DEQUE_COMPARISON_OPERATOR(<) {
+	return ft::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
+}
+
+
+DEQUE_COMPARISON_OPERATOR(<=) {
+	return !(rhs < lhs);
+}
+
+
+DEQUE_COMPARISON_OPERATOR(>) {
+	return (rhs < lhs);
+}
+
+
+DEQUE_COMPARISON_OPERATOR(>=) {
+	return !(lhs < rhs);
+}
+
+
+#undef DEQUE_COMPARISON_OPERATOR
+
+
 #include ".containers/deque.tpp"
+
+
+#undef DEQUE_ARRAY_SIZE
+#undef DEQUE_INIT_ARRAY_NUM
+#undef DEQUE_AT_EXCEPTION_MSG
 
 #endif //DEQUE_H
