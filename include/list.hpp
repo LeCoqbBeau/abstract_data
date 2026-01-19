@@ -1,5 +1,5 @@
-#ifndef LIST_H
-#define LIST_H
+#ifndef LIST_HPP
+#define LIST_HPP
 
 #include ".helper/ftdef.hpp"
 #include ".helper/iterator.hpp"
@@ -237,4 +237,4 @@ LIST_COMPARISON_OPERATOR(>=) {
 
 #include ".containers/list.tpp"
 
-#endif //LIST_H
+#endif //LIST_HPP

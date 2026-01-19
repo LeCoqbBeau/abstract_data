@@ -2,8 +2,8 @@
 // Created by mscheman on 10/27/25.
 //
 
-#ifndef DEQUE_H
-#define DEQUE_H
+#ifndef DEQUE_HPP
+#define DEQUE_HPP
 
 #include ".helper/ftdef.hpp"
 #include ".helper/algorithm.hpp"
@@ -212,4 +212,4 @@ DEQUE_COMPARISON_OPERATOR(>=) {
 #undef DEQUE_INIT_ARRAY_NUM
 #undef DEQUE_AT_EXCEPTION_MSG
 
-#endif //DEQUE_H
+#endif //DEQUE_HPP
