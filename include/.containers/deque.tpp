@@ -161,9 +161,6 @@ operator - (TWO_DEQUEIT_PARAMETERS) {
 
 // Public Members
 // Constructor
-
-
-
 template <typename T, typename Allocator>
 ft::deque<T, Allocator>::deque(allocator_type CREF allocator)
 	: _allocator(allocator)
@@ -469,7 +466,7 @@ ft::deque<T, Allocator>::erase(iterator position) {
 		return _start + elemBefore - 1;
 	}
 	try {
-	ft::rcopy(_end - elemAfter, _end, _end - 1);
+		ft::rcopy(_end - elemAfter, _end, _end - 1);
 	} catch (...) { return _end; }
 	pop_back();
 	return _start + posIndex;

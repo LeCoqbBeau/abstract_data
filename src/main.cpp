@@ -12,13 +12,18 @@ struct Loud
 	int i;
 };
 
-// template <typename T>
-// void joblyContainer(T CREF container) {
-// 	for (__auto_type it = container.begin(); it != container.end(); ++it)
-// 		it->jobly();
-// }
+template <typename T>
+void joblyContainer(T CREF container) {
+	for (__auto_type it = container.begin(); it != container.end(); ++it)
+		it->jobly();
+}
+
+#include <vector>
 
 int main() {
+	std::vector<Loud> vector(10, 10);
 
+	vector.insert(vector.end(), 15);
+	joblyContainer(vector);
 }
 

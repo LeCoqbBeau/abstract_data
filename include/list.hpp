@@ -71,8 +71,8 @@ class list {
 		typedef Allocator								allocator_type;
 		typedef	ft::size_t								size_type;
 		typedef ft::ptrdiff_t							difference_type;
-		typedef typename Allocator::reference			reference;
-		typedef typename Allocator::const_reference		const_reference;
+		typedef value_type REF							reference;
+		typedef value_type CREF							const_reference;
 		typedef typename Allocator::pointer				pointer;
 		typedef typename Allocator::const_pointer		const_pointer;
 		typedef _listIterator<T, T REF, T*>				iterator;
