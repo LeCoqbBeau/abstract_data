@@ -5,9 +5,8 @@
 #ifndef DEQUE_TPP
 #define DEQUE_TPP
 
-#include ".never_included/utils.h"
-#include ".helper/algorithm.hpp"
 #include ".helper/ftexcept.hpp"
+#include ".helper/new.hpp"
 
 //	//
 //	//	ft::_dequeIterator<T, TRef, TPtr>
@@ -89,7 +88,7 @@ ft::_dequeIterator<T, TRef, TPtr>::operator -- () {
 	if (FT_UNLIKELY(current == begin)) {
 		begin = *--map;
 		end = begin + DEQUE_ARRAY_SIZE;
-		current = end - 1;
+		current = end;
 	}
 	--current;
 	return *this;
@@ -162,6 +161,9 @@ operator - (TWO_DEQUEIT_PARAMETERS) {
 
 // Public Members
 // Constructor
+
+
+
 template <typename T, typename Allocator>
 ft::deque<T, Allocator>::deque(allocator_type CREF allocator)
 	: _allocator(allocator)
@@ -201,9 +203,9 @@ ft::deque<T, Allocator> REF ft::deque<T, Allocator>::operator = (deque CREF rhs)
 		// Cleanups before allocating
 		if (_map)
 			_clearHelper();
-		_map = 0;
+		_map = NULL;
 		// Copy basic attributes
-		_allocator = rhs._allocator;
+		_allocator = rhs._allocator;	// can throw, shouldn't throw
 		_mapSize = rhs._mapSize;
 		_map = _allocateMap(_mapSize);
 		size_type const elemNum = rhs.size();
@@ -215,16 +217,21 @@ ft::deque<T, Allocator> REF ft::deque<T, Allocator>::operator = (deque CREF rhs)
 			&_map[startOffset / DEQUE_ARRAY_SIZE][startOffset % DEQUE_ARRAY_SIZE - 1]
 		);
 		_end = _start;
-		for (const_iterator it = rhs.begin(); it != rhs._end; ++it)
-			push_back(*it);
+		// Copy content
+		try {
+			for (const_iterator it = rhs.begin(); it != rhs._end; ++it)
+				push_back(*it);			// can throw, shouldn't throw
+		} catch (...) {
+			while (_start != _end)
+				pop_back();
+		}
 	}
 	return *this;
 }
 
 
 template <typename T, typename Allocator>
-ft::deque<T, Allocator>::~deque()
-{
+ft::deque<T, Allocator>::~deque() {
 	_clearHelper();
 }
 
@@ -238,7 +245,7 @@ typename ft::deque<T, Allocator>::iterator ft::deque<T, Allocator>::begin() {
 
 template <class T, class Allocator>
 typename ft::deque<T, Allocator>::const_iterator ft::deque<T, Allocator>::begin() const {
-	return const_iterator(_start).operator++();
+	return const_iterator(_start);
 }
 
 
@@ -294,11 +301,11 @@ typename ft::deque<T, Allocator>::size_type ft::deque<T, Allocator>::max_size() 
 template <typename T, typename Allocator>
 void ft::deque<T, Allocator>::resize(size_type n, value_type CREF val) {
 	if (n > size())
-		for (size_type i = size(); i < n; ++i)
-			push_back(val);
+			for (size_type i = size(); i < n; ++i)
+				push_back(val); // this can throw :D
 	else
 		for (size_type i = size() - 1; i > n; --i)
-			pop_back();
+			pop_back(); // this never throws
 }
 
 
@@ -324,7 +331,8 @@ ft::deque<T, Allocator>::operator [] (size_type n) const {
 
 
 template <class T, class Allocator>
-typename ft::deque<T, Allocator>::reference ft::deque<T, Allocator>::at(size_type n) {
+typename ft::deque<T, Allocator>::reference
+ft::deque<T, Allocator>::at(size_type n) {
 	if (n >= size())
 		throw ft::out_of_range(DEQUE_AT_EXCEPTION_MSG);
 	return operator[](n);
@@ -332,7 +340,8 @@ typename ft::deque<T, Allocator>::reference ft::deque<T, Allocator>::at(size_typ
 
 
 template <class T, class Allocator>
-typename ft::deque<T, Allocator>::const_reference ft::deque<T, Allocator>::at(size_type n) const {
+typename ft::deque<T, Allocator>::const_reference
+ft::deque<T, Allocator>::at(size_type n) const {
 	if (n > size())
 		throw ft::out_of_range(DEQUE_AT_EXCEPTION_MSG);
 	return operator[](n);
@@ -340,25 +349,29 @@ typename ft::deque<T, Allocator>::const_reference ft::deque<T, Allocator>::at(si
 
 
 template <class T, class Allocator>
-typename ft::deque<T, Allocator>::reference ft::deque<T, Allocator>::front() {
+typename ft::deque<T, Allocator>::reference
+ft::deque<T, Allocator>::front() {
 	return *_start.current;
 }
 
 
 template <class T, class Allocator>
-typename ft::deque<T, Allocator>::const_reference ft::deque<T, Allocator>::front() const {
+typename ft::deque<T, Allocator>::const_reference
+ft::deque<T, Allocator>::front() const {
 	return *_start.current;
 }
 
 
 template <class T, class Allocator>
-typename ft::deque<T, Allocator>::reference ft::deque<T, Allocator>::back() {
+typename ft::deque<T, Allocator>::reference
+ft::deque<T, Allocator>::back() {
 	return *(_end.current - 1);
 }
 
 
 template <class T, class Allocator>
-typename ft::deque<T, Allocator>::const_reference ft::deque<T, Allocator>::back() const {
+typename ft::deque<T, Allocator>::const_reference
+ft::deque<T, Allocator>::back() const {
 	return *(_end.current - 1);
 }
 
@@ -381,7 +394,8 @@ template <typename T, typename Allocator>
 void ft::deque<T, Allocator>::push_back(value_type CREF value) {
 	if (FT_UNLIKELY(_end.current == _end.end))
 		_expandBack();
-	_allocator.construct(_end.current++, value);
+	_allocator.construct(_end.current, value);
+	++_end.current;
 }
 
 
@@ -389,7 +403,8 @@ template <typename T, typename Allocator>
 void ft::deque<T, Allocator>::push_front(value_type CREF value) {
 	if (FT_UNLIKELY(_start.current == _start.begin - 1))
 		_expandFront();
-	_allocator.construct(_start.current--, value);
+	_allocator.construct(&(_start.current[-1]), value);
+	--_start.current;
 }
 
 
@@ -409,33 +424,93 @@ void ft::deque<T, Allocator>::pop_front() {
 }
 
 
-// template <class T, class Allocator>
-// typename ft::deque<T, Allocator>::iterator
-// ft::deque<T, Allocator>::insert(iterator position, value_type CREF value) {
-// 	if (FT_UNLIKELY(position.current == _start.current)) {
-// 		push_front(value);
-// 		return _start;
-// 	}
-// 	if (FT_UNLIKELY(position.current == _end.current)) {
-// 		push_back(value);
-// 		return --iterator(_end);
-// 	}
-// 	return _insertHelper(position, 1, value, ft::true_type());
-// }
-//
-//
-// template <class T, class Allocator>
-// typename ft::deque<T, Allocator>::iterator
-// ft::deque<T, Allocator>::insert(iterator position, size_type count, value_type CREF value) {
-// 	return _insertHelper(position, count, value, ft::true_type());
-// }
-//
-// template <class T, class Allocator>
-// template<class InputIt>
-// typename ft::deque<T, Allocator>::iterator
-// ft::deque<T, Allocator>::insert(iterator position, InputIt first, InputIt last) {
-// 	return _insertHelper(position, first, last, ft::is_integral<InputIt>());
-// }
+template <typename T, typename Allocator>
+typename ft::deque<T, Allocator>::iterator
+ft::deque<T, Allocator>::insert(iterator position, value_type CREF value) {
+	return _insertHelper(position, 1, value, ft::true_type());
+}
+
+
+template <class T, class Allocator>
+void ft::deque<T, Allocator>::insert(iterator position, size_type count, value_type CREF value) {
+	_insertHelper(position, count, value, ft::true_type());
+}
+
+
+template <class T, class Allocator>
+template<class InputIt>
+void ft::deque<T, Allocator>::insert(iterator position, InputIt first, InputIt last) {
+	_insertHelper(position, first, last, ft::is_integral<InputIt>());
+}
+
+
+template <typename T, typename Allocator>
+typename ft::deque<T, Allocator>::iterator
+ft::deque<T, Allocator>::erase(iterator position) {
+	size_type const posIndex	= position - _start;
+	size_type const elemBefore	= posIndex;
+	size_type const elemAfter	= size() - elemBefore - 1;
+
+	// Edge cases
+	if (FT_UNLIKELY(position.current == _start.current)) {
+		pop_front();
+		return _start;
+	}
+	if (FT_UNLIKELY(position == _end - 1)) {
+		pop_back();
+		return _end;
+	}
+
+	if (elemBefore < elemAfter) {
+		try {
+			ft::copy(_start, _start + elemBefore, _start + 1);
+		} catch (...) { return _end; }
+		pop_front();
+		return _start + elemBefore - 1;
+	}
+	try {
+	ft::rcopy(_end - elemAfter, _end, _end - 1);
+	} catch (...) { return _end; }
+	pop_back();
+	return _start + posIndex;
+}
+
+
+template <typename T, typename Allocator>
+typename ft::deque<T, Allocator>::iterator
+ft::deque<T, Allocator>::erase(iterator first, iterator last) {
+	size_type const posIndex	= first - _start;
+	size_type const n			= ft::distance(first, last);
+	size_type const elemBefore	= posIndex;
+	size_type const elemAfter	= size() - elemBefore - n;
+
+	// Edge cases
+	if (FT_UNLIKELY(first == _start)) {
+		while (first++ != last)
+			pop_front();
+		return _start;
+	}
+	if (FT_UNLIKELY(last == _end)) {
+		while (last-- != first)
+			pop_back();
+		return _end;
+	}
+
+	if (elemBefore < elemAfter) {
+		try {
+			ft::copy(_start, _start + elemBefore, _start + n);
+		} catch (...) { return _end; }
+		for (size_type i = 0; i < n; ++i)
+			pop_front();
+		return _start + elemBefore;
+	}
+	try {
+		ft::copy(_end - elemAfter, _end, _end - elemAfter - n);
+	} catch (...) { return _end; }
+	for (size_type i = 0; i < n; ++i)
+		pop_back();
+	return _start + posIndex;
+}
 
 
 template <typename T, typename Allocator>
@@ -446,13 +521,14 @@ void ft::deque<T, Allocator>::swap(deque REF other) {
 	ft::swap(_mapSize, other._mapSize);
 	ft::swap(_start, other._start);
 	ft::swap(_end, other._end);
+	ft::swap(_allocator, other._allocator);
 }
 
 
 template <typename T, typename Allocator>
 void ft::deque<T, Allocator>::clear() {
-	_clearHelper();
-	_init(DEQUE_INIT_ARRAY_NUM);
+	_clearHelper(true);
+	// _init(DEQUE_INIT_ARRAY_NUM);
 }
 
 
@@ -469,8 +545,8 @@ ft::deque<T, Allocator>::get_allocator() const {
 template <typename T, typename Allocator>
 void ft::deque<T, Allocator>::_init(size_type size) {
 	_map = _allocateMap(size);
+	_map[size / 2] = _allocateBuffer();
 	_mapSize = size;
-	_map[_mapSize / 2] = _allocateBuffer();
 	size_type startIdx = _mapSize / 2;
 	_start = iterator(&_map[startIdx], &_map[startIdx][DEQUE_ARRAY_SIZE / 2 - 1]);
 	_end = _start;
@@ -511,8 +587,8 @@ template <typename T, typename Allocator>
 void ft::deque<T, Allocator>::_expandBack() {
 	if (FT_UNLIKELY(_end.map == _map + _mapSize - 1))
 		_reallocateMap(_mapSize * 2);
+	_end.map[1] = _allocateBuffer();
 	++_end.map;
-	*_end.map = _allocateBuffer();
 	_end.current = *_end.map;
 	_end.begin = _end.current;
 	_end.end = _end.begin + DEQUE_ARRAY_SIZE;
@@ -523,8 +599,8 @@ template <typename T, typename Allocator>
 void ft::deque<T, Allocator>::_expandFront() {
 	if (FT_UNLIKELY(_start.map == _map))
 		_reallocateMap(_mapSize * 2);
+	_start.map[-1] = _allocateBuffer();
 	--_start.map;
-	*_start.map = _allocateBuffer();
 	_start.current = *_start.map + DEQUE_ARRAY_SIZE - 1;
 	_start.begin = *_start.map;
 	_start.end = _start.begin + DEQUE_ARRAY_SIZE;
@@ -533,39 +609,116 @@ void ft::deque<T, Allocator>::_expandFront() {
 
 template <typename T, typename Allocator>
 void ft::deque<T, Allocator>::_reserveBack(size_type n) {
-	// if ()
+	if (_end.current + n < _end.end)
+		return ;
+	if (FT_UNLIKELY(_end.map > &_map[_mapSize]))
+		_reallocateMap(_mapSize + n);
+	size_type j = 1;
+	for (difference_type i = n; i > 0; i -= DEQUE_ARRAY_SIZE) {
+		*(_end.map + j) = _allocateBuffer();
+		++j;
+	}
 }
 
 
 template <typename T, typename Allocator>
 void ft::deque<T, Allocator>::_reserveFront(size_type n) {
-	// if ()
+	if (_start.end - _start.current > static_cast<difference_type>(n))
+		return ;
+	if (FT_UNLIKELY(_start.map == _map))
+		_reallocateMap(_mapSize + n);
+	size_type j = 1;
+	for (difference_type i = n; i > 0; i -= DEQUE_ARRAY_SIZE) {
+		*(_start.map - j) = _allocateBuffer();
+		++j;
+	}
 }
 
 
-// template <typename T, typename Allocator>
-// typename ft::deque<T, Allocator>::iterator
-// ft::deque<T, Allocator>::_insertHelper(iterator pos, size_type n, value_type CREF val, ft::true_type) {
-//
-// }
-//
-//
-// template <typename T, typename Allocator>
-// template <typename InputIt>
-// typename ft::deque<T, Allocator>::iterator
-// ft::deque<T, Allocator>::_insertHelper(iterator pos, InputIt first, InputIt last, ft::false_type) {
-//
-// }
+template <typename T, typename Allocator>
+typename ft::deque<T, Allocator>::iterator
+ft::deque<T, Allocator>::_insertHelper(iterator pos, size_type n, value_type CREF val, ft::true_type) {
+	size_type posIndex			= pos - _start;
+	size_type const elemBefore	= posIndex;
+	size_type const elemAfter	= size() - elemBefore - n;
+	value_type const saveValue	= val;
+
+	if (FT_UNLIKELY(pos == _start)) {
+		while (n--)
+			push_front(saveValue);
+		return _start;
+	}
+	if (FT_UNLIKELY(pos == _end)) {
+		while (n--)
+			push_back(saveValue);
+		return iterator(_end).operator--();
+	}
+	if (elemBefore < elemAfter) {
+		_reserveFront(n);
+		ft::copy(_start, _start + posIndex, _start - n);
+		ft::fill_n(_start - n + posIndex, n, saveValue);
+		_start -= n;
+		return _start + n + posIndex - 1;
+	}
+	_reserveBack(n);
+	ft::rcopy(_end - posIndex + 1, _end, _end + n);
+	ft::fill_n(_end - posIndex + 1, n, saveValue);
+	_end += n;
+	return _end - n - 1;
+}
 
 
 template <typename T, typename Allocator>
-void ft::deque<T, Allocator>::_clearHelper() {
+template <typename InputIt>
+typename ft::deque<T, Allocator>::iterator
+ft::deque<T, Allocator>::_insertHelper(iterator pos, InputIt first, InputIt last, ft::false_type) {
+	size_type posIndex			= pos - _start;
+	size_type const n			= ft::distance(first, last);
+	size_type const elemBefore	= posIndex;
+	size_type const elemAfter	= size() - elemBefore - n;
+
+	if (FT_UNLIKELY(pos == _start)) {
+		while (first != last)
+			push_front(*first++);
+		return _start;
+	}
+	if (FT_UNLIKELY(pos == _end)) {
+		while (first != last)
+			push_back(*first++);
+		return iterator(_end).operator--();
+	}
+	if (elemBefore < elemAfter) {
+		_reserveFront(n);
+		ft::copy(_start, _start + posIndex, _start - n);
+		ft::copy(first, last, _start - n + posIndex);
+		_start -= n;
+		return _start + n + posIndex - 1;
+	}
+	_reserveBack(n);
+	ft::rcopy(_end - posIndex + 1, _end, _end + n);
+	ft::copy(first, last, _end - posIndex + 1);
+	_end += n;
+	return _end - n - 1;
+}
+
+
+template <typename T, typename Allocator>
+void ft::deque<T, Allocator>::_clearHelper(bool preserveMap) {
 	for (iterator it = begin(); it != end(); ++it)
 		_allocator.destroy(it.current);
 	for (size_type i = 0; i < _mapSize; ++i)
-		_allocator.deallocate(_map[i], DEQUE_ARRAY_SIZE);
-	_mapAllocator().deallocate(_map, _mapSize);
-	_map = NULL;
+		if (FT_LIKELY(!preserveMap || i != _mapSize / 2)) {
+			_allocator.deallocate(_map[i], DEQUE_ARRAY_SIZE);
+			_map[i] = NULL;
+		}
+	if (!preserveMap) {
+		_mapAllocator().deallocate(_map, _mapSize);
+		_map = NULL;
+		_mapSize = 0;
+		return;
+	}
+	_start = iterator(&_map[_mapSize / 2], &_map[_mapSize / 2][DEQUE_ARRAY_SIZE / 2]);
+	_end = _start;
 }
 
 
@@ -574,7 +727,8 @@ typename ft::deque<T, Allocator>::value_type **
 ft::deque<T, Allocator>::_allocateMap(size_type n) {
 	if (n < DEQUE_INIT_ARRAY_NUM)
 		n = DEQUE_INIT_ARRAY_NUM;
-	value_type **newMap = _mapAllocator().allocate(n);
+	value_type **newMap = NULL;
+	TRY_ALLOCATION( newMap = _mapAllocator().allocate(n); )
 	ft::fill(newMap, newMap + n, static_cast<value_type*>(0));
 	return newMap;
 }
@@ -583,7 +737,9 @@ ft::deque<T, Allocator>::_allocateMap(size_type n) {
 template <typename T, typename Allocator>
 typename ft::deque<T, Allocator>::value_type *
 ft::deque<T, Allocator>::_allocateBuffer() {
-	return _allocator.allocate(DEQUE_ARRAY_SIZE);
+	TRY_ALLOCATION(
+		return _allocator.allocate(DEQUE_ARRAY_SIZE);
+	)
 }
 
 

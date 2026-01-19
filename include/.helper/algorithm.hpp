@@ -182,6 +182,18 @@ OutputIt copy(
 }
 
 
+template<class BidirIt1, class BidirIt2>
+BidirIt2 rcopy(
+	BidirIt1 first,
+	BidirIt1 last,
+	BidirIt2 d_last
+) {
+	while (first != last)
+		*(--d_last) = *(--last);
+	return d_last;
+}
+
+
 template <class InputIt, class Size, class OutputIt>
 OutputIt copy_n(
 	InputIt first,

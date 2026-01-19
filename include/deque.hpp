@@ -5,14 +5,14 @@
 #ifndef DEQUE_H
 #define DEQUE_H
 
-#include ".helper/algorithm.hpp"
 #include ".helper/ftdef.hpp"
+#include ".helper/algorithm.hpp"
 #include ".helper/iterator.hpp"
 #include ".helper/type_traits.hpp"
 
 # define DEQUE_ARRAY_SIZE 16
 # define DEQUE_INIT_ARRAY_NUM 8
-# define DEQUE_AT_EXCEPTION_MSG ("deque::at(): index n out of range")
+# define DEQUE_AT_EXCEPTION_MSG ("deque::at(): index n out of bounds")
 
 namespace ft
 {
@@ -116,11 +116,11 @@ class deque {
 		void								push_front(value_type CREF value);
 		void								pop_back();
 		void								pop_front();
-		// iterator							insert(iterator position, value_type CREF value);
-		// void								insert(iterator position, size_type count, value_type CREF value);
-		// template <typename InputIt> void	insert(iterator position, InputIt first, InputIt last);
-		// iterator							erase(iterator position);
-		// iterator							erase(iterator first, iterator last);
+		iterator							insert(iterator position, value_type CREF value);
+		void								insert(iterator position, size_type count, value_type CREF value);
+		template <typename InputIt> void	insert(iterator position, InputIt first, InputIt last);
+		iterator							erase(iterator position);
+		iterator							erase(iterator first, iterator last);
 		void								swap(deque REF other);
 		void								clear();
 
@@ -139,10 +139,9 @@ class deque {
 		void									_expandFront();
 		void									_reserveBack(size_type n);
 		void									_reserveFront(size_type n);
-		// iterator								_insertHelper(iterator pos, value_type CREF val);
-		// iterator								_insertHelper(iterator pos, size_type n, value_type CREF val, ft::true_type);
-		// template <typename InputIt> iterator	_insertHelper(iterator pos, InputIt first, InputIt last, ft::false_type);
-		void									_clearHelper();
+		iterator								_insertHelper(iterator pos, size_type n, value_type CREF val, ft::true_type);
+		template <typename InputIt> iterator	_insertHelper(iterator pos, InputIt first, InputIt last, ft::false_type);
+		void									_clearHelper(bool preserveMap = false);
 		value_type**							_allocateMap(size_type n);
 		value_type*								_allocateBuffer();
 		void									_reallocateMap(size_type n);

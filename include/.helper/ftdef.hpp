@@ -19,19 +19,23 @@
 	#endif
 #endif
 
+
 #ifndef CREF
 	#define CREF const&
 #endif
+
 
 #ifndef REF
 	#define REF &
 #endif
 
-#ifndef FT_NOMINMAX
-	#define FT_NOMINMAX 1
+
+#ifndef TRY_ALLOCATION
+	#define TRY_ALLOCATION(lines) try { lines } catch (...) { throw ft::bad_alloc("allocation failed"); }
 #endif
 
-# include <string>	// for std::string, might implement ft::string later
+
+# include <string>
 
 namespace ft {
 
