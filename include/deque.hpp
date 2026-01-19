@@ -25,11 +25,11 @@ struct _dequeIterator
 	: public ft::iterator<ft::bidirectional_iterator_tag, T, ft::ptrdiff_t, TRef, TPtr>
 {
 	// Typedefs
-	typedef _dequeIterator<T, TRef, TPtr>				this_type;
-	typedef T											value_type;
-	typedef TRef										reference;
-	typedef TPtr										pointer;
-	typedef ft::ptrdiff_t								difference_type;
+	typedef _dequeIterator<T, TRef, TPtr>	this_type;
+	typedef T								value_type;
+	typedef TRef							reference;
+	typedef TPtr							pointer;
+	typedef ft::ptrdiff_t					difference_type;
 
 	// Constructor
 	explicit	_dequeIterator(value_type** map = 0, value_type *curr = 0);
@@ -37,8 +37,8 @@ struct _dequeIterator
 				~_dequeIterator() {}
 
 	// Dereference Operator
-	reference	operator		* () { return *current; }
-	pointer		operator		->() { return current; }
+	reference	operator		* () { return *_mCurrent; }
+	pointer		operator		->() { return _mCurrent; }
 
 	// Shift Operators
 	this_type REF	operator	++ ();
@@ -51,10 +51,10 @@ struct _dequeIterator
 	this_type		operator	-  (difference_type n);
 
 	// Attributes
-	value_type*		current;	// Current element in buffer
-	value_type*		begin;		// Start of buffer
-	value_type*		end;		// End of buffer
-	value_type**	map;		// Map that holds the current buffer
+	value_type*		_mCurrent;	// Current element in buffer
+	value_type*		_mBegin;	// Start of buffer
+	value_type*		_mEnd;		// End of buffer
+	value_type**	_mMap;		// Map that holds the current buffer
 };
 
 
@@ -127,7 +127,7 @@ class deque {
 		// Allocator
 		allocator_type	get_allocator() const;
 
-	public:
+	protected:
 		// Typedefs
 		typedef typename allocator_type::template rebind<value_type*>::other _mapAllocator_type;
 
