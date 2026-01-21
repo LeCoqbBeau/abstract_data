@@ -112,7 +112,6 @@ void swap(ft::vector<T, Allocator> x, ft::vector<T, Allocator> y) {
 }
 
 
-
 # define VECTOR_COMPARISON_OPERATOR(op) template <class T, class Allocator> bool operator op						\
 											(ft::vector<T, Allocator> CREF lhs, ft::vector<T, Allocator> CREF rhs)
 
@@ -149,6 +148,7 @@ VECTOR_COMPARISON_OPERATOR(>=) {
 
 
 #include ".containers/vector.tpp"
+
 
 #undef VECTOR_ARRAY_INIT_SIZE
 #undef VECTOR_AT_EXCEPTION_MSG

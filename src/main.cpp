@@ -1,5 +1,6 @@
 
 #include ".helper/ftdef.hpp"
+#include ".helper/rbtree.hpp"
 #include ".never_included/utils.h"
 
 struct Loud
@@ -8,6 +9,7 @@ struct Loud
 	~Loud() { /*PRINT "~Loud(" AND i AND ");" ENDL;*/ }
 	void jobly() const { PRINT "What a jobly day " AND i ENDL; }
 	bool operator == (Loud CREF l) const { return i == l.i; }
+	bool operator < (Loud CREF l) const { return i < l.i; }
 	friend std::ostream REF operator << (std::ostream REF os, Loud CREF l) { os << l.i; return os; }
 	int i;
 };
@@ -18,12 +20,44 @@ void joblyContainer(T CREF container) {
 		it->jobly();
 }
 
-#include <vector>
+void joblyRBT(ft::internal::rbtree_node<Loud> const* node, int depth = 0) {
+	if (!node)
+		return;
+	node->value.jobly();
+	if (node->next[LEFT]) {
+		for (int i = 0; i < depth; ++i)
+			PRINT TAB;
+		PRINT "Left: ";
+		joblyRBT(node->next[LEFT], depth + 1);
+	}
+	if (node->next[LEFT]) {
+		for (int i = 0; i < depth; ++i)
+			PRINT TAB;
+		PRINT "Right: ";
+		joblyRBT(node->next[RIGHT], depth + 1);
+	}
+}
+
 
 int main() {
-	std::vector<Loud> vector(10, 10);
+	typedef ft::internal::rbtree_node<Loud> node;
 
-	vector.insert(vector.end(), 15);
-	joblyContainer(vector);
+	node seventeen(17);
+
+	node fifty(50, &seventeen);
+	seventeen.next[RIGHT] = &fifty;
+
+	node a(1, &seventeen);
+	seventeen.next[LEFT] = &a;
+
+	node b(2, &fifty);
+	fifty.next[LEFT] = &b;
+	node c(3, &fifty);
+	fifty.next[RIGHT] = &c;
+
+	node *root = &seventeen;
+	joblyRBT(root);
+	root = root->rotate(LEFT);
+	joblyRBT(root);
 }
 

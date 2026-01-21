@@ -54,9 +54,9 @@ struct _listIterator
 
 	// Shift Operators
 	this_type REF	operator ++ () { _currentNode = _currentNode->next; return *this; }
-	this_type		operator ++ (int) { this_type tmp = *this; _currentNode = _currentNode->next; return tmp; }
+	this_type		operator ++ (int) { this_type tmp = *this; operator++(); return tmp; }
 	this_type REF	operator -- () { _currentNode = _currentNode->prev; return *this; }
-	this_type		operator -- (int) { this_type tmp = *this; _currentNode = _currentNode->prev; return tmp; }
+	this_type		operator -- (int) { this_type tmp = *this; operator--(); return tmp; }
 
 	// Attributes
 	node_type	_currentNode;

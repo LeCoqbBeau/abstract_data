@@ -32,7 +32,7 @@ typedef unsigned int uint;
 // # define TERMLEN getTerminalWidth()
 # define ERROR std::cerr AND
 # define ENDL AND std::endl
-# define TAB "\t" AND
+# define TAB "\t"
 # define NEWL PRINT "" ENDL
 # define CENDL AND CLR ENDL
 # define SHOW(var) PRINT #var AND " = " AND var

@@ -169,24 +169,32 @@ REVERSE_ITERATOR_RELATIONAL_PROTOTYPE(>=) {
 
 # undef REVERSE_ITERATOR_RELATIONAL_PROTOTYPE
 
+
 // Non-member Operator overloads
 template< class Iter >
-ft::reverse_iterator<Iter> operator + ( typename ft::reverse_iterator<Iter>::difference_type n,
-										ft::reverse_iterator<Iter> CREF it )
-{
+ft::reverse_iterator<Iter>
+operator + (
+	typename ft::reverse_iterator<Iter>::difference_type n,
+	ft::reverse_iterator<Iter> CREF it
+) {
 	return ft::reverse_iterator<Iter>(it.base() - n);
 }
 
 
 template< class Iter >
-typename ft::reverse_iterator<Iter>::difference_type operator - ( ft::reverse_iterator<Iter> CREF lhs,
-																  ft::reverse_iterator<Iter> CREF rhs )
-{
+typename ft::reverse_iterator<Iter>::difference_type
+operator - (
+	ft::reverse_iterator<Iter> CREF lhs,
+	ft::reverse_iterator<Iter> CREF rhs
+) {
 	return rhs.base() - lhs.base();
 }
 
 
 // Functions
+namespace internal {
+
+
 template <typename InputIterator>
 typename ft::iterator_traits<InputIterator>::difference_type
 distance_impl(InputIterator first, InputIterator last, ft::input_iterator_tag)
@@ -210,18 +218,8 @@ distance_impl(RandomAccessIterator first, RandomAccessIterator last, ft::random_
 }
 
 
-template <typename InputIterator>
-typename ft::iterator_traits<InputIterator>::difference_type
-distance(InputIterator first, InputIterator last)
-{
-	typedef typename ft::iterator_traits<InputIterator>::iterator_category IC;
-
-	return ft::distance_impl(first, last, IC());
-}
-
-
 template <typename InputIterator, typename Distance>
-void advance_impl(InputIterator& i, Distance n, ft::input_iterator_tag)
+void advance_impl(InputIterator REF i, Distance n, ft::input_iterator_tag)
 {
 	while(n--)
 		++i;
@@ -261,24 +259,38 @@ struct advance_bi_impl<true>
 
 
 template <typename BidirectionalIterator, typename Distance>
-void advance_impl(BidirectionalIterator& i, Distance n, ft::bidirectional_iterator_tag)
+void advance_impl(BidirectionalIterator REF i, Distance n, ft::bidirectional_iterator_tag)
 {
 	advance_bi_impl<ft::is_signed<Distance>::value>::advance_impl(i, n);
 }
 
 
 template <typename RandomAccessIterator, typename Distance>
-void advance_impl(RandomAccessIterator& i, Distance n, ft::random_access_iterator_tag)
+void advance_impl(RandomAccessIterator REF i, Distance n, ft::random_access_iterator_tag)
 {
 	i += n;
 }
+
+
+} // namespace impl
+
+
+template <typename InputIterator>
+typename ft::iterator_traits<InputIterator>::difference_type
+distance(InputIterator first, InputIterator last)
+{
+	typedef typename ft::iterator_traits<InputIterator>::iterator_category IC;
+
+	return ft::internal::distance_impl(first, last, IC());
+}
+
 
 template <typename InputIterator, typename Distance>
 void advance(InputIterator REF i, Distance n)
 {
 	typedef typename ft::iterator_traits<InputIterator>::iterator_category IC;
 
-	ft::advance_impl(i, n, IC());
+	ft::internal::advance_impl(i, n, IC());
 }
 
 
