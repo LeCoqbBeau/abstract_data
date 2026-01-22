@@ -59,7 +59,8 @@ class priority_queue {
 		// Constructor
 		explicit priority_queue(value_compare CREF comp = value_compare(), container_type CREF container = container_type())
 			: c(container), comp(comp) {}
-		template <class InputIt> priority_queue(InputIt first, InputIt last, value_compare CREF comp = value_compare(), container_type CREF container = container_type());
+		template <class InputIt> priority_queue(InputIt first, InputIt last, value_compare CREF comp = value_compare(), container_type CREF container = container_type())
+			: c(container), comp(comp) { c.insert(c.end(), first, last); ft::make_heap(c.begin(), c.end(), comp); }
 
 		// Element Access
 		reference		front() { return c.front(); }
