@@ -339,9 +339,8 @@ ft::vector<T, Allocator>::erase(iterator position)
 
 
 template <typename T, typename Allocator>
-template <typename InputIt>
 typename ft::vector<T, Allocator>::iterator
-ft::vector<T, Allocator>::erase(InputIt first, InputIt last)
+ft::vector<T, Allocator>::erase(iterator first, iterator last)
 {
 	size_type const posIndex	= first - _array;
 	size_type const n			= ft::distance(first, last);

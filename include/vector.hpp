@@ -76,7 +76,7 @@ class vector {
 		void									pop_back();
 		iterator								insert(iterator position, value_type CREF val);
 		void									insert(iterator position, size_type count, value_type CREF val);
-		template <typename InputIt> iterator	insert(iterator position, InputIt first, InputIt last);
+		template <typename InputIt> void		insert(iterator position, InputIt first, InputIt last);
 		iterator								erase(iterator position);
 		iterator								erase(iterator first, iterator last);
 		void									swap(vector CREF other);

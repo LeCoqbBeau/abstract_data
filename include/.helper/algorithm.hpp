@@ -6,6 +6,8 @@
 #define ALGORITHM_H
 
 #include "ftdef.hpp"
+#include "iterator.hpp"
+
 
 namespace ft {
 
@@ -298,6 +300,318 @@ bool lexicographical_compare(
 			return false;
 	}
 	return (first1 == last1) && (first2 != last2);
+}
+
+
+//
+//	Heap
+//
+
+
+namespace internal {
+
+template <typename RandomAccessIterator, typename Distance, typename T, typename ValueType>
+void promote_heap_impl(
+	RandomAccessIterator first,
+	Distance topPosition,
+	Distance position,
+	T value
+) {
+	for (
+		Distance parentPosition = (position - 1) / 2;
+		(position > topPosition) && (*(first + parentPosition) < value);
+		parentPosition = (position - 1) >> 1
+	) {
+		*(first + position) = *(first + parentPosition);
+		position = parentPosition;
+	}
+	*(first + position) = value;
+}
+
+template <typename RandomAccessIterator, typename Distance, typename T, typename Compare, typename ValueType>
+void promote_heap_impl(
+	RandomAccessIterator first,
+	Distance topPosition,
+	Distance position,
+	T value,
+	Compare compare
+) {
+	for (
+		Distance parentPosition = (position - 1) / 2;
+		(position > topPosition) && compare(*(first + parentPosition), value);
+		parentPosition = (position - 1) >> 1
+	) {
+		*(first + position) = *(first + parentPosition);
+		position = parentPosition;
+	}
+	*(first + position) = value;
+}
+
+}
+
+
+template <typename RandomAccessIterator, typename Distance, typename T>
+void promote_heap(
+	RandomAccessIterator first,
+	Distance topPosition,
+	Distance position,
+	T CREF value
+) {
+	typedef typename iterator_traits<RandomAccessIterator>::value_type value_type;
+	internal::promote_heap_impl<RandomAccessIterator, Distance, T CREF, value_type const>(
+		first,
+		topPosition,
+		position,
+		value
+	);
+}
+
+
+template <typename RandomAccessIterator, typename Distance, typename T, typename Compare>
+void promote_heap(
+	RandomAccessIterator first,
+	Distance topPosition,
+	Distance position,
+	T CREF value,
+	Compare compare
+) {
+	typedef typename iterator_traits<RandomAccessIterator>::value_type value_type;
+	internal::promote_heap_impl<RandomAccessIterator, Distance, T CREF, Compare, value_type const>(
+		first,
+		topPosition,
+		position,
+		value,
+		compare
+	);
+}
+
+
+namespace internal {
+
+template <typename RandomAccessIterator, typename Distance, typename T, typename ValueType>
+void adjust_heap_impl(
+	RandomAccessIterator first,
+	Distance topPosition,
+	Distance heapSize,
+	Distance position,
+	T value
+) {
+	Distance childPosition = (2 * position) + 2;
+
+	for (; childPosition < heapSize; childPosition = (2 * childPosition) + 2)
+	{
+		if (*(first + childPosition) < *(first + (childPosition - 1)))
+			--childPosition;
+		*(first + position) = *(first + childPosition);
+		position = childPosition;
+	}
+	if (childPosition == heapSize)
+	{
+		*(first + position) = *(first + (childPosition - 1));
+		position = childPosition - 1;
+	}
+	ft::promote_heap<RandomAccessIterator, Distance, T>(first, topPosition, position, value);
+}
+
+template <typename RandomAccessIterator, typename Distance, typename T, typename Compare, typename ValueType>
+void adjust_heap_impl(
+	RandomAccessIterator first,
+	Distance topPosition,
+	Distance heapSize,
+	Distance position,
+	T value,
+	Compare compare
+) {
+	Distance childPosition = (2 * position) + 2;
+
+	for (; childPosition < heapSize; childPosition = (2 * childPosition) + 2)
+	{
+		if(compare(*(first + childPosition), *(first + (childPosition - 1))))
+			--childPosition;
+		*(first + position) = *(first + childPosition);
+		position = childPosition;
+	}
+	if (childPosition == heapSize)
+	{
+		*(first + position) = *(first + (childPosition - 1));
+		position = childPosition - 1;
+	}
+	ft::promote_heap<RandomAccessIterator, Distance, T, Compare>(first, topPosition, position, value, compare);
+}
+
+}
+
+
+template <typename RandomAccessIterator, typename Distance, typename T>
+void adjust_heap(
+	RandomAccessIterator first,
+	Distance topPosition,
+	Distance heapSize,
+	Distance position,
+	T CREF value
+) {
+	typedef typename iterator_traits<RandomAccessIterator>::value_type value_type;
+	internal::adjust_heap_impl<RandomAccessIterator, Distance, T CREF, value_type const>(
+		first,
+		topPosition,
+		heapSize,
+		position,
+		value
+	);
+}
+
+
+template <typename RandomAccessIterator, typename Distance, typename T, typename Compare>
+void adjust_heap(
+	RandomAccessIterator first,
+	Distance topPosition,
+	Distance heapSize,
+	Distance position,
+	T CREF value,
+	Compare compare
+) {
+	typedef typename iterator_traits<RandomAccessIterator>::value_type value_type;
+	internal::adjust_heap_impl<RandomAccessIterator, Distance, T CREF, Compare, const value_type>(
+		first,
+		topPosition,
+		heapSize,
+		position,
+		value,
+		compare
+	);
+}
+
+
+template <typename RandomAccessIterator>
+void make_heap(
+	RandomAccessIterator first,
+	RandomAccessIterator last
+) {
+	typedef typename ft::iterator_traits<RandomAccessIterator>::difference_type	difference_type;
+	typedef typename ft::iterator_traits<RandomAccessIterator>::value_type		value_type;
+
+	difference_type const heapSize = last - first;
+	if (heapSize < 2)
+		return ;
+	difference_type parentPosition = ((heapSize - 2) / 2) + 1;
+	do{
+		--parentPosition;
+		value_type temp(*(first + parentPosition));
+		ft::adjust_heap<RandomAccessIterator, difference_type, value_type>(
+			first,
+			parentPosition,
+			heapSize,
+			parentPosition,
+			temp
+		);
+	} while(parentPosition != 0);
+}
+
+
+template <typename RandomAccessIterator, typename Compare>
+void make_heap(
+	RandomAccessIterator first,
+	RandomAccessIterator last,
+	Compare compare
+) {
+	typedef typename ft::iterator_traits<RandomAccessIterator>::difference_type difference_type;
+	typedef typename ft::iterator_traits<RandomAccessIterator>::value_type      value_type;
+
+	const difference_type heapSize = last - first;
+
+	if (heapSize < 2)
+		return;
+	difference_type parentPosition = ((heapSize - 2) / 2) + 1;
+	do{
+		--parentPosition;
+		value_type temp(*(first + parentPosition));
+		ft::adjust_heap<RandomAccessIterator, difference_type, value_type, Compare> (
+			first,
+			parentPosition,
+			heapSize,
+			parentPosition,
+			temp,
+			compare
+		);
+	} while(parentPosition != 0);
+}
+
+
+template <typename RandomAccessIterator>
+void push_heap(
+	RandomAccessIterator first,
+	RandomAccessIterator last
+) {
+	typedef typename ft::iterator_traits<RandomAccessIterator>::difference_type	difference_type;
+	typedef typename ft::iterator_traits<RandomAccessIterator>::value_type		value_type;
+
+	value_type const tempBottom(*(last - 1));
+	ft::promote_heap<RandomAccessIterator, difference_type, value_type>(
+		first,
+		static_cast<difference_type>(0),
+		static_cast<difference_type>(last - first - 1),
+		tempBottom
+	);
+}
+
+
+template <typename RandomAccessIterator, typename Compare>
+void push_heap(RandomAccessIterator first, RandomAccessIterator last, Compare compare)
+{
+	typedef typename ft::iterator_traits<RandomAccessIterator>::difference_type	difference_type;
+	typedef typename ft::iterator_traits<RandomAccessIterator>::value_type		value_type;
+
+	const value_type tempBottom(*(last - 1));
+
+	ft::promote_heap<RandomAccessIterator, difference_type, value_type, Compare>(
+		first,
+		static_cast<difference_type>(0),
+		static_cast<difference_type>(last - first - 1),
+		tempBottom,
+		compare
+	);
+}
+
+
+template <typename RandomAccessIterator>
+void pop_heap(
+	RandomAccessIterator first,
+	RandomAccessIterator last
+) {
+	typedef typename ft::iterator_traits<RandomAccessIterator>::difference_type difference_type;
+	typedef typename ft::iterator_traits<RandomAccessIterator>::value_type      value_type;
+
+	value_type tempBottom(*(last - 1));
+	*(last - 1) = *first;
+	ft::adjust_heap<RandomAccessIterator, difference_type, value_type>(
+		first,
+		static_cast<difference_type>(0),
+		static_cast<difference_type>(last - first - 1),
+		0,
+		tempBottom
+	);
+}
+
+
+template <typename RandomAccessIterator, typename Compare>
+void pop_heap(
+	RandomAccessIterator first,
+	RandomAccessIterator last,
+	Compare compare
+) {
+	typedef typename ft::iterator_traits<RandomAccessIterator>::difference_type difference_type;
+	typedef typename ft::iterator_traits<RandomAccessIterator>::value_type      value_type;
+
+	value_type tempBottom(*(last - 1));
+	*(last - 1) = *first;
+	ft::adjust_heap<RandomAccessIterator, difference_type, value_type, Compare>(
+		first,
+		static_cast<difference_type>(0),
+		static_cast<difference_type>(last - first - 1),
+		0,
+		tempBottom,
+		compare
+	);
 }
 
 
