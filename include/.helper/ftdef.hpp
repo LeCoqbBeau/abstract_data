@@ -31,7 +31,7 @@
 
 
 #ifndef TRY_ALLOCATION
-	#define TRY_ALLOCATION(lines) try { lines } catch (...) { throw ft::bad_alloc("allocation failed"); }
+	#define TRY_ALLOCATION(lines, clean) try { lines } catch (...) { do { clean } while (false); throw ft::bad_alloc("allocation failed"); }
 #endif
 
 

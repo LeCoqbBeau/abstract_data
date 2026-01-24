@@ -44,6 +44,9 @@ re: fclean all
 run:
 	./$(NAME)
 
+doc:
+	doxygen Doxyfile
+
 bear:
 	bear -- make
 

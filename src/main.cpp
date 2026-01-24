@@ -19,9 +19,11 @@ void joblyContainer(T CREF container) {
 		it->jobly();
 }
 
-#include "queue.hpp"
+#include "bonus/matrix.hpp"
 
 int main() {
+	ft::matrix<Loud, 3, 3> mat(9, 1);
 
+	joblyContainer(mat);
 }
 

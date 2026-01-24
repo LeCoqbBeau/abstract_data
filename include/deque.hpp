@@ -22,7 +22,7 @@ class deque;
 
 template <typename T, typename TRef, typename TPtr>
 struct _dequeIterator
-	: public ft::iterator<ft::bidirectional_iterator_tag, T, ft::ptrdiff_t, TRef, TPtr>
+	: public ft::iterator<ft::random_access_iterator_tag, T, ft::ptrdiff_t, TRef, TPtr>
 {
 	// Typedefs
 	typedef _dequeIterator<T, TRef, TPtr>	this_type;
