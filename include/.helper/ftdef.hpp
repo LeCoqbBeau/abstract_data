@@ -9,6 +9,7 @@
 	#define FT_NOTHROW throw()
 #endif
 
+
 #ifndef FT_LIKELY
 	#if defined(__GNUC__) && (__GNUC__ >= 3)
 		#define FT_LIKELY(x)   __builtin_expect(!!(x), true)
@@ -30,12 +31,12 @@
 #endif
 
 
-#ifndef TRY_ALLOCATION
-	#define TRY_ALLOCATION(lines, clean) try { lines } catch (...) { do { clean } while (false); throw ft::bad_alloc("allocation failed"); }
+#ifndef TRY_ALLOC
+	#define TRY_ALLOC(alloc, free) try { alloc } catch (...) { do { free } while (false); throw ft::bad_alloc("allocation failed"); }
 #endif
 
 
-# include <string>
+# include <string> // for std::string :)
 
 namespace ft {
 

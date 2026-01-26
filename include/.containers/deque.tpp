@@ -725,7 +725,7 @@ ft::deque<T, Allocator>::_allocateMap(size_type n) {
 	if (n < DEQUE_INIT_ARRAY_NUM)
 		n = DEQUE_INIT_ARRAY_NUM;
 	value_type **newMap = NULL;
-	TRY_ALLOCATION( newMap = _mapAllocator().allocate(n); )
+	TRY_ALLOC( newMap = _mapAllocator().allocate(n); )
 	ft::fill(newMap, newMap + n, static_cast<value_type*>(0));
 	return newMap;
 }
@@ -734,7 +734,7 @@ ft::deque<T, Allocator>::_allocateMap(size_type n) {
 template <typename T, typename Allocator>
 typename ft::deque<T, Allocator>::value_type *
 ft::deque<T, Allocator>::_allocateBuffer() {
-	TRY_ALLOCATION(
+	TRY_ALLOC(
 		return _allocator.allocate(DEQUE_ARRAY_SIZE);
 	)
 }

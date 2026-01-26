@@ -2,8 +2,10 @@
 #ifndef BINARY_TREE_HPP
 #define BINARY_TREE_HPP
 
-#include ".helper/algorithm.hpp"
 #include "ftdef.hpp"
+#include "algorithm.hpp"
+#include "functional.hpp"
+#include "new.hpp"
 
 #define RBT_LEFT	0
 #define RBT_RIGHT	1
@@ -23,14 +25,19 @@ struct rbt_node_base {
 	// Constructor
 	rbt_node_base(this_type* parent = NULL, color_type color = RBT_RED)
 		: parent(parent), color(color) { ft::fill_n(next, 2, reinterpret_cast<this_type*>(NULL)); }
-	virtual ~rbt_node_base() {}
+	~rbt_node_base() {}
 
 	// Methods
-	this_type*	rotate(side_type side);
-	this_type*	min();
-	this_type*	max();
-	this_type*	nextNode(); // this is used for iterators purpose
-	this_type*	prevNode(); // this is used for iterators purpose
+	this_type* REF	left();
+	this_type* CREF	left() const;
+	this_type* REF	right();
+	this_type* CREF	right() const;
+	this_type*		min();
+	this_type*		max();
+	this_type*		rotate(side_type side);
+	this_type*		nextNode(); // this is used for iterators purpose
+	this_type*		prevNode(); // this is used for iterators purpose
+	void			transplant(this_type* other);
 
 	// Attributes
 	this_type*	next[2];
@@ -39,38 +46,69 @@ struct rbt_node_base {
 };
 
 
-template <typename T>
+template <typename T, typename Comp = ft::less<T> >
 struct rbt_node : rbt_node_base {
-	public:
-		// Typedefs
-		typedef rbt_node<T>		this_type;
-		typedef rbt_node_base	base_type;
-		typedef	T				value_type;
+	// Typedefs
+	typedef rbt_node<T, Comp>	this_type;
+	typedef rbt_node_base		base_type;
+	typedef	T					value_type;
+	typedef Comp				value_compare;
 
-		// Constructor
-		rbt_node(value_type CREF val = value_type(), base_type* parent = NULL)
-			: rbt_node_base(parent, RBT_RED), value(val) {}
+	// Constructor
+	rbt_node(value_type CREF val = value_type(), base_type* parent = NULL)
+		: rbt_node_base(parent, RBT_RED), value(val), comp(value_compare()) {}
 
-		// Methods
-		this_type*	insert(this_type* node);
-		this_type*	remove(this_type* node);
-		this_type*	find(value_type CREF val);
+	// Methods
+	this_type*													find(value_type CREF val);
+	this_type*													insert(this_type* node);
+	template <typename Allocator, typename FreeFunc> this_type*	remove(value_type CREF val, Allocator allocator, FreeFunc free);
 
-		// Attributes
-		value_type	value;
 
-	protected:
-		void	_insertFixup();
-		void	_removeFixup();	
+	// Attributes
+	value_type		value;
+	value_compare	comp;
 };
 
 
-template <typename T, typename Allocator = allocator<T> >
+template <typename T, typename Comp = ft::less<T>, typename Allocator = allocator<T> >
 struct rb_tree {
-public:
+	public:
+		// Typedefs
+		typedef T					value_type;
+		typedef Comp				value_compare;
+		typedef Allocator			allocator_type;
+		typedef rbt_node<T, Comp>	node_type;
+		typedef rbt_node_base		node_base_type;
 
-protected:
+		// Constructors
+		rb_tree(allocator_type CREF alloc = allocator_type()) :  _sentinel(), _root(NULL), _allocator(alloc) {}
+		~rb_tree();
 
+		// Methods
+		node_type*	begin();
+		node_type*	begin() const;
+		node_type*	end();
+		node_type*	end() const;
+
+		node_type*	find(value_type CREF val);
+		node_type*	insert(value_type CREF val);
+		node_type*	remove(value_type CREF val);
+
+
+	public:
+		// Typedefs
+		typedef typename allocator_type::template rebind<node_type>::other _node_allocator_type;
+
+		// Methods
+		node_type*		_createNode(value_type CREF val);
+		static void		_deallocateNode(_node_allocator_type allocator, node_type* node);
+		void			_clearTree(node_type* node);
+
+		// Attributes
+		node_base_type			_sentinel;
+		node_type*				_root;
+		mutable allocator_type	_allocator;
+		_node_allocator_type	_node_allocator() { return _node_allocator_type(_allocator); }
 };
 
 
@@ -78,123 +116,7 @@ protected:
 } // namespace ft
 
 
-//
-//	rbt_node_base
-//
+#include "binary_trees.tpp"
 
-
-inline
-ft::internal::rbt_node_base::this_type*
-ft::internal::rbt_node_base::min()
-{
-	this_type*	ret = this;
-	while (ret->next[RBT_LEFT])
-		ret = ret->next[RBT_LEFT];
-	return ret;
-}
-
-
-inline
-ft::internal::rbt_node_base::this_type*
-ft::internal::rbt_node_base::max()
-{
-	this_type*	ret = this;
-	while (ret->next[RBT_RIGHT])
-		ret = ret->next[RBT_RIGHT];
-	return ret;
-}
-
-
-
-inline
-ft::internal::rbt_node_base::this_type*
-ft::internal::rbt_node_base::rotate(side_type side)
-{
-	this_type	*child = next[!side];
-	if (!child)
-		return	this;
-	this->next[!side] = child->next[side];
-	if (child->next[side])
-		child->next[side]->parent = this;
-	child->parent = this->parent;
-	if (!this->parent)
-		;
-	else if (this->parent == this->parent->next[side])
-		this->parent->next[side] = child;
-	else
-		this->parent->next[!side] = child;
-	child->next[side] = this;
-	this->parent = child;
-	return child;
-}
-
-
-inline
-ft::internal::rbt_node_base::this_type*
-ft::internal::rbt_node_base::nextNode()
-{
-	this_type*	nextNode = this;
-	if (nextNode->next[RBT_RIGHT]) {
-		nextNode = nextNode->next[RBT_RIGHT];
-		while (nextNode->next[RBT_LEFT])
-			nextNode = nextNode->next[RBT_LEFT];
-		return nextNode;
-	}
-	this_type*	parent = nextNode->parent;
-	while (parent && parent->next[RBT_RIGHT] == nextNode) {
-		nextNode = parent;
-		parent = parent->parent;
-	}
-	return parent;
-}
-
-
-inline
-ft::internal::rbt_node_base::this_type*
-ft::internal::rbt_node_base::prevNode()
-{
-	this_type*	nextNode = this;
-	if (nextNode->next[RBT_LEFT]) {
-		nextNode = nextNode->next[RBT_LEFT];
-		while (nextNode->next[RBT_RIGHT])
-			nextNode = nextNode->next[RBT_RIGHT];
-		return nextNode;
-	}
-	this_type*	parent = nextNode->parent;
-	while (parent && parent->next[RBT_LEFT] == nextNode) {
-		nextNode = parent;
-		parent = parent->parent;
-	}
-	return parent;
-}
-
-
-//
-//	rbt_node<T>
-//
-
-
-#define NODE(base) (dynamic_cast<ft::internal::rbt_node<T>*>(base))		// baseToNode
-#define BASE(node) (dynamic_cast<ft::internal::rbt_node_base*>(node))	// nodeToBase
-
-
-template <typename T>
-typename ft::internal::rbt_node<T>::this_type*
-ft::internal::rbt_node<T>::insert(this_type* node)
-{
-	side_type	insertSide = (node->value < this->value) ? RBT_LEFT : RBT_RIGHT;
-	if (this->next[insertSide])
-		return NODE(this->next[insertSide])->insert(node);
-	this->next[insertSide] = node;
-	node->color = RBT_RED;
-	node->parent = this;
-	ft::fill_n(node->next, 2, (base_type*)NULL);
-	node->_insertFixup();
-	return node;
-}
-
-
-#undef NODE
-#undef BASE
 
 #endif // BINARY_TREE_HPP

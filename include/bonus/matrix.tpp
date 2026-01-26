@@ -350,7 +350,7 @@ ft::matrix<T, M, N, Allocator>::_init()
 		return;
 	_matrix = _matrixAllocator().allocate(M);
 	for (size_type m = 0; m < M; ++m) {
-		TRY_ALLOCATION(
+		TRY_ALLOC(
 			_matrix[m] = _allocator.allocate(N);,
 			while (m) {
 				--m;
