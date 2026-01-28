@@ -5,6 +5,11 @@
 #ifndef BINARY_TREES_TPP
 #define BINARY_TREES_TPP
 
+
+#include "ftexcept.hpp"
+#include "new.hpp"
+
+
 //
 //	rbt_node_base
 //
@@ -184,31 +189,19 @@ ft::internal::rbt_node<T, Comp>::insert(this_type* node)
 
 template <typename T, typename Comp>
 template <typename Allocator, typename FreeFunc>
-typename ft::internal::rbt_node<T, Comp>::this_type*
-ft::internal::rbt_node<T, Comp>::remove(value_type CREF val, Allocator allocator, FreeFunc free)
+typename ft::internal::rbt_node<T, Comp>::remove_result
+ft::internal::rbt_node<T, Comp>::remove(Allocator allocator, FreeFunc free)
 {
-	bool const isSmaller = comp(val, this->value);
-	bool const isBigger = comp(this->value, val);
-	if (isSmaller)
-		left() = NODE(left())->remove(val, allocator, free);
-	else if (isBigger)
-		right() = NODE(right())->remove(val, allocator, free);
-	else {
-		if (!left()) {
-			this_type* tmp = NODE(right());
-			free(allocator, this);
-			return tmp;
-		}
-		if (!right()) {
-			this_type* tmp = NODE(left());
-			free(allocator, this);
-			return tmp;
-		}
-		this_type* successor = NODE(this->nextNode());
-		ft::swap(value, successor->value);
-		this->right() = NODE(this->right())->remove(val, allocator, free);
-	}
-	return this;
+	remove_result	result;
+
+	if (!left() && !right())
+		result = noChildRemove(this);
+	else if (left() && right())
+		result = twoChildrenRemove(this);
+	else // if (left() || right())
+		result = oneChildRemove(this);
+	free(allocator, this);
+	return result;
 }
 
 
@@ -294,16 +287,19 @@ ft::internal::rb_tree<T, Comp, Allocator>::insert(value_type CREF val)
 
 
 template <typename T, typename Comp, typename Allocator>
-typename ft::internal::rb_tree<T, Comp, Allocator>::node_type*
+typename ft::internal::rb_tree<T, Comp, Allocator>::remove_result
 ft::internal::rb_tree<T, Comp, Allocator>::remove(value_type CREF val)
 {
-	node_type *replacingNode = _root->remove(val, _node_allocator(), _deallocateNode);
-	if (replacingNode == _root) {
-		_root = replacingNode;
+	node_type	*toRemove = find(val);
+	if (toRemove == &_sentinel)
+		return remove_result(toRemove, toRemove, toRemove->color);
+	remove_result result = toRemove->remove(_node_allocator(), _deallocateNode);
+	if (toRemove == _root) {
+		_root = result.replacementNode;
 		_root->parent = &_sentinel;
-	}
-	_deallocateNode(_node_allocator() ,replacingNode);
-	return replacingNode;
+	} else if (result.removedColor == RBT_BLACK)
+		_removeCleanup(result);
+	return result;
 }
 
 
@@ -320,10 +316,9 @@ ft::internal::rb_tree<T, Comp, Allocator>::_createNode(value_type CREF val)
 
 template <typename T, typename Comp, typename Allocator>
 void
-ft::internal::rb_tree<T, Comp, Allocator>::_deallocateNode(_node_allocator_type allocator, node_type* node)
+ft::internal::rb_tree<T, Comp, Allocator>::_removeCleanup(remove_result result)
 {
-	allocator.destroy(node);
-	allocator.deallocate(node, 1);
+
 }
 
 
@@ -338,6 +333,91 @@ ft::internal::rb_tree<T, Comp, Allocator>::_clearTree(node_type* node)
 	_deallocateNode(_node_allocator(), node);
 }
 
+
+template <typename T, typename Comp, typename Allocator>
+void
+ft::internal::rb_tree<T, Comp, Allocator>::_deallocateNode(_node_allocator_type allocator, node_type* node)
+{
+	allocator.destroy(node);
+	allocator.deallocate(node, 1);
+}
+
+
+// Static Functions
+
+
+template <typename T, typename Comp>
+static
+typename ft::internal::rbt_node<T, Comp>::remove_result
+noChildRemove(ft::internal::rbt_node<T, Comp>* node)
+{
+	typedef typename ft::internal::rbt_node<T, Comp>::remove_result remove_result;
+
+	remove_result result(NULL, NULL, node->color);
+	if (node->parent)
+		(node->parent->left() == node) ? node->parent->left() = NULL : node->parent->right() = NULL;
+	result.parentNode = NODE(node->parent);
+	return result;
+}
+
+
+template <typename T, typename Comp>
+static
+typename ft::internal::rbt_node<T, Comp>::remove_result
+oneChildRemove(ft::internal::rbt_node<T, Comp>* node)
+{
+	typedef ft::internal::rbt_node<T, Comp>		node_type;
+	typedef typename node_type::remove_result	remove_result;
+
+
+	remove_result result(NULL, NULL, node->color);
+	node_type*	successor = node->left() ? NODE(node->left()) : NODE(node->right());
+	successor->parent = node->parent;
+	if (node->parent)
+		(node->parent->left() == node) ? node->parent->left() = successor : node->parent->right() = successor;
+	result.replacementNode = successor;
+	result.parentNode = NODE(node->parent);
+	return result;
+}
+
+
+template <typename T, typename Comp>
+static
+typename ft::internal::rbt_node<T, Comp>::remove_result
+twoChildrenRemove(ft::internal::rbt_node<T, Comp>* node)
+{
+	typedef ft::internal::rbt_node<T, Comp>		node_type;
+	typedef typename node_type::side_type		side_type;
+	typedef typename node_type::remove_result	remove_result;
+
+	remove_result	result(NULL, NULL, 0);
+	node_type*		successor = NODE(node->right()->min());
+	side_type	successorSide = (successor->parent->left() == successor) ? RBT_LEFT : RBT_RIGHT;
+	// Fixup successor child before extracting the successor
+	node_type*	successorChild = NODE(successor->right());
+	if (successorChild)
+		successorChild->parent = successor->parent;
+	successor->parent->next[successorSide] = successorChild;
+	// Initialise the correct value of result
+	result.parentNode = NODE(successor->parent);
+	result.replacementNode = successorChild;
+	result.removedColor = successor->color;
+
+	// Replacing the node by the successor
+	successor->parent = node->parent;
+	if (node->parent)
+		(node->parent->left() == node) ? node->parent->left() = successor : node->parent->right() = successor;
+	node->left()->parent = successor;
+	node->right()->parent = successor;
+	successor->left() = node->left();
+	successor->right() = node->right();
+	if (successor->left() == successor)
+		successor->left() = NULL;
+	if (successor->right() == successor)
+		successor->right() = NULL;
+	result.replacementNode = successor;
+	return result;
+}
 
 #undef NODE
 #undef BASE

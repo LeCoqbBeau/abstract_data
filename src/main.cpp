@@ -30,21 +30,21 @@ void joblyBST(tree_type REF tree) {
 	}
 }
 
-void joblyRBTPrint(node_type node, uint depth = 0) {
+void joblyRBTPrint(node_type node, uint depth = 1) {
 	if (!node)
 		return;
-	PRINT (node->color == RBT_RED ? RED : "") AND node->value CENDL;
-	if ((node_type)(node->left())) {
+	PRINT (node->color == RBT_RED ? RED : CYN) AND node->value CENDL;
+	if (static_cast<node_type>(node->left())) {
 		for (uint i = 0; i < depth; ++i)
 			PRINT TAB;
 		PRINT "L: ";
-		joblyRBTPrint((node_type)(node->left()), depth + 1);
+		joblyRBTPrint(static_cast<node_type>(node->left()), depth + 1);
 	}
-	if ((node_type)(node->right())) {
+	if (static_cast<node_type>(node->right())) {
 		for (uint i = 0; i < depth; ++i)
 			PRINT TAB;
 		PRINT "R: ";
-		joblyRBTPrint((node_type)(node->right()), depth + 1);
+		joblyRBTPrint(static_cast<node_type>(node->right()), depth + 1);
 	}
 }
 
@@ -62,12 +62,11 @@ int main() {
 	tree.insert(16);
 	tree.insert(128);
 
-	joblyRBTPrint(tree._root);
 
 	// SHOWL(&tree._sentinel);
-	SHOWL(tree.remove(2));
+	joblyRBTPrint(tree._root);
+	tree.remove(8);
 	joblyRBTPrint(tree._root);
 
-	// joblyBST(tree);
 }
 

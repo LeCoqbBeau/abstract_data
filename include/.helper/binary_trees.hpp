@@ -5,7 +5,6 @@
 #include "ftdef.hpp"
 #include "algorithm.hpp"
 #include "functional.hpp"
-#include "new.hpp"
 
 #define RBT_LEFT	0
 #define RBT_RIGHT	1
@@ -48,20 +47,34 @@ struct rbt_node_base {
 
 template <typename T, typename Comp = ft::less<T> >
 struct rbt_node : rbt_node_base {
+	// Nested structure
+	struct RemoveResult {
+		// Constructor
+		RemoveResult(rbt_node* rNode = NULL, rbt_node* pNode = NULL, color_type c = RBT_BLACK)
+			: replacementNode(rNode), parentNode(pNode), removedColor(c) {}
+
+		// Attributes
+		rbt_node*	replacementNode;
+		rbt_node*	parentNode;
+		color_type	removedColor;
+	};
+
 	// Typedefs
 	typedef rbt_node<T, Comp>	this_type;
 	typedef rbt_node_base		base_type;
 	typedef	T					value_type;
 	typedef Comp				value_compare;
+	typedef RemoveResult		remove_result;
+
 
 	// Constructor
 	rbt_node(value_type CREF val = value_type(), base_type* parent = NULL)
 		: rbt_node_base(parent, RBT_RED), value(val), comp(value_compare()) {}
 
 	// Methods
-	this_type*													find(value_type CREF val);
-	this_type*													insert(this_type* node);
-	template <typename Allocator, typename FreeFunc> this_type*	remove(value_type CREF val, Allocator allocator, FreeFunc free);
+	this_type*														find(value_type CREF val);
+	this_type*														insert(this_type* node);
+	template <typename Allocator, typename FreeFunc> remove_result	remove(Allocator allocator, FreeFunc free);
 
 
 	// Attributes
@@ -74,25 +87,27 @@ template <typename T, typename Comp = ft::less<T>, typename Allocator = allocato
 struct rb_tree {
 	public:
 		// Typedefs
-		typedef T					value_type;
-		typedef Comp				value_compare;
-		typedef Allocator			allocator_type;
-		typedef rbt_node<T, Comp>	node_type;
-		typedef rbt_node_base		node_base_type;
+		typedef T									value_type;
+		typedef Comp								value_compare;
+		typedef Allocator							allocator_type;
+		typedef rbt_node<T, Comp>					node_type;
+		typedef rbt_node_base						base_type;
+		typedef base_type::color_type				color_type;
+		typedef typename node_type::remove_result	remove_result;
 
 		// Constructors
 		rb_tree(allocator_type CREF alloc = allocator_type()) :  _sentinel(), _root(NULL), _allocator(alloc) {}
 		~rb_tree();
 
 		// Methods
-		node_type*	begin();
-		node_type*	begin() const;
-		node_type*	end();
-		node_type*	end() const;
+		node_type*		begin();
+		node_type*		begin() const;
+		node_type*		end();
+		node_type*		end() const;
 
-		node_type*	find(value_type CREF val);
-		node_type*	insert(value_type CREF val);
-		node_type*	remove(value_type CREF val);
+		node_type*		find(value_type CREF val);
+		node_type*		insert(value_type CREF val);
+		remove_result	remove(value_type CREF val);
 
 
 	public:
@@ -101,11 +116,14 @@ struct rb_tree {
 
 		// Methods
 		node_type*		_createNode(value_type CREF val);
-		static void		_deallocateNode(_node_allocator_type allocator, node_type* node);
+		void			_removeCleanup(remove_result result);
 		void			_clearTree(node_type* node);
 
+		// Static Members
+		static void		_deallocateNode(_node_allocator_type allocator, node_type* node);
+
 		// Attributes
-		node_base_type			_sentinel;
+		base_type				_sentinel;
 		node_type*				_root;
 		mutable allocator_type	_allocator;
 		_node_allocator_type	_node_allocator() { return _node_allocator_type(_allocator); }
@@ -114,6 +132,24 @@ struct rb_tree {
 
 } // namespace internal
 } // namespace ft
+
+
+template <typename T, typename Comp>
+static
+typename ft::internal::rbt_node<T, Comp>::remove_result
+noChildRemove(ft::internal::rbt_node<T, Comp>* node);
+
+
+template <typename T, typename Comp>
+static
+typename ft::internal::rbt_node<T, Comp>::remove_result
+oneChildRemove(ft::internal::rbt_node<T, Comp>* node);
+
+
+template <typename T, typename Comp>
+static
+typename ft::internal::rbt_node<T, Comp>::remove_result
+twoChildrenRemove(ft::internal::rbt_node<T, Comp>* node);
 
 
 #include "binary_trees.tpp"
