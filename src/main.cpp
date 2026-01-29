@@ -1,5 +1,6 @@
 
 #include ".helper/ftdef.hpp"
+#include ".helper/binary_trees.hpp"
 #include ".never_included/utils.h"
 
 struct Loud
@@ -19,9 +20,9 @@ void joblyContainer(T CREF container) {
 		it->jobly();
 }
 
-#include ".helper/binary_trees.hpp"
 typedef ft::internal::rb_tree<Loud> tree_type;
 typedef tree_type::node_type* node_type;
+typedef tree_type::base_type* base_type;
 
 void joblyBST(tree_type REF tree) {
 	for (__auto_type it = tree.begin(); it != tree.end(); it = (node_type)it->nextNode()) {
@@ -47,6 +48,52 @@ void joblyRBTPrint(node_type node, uint depth = 1) {
 		joblyRBTPrint(static_cast<node_type>(node->right()), depth + 1);
 	}
 }
+
+
+bool isValidBST(node_type node) {
+	if (node->left()) {
+		if (node->comp(node->value, static_cast<node_type>((node->left()))->value))
+			return false;
+		return isValidBST(static_cast<node_type>(node->left()));
+	}
+	if (node->right()) {
+		if (node->comp(static_cast<node_type>((node->right()))->value, node->value))
+			return false;
+		return isValidBST(static_cast<node_type>(node->right()));
+	}
+	return true;
+}
+
+bool areRedChildrenBlack(base_type node) {
+	if (node->left()) {
+		if (node->color == RBT_RED)
+			if (node->left()->color == RBT_RED)
+				return false;
+		return areRedChildrenBlack(node->left());
+	}
+	if (node->right()) {
+		if (node->color == RBT_RED)
+			if (node->right()->color == RBT_RED)
+				return false;
+		return areRedChildrenBlack(node->right());
+	}
+	return true;
+}
+
+int getBlackHeight(base_type node) {
+	if (!node)
+		return 1;
+	int const leftBH = getBlackHeight(node->left());
+	int const rightBH = getBlackHeight(node->right());
+	if (leftBH != rightBH || leftBH == -1)
+		return -1;
+	return leftBH + (node->color == RBT_BLACK);
+}
+
+bool checkBlackHeight(base_type node) {
+	return getBlackHeight(node) != -1;
+}
+
 
 int main() {
 	tree_type tree;

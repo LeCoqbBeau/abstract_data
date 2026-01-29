@@ -38,6 +38,7 @@
 
 # include <string> // for std::string :)
 
+
 namespace ft {
 
 typedef long int	ptrdiff_t;

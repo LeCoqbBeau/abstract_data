@@ -6,10 +6,11 @@
 #include "algorithm.hpp"
 #include "functional.hpp"
 
+
 #define RBT_LEFT	0
 #define RBT_RIGHT	1
-#define RBT_BLACK	0
-#define RBT_RED		1
+#define RBT_BLACK	'B'
+#define RBT_RED		'R'
 
 
 namespace ft { namespace internal {
@@ -93,6 +94,7 @@ struct rb_tree {
 		typedef rbt_node<T, Comp>					node_type;
 		typedef rbt_node_base						base_type;
 		typedef base_type::color_type				color_type;
+		typedef base_type::side_type				side_type;
 		typedef typename node_type::remove_result	remove_result;
 
 		// Constructors
@@ -115,12 +117,13 @@ struct rb_tree {
 		typedef typename allocator_type::template rebind<node_type>::other _node_allocator_type;
 
 		// Methods
-		node_type*		_createNode(value_type CREF val);
-		void			_removeCleanup(remove_result result);
-		void			_clearTree(node_type* node);
+		node_type*				_createNode(value_type CREF val);
+		void					_insertFixup(node_type* inserted);
+		void					_removeFixup(remove_result result);
+		void					_clearTree(node_type* node);
 
 		// Static Members
-		static void		_deallocateNode(_node_allocator_type allocator, node_type* node);
+		static void				_deallocateNode(_node_allocator_type allocator, node_type* node);
 
 		// Attributes
 		base_type				_sentinel;

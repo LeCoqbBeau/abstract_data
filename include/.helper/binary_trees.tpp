@@ -82,10 +82,10 @@ ft::internal::rbt_node_base::rotate(side_type side)
 	child->parent = this->parent;
 	if (!this->parent)
 		;
-	else if (this->parent == this->parent->next[side])
-		this->parent->next[side] = child;
+	else if (this == this->parent->next[RBT_LEFT])
+		this->parent->next[RBT_LEFT] = child;
 	else
-		this->parent->next[!side] = child;
+		this->parent->next[RBT_RIGHT] = child;
 	child->next[side] = this;
 	this->parent = child;
 	return child;
@@ -272,12 +272,13 @@ ft::internal::rb_tree<T, Comp, Allocator>::insert(value_type CREF val)
 		_sentinel.parent = _root;
 		_sentinel.left() = _root;
 		_sentinel.right() = _root;
-		_root->parent = &_sentinel;
+		_root->parent = NULL;
 		_root->color = RBT_BLACK;
 		return _root;
 	}
 	_root->insert(insertNode);
-	// insert Fixup
+	_insertFixup(insertNode);
+	_root->color = RBT_BLACK;
 	if (insertNode->parent == _sentinel.left() && insertNode == _sentinel.left()->left())
 		_sentinel.left() = insertNode;
 	else if (insertNode->parent == _sentinel.right() && insertNode == _sentinel.right()->right())
@@ -293,12 +294,23 @@ ft::internal::rb_tree<T, Comp, Allocator>::remove(value_type CREF val)
 	node_type	*toRemove = find(val);
 	if (toRemove == &_sentinel)
 		return remove_result(toRemove, toRemove, toRemove->color);
+	// Prefix the _sentinel
+	if (toRemove == _sentinel.left())
+		_sentinel.left() = _sentinel.left()->parent;
+	else if (toRemove == _sentinel.right())
+		_sentinel.right() = _sentinel.right()->parent;
+	// Actually remove the node
 	remove_result result = toRemove->remove(_node_allocator(), _deallocateNode);
+	// Fixup the _root
 	if (toRemove == _root) {
-		_root = result.replacementNode;
-		_root->parent = &_sentinel;
+		if (!result.parentNode && result.replacementNode)
+			_root = result.replacementNode;
+		if (_root) {
+			_root->color = RBT_BLACK;
+			_root->parent = &_sentinel;
+		}
 	} else if (result.removedColor == RBT_BLACK)
-		_removeCleanup(result);
+		_removeFixup(result);
 	return result;
 }
 
@@ -316,9 +328,90 @@ ft::internal::rb_tree<T, Comp, Allocator>::_createNode(value_type CREF val)
 
 template <typename T, typename Comp, typename Allocator>
 void
-ft::internal::rb_tree<T, Comp, Allocator>::_removeCleanup(remove_result result)
+ft::internal::rb_tree<T, Comp, Allocator>::_insertFixup(node_type* inserted)
 {
+	color_type	blackRef = RBT_BLACK;
+	while (inserted->parent && inserted->parent->color == RBT_RED) {
+		base_type*		parent = inserted->parent;
+		if (!parent)
+			return;
+		base_type*		grandParent = parent->parent;
+		if (!grandParent)
+			return;
+		side_type		parentSide = (parent == grandParent->left()) ? RBT_LEFT : RBT_RIGHT;
+		base_type*		uncle = grandParent->next[!parentSide];
+		color_type REF	uncleColor = (uncle) ? uncle->color : blackRef;
+		if (uncleColor == RBT_RED) {
+			parent->color = RBT_BLACK;
+			uncleColor = RBT_BLACK;
+			parent->parent->color = RBT_RED;
+			inserted = NODE(parent->parent);
+			continue;
+		}
+		if (inserted == parent->next[!parentSide]) {
+			inserted = NODE(parent);
+			base_type* rotatedNode = inserted->rotate(parentSide);
+			if (!rotatedNode->parent)
+				_root = NODE(rotatedNode);
+		}
+		inserted->parent->color = RBT_BLACK;
+		inserted->parent->parent->color = RBT_RED;
+		base_type* rotatedNode = inserted->parent->parent->rotate(!parentSide);
+		if (!rotatedNode->parent)
+			_root = NODE(rotatedNode);
+	}
+}
 
+template <typename T, typename Comp, typename Allocator>
+void
+ft::internal::rb_tree<T, Comp, Allocator>::_removeFixup(remove_result result)
+{
+	base_type*	node = result.replacementNode;
+	base_type*	parent = result.parentNode;
+
+	while ((!node || node->color) && node != _root) {
+		if (!parent)
+			break;
+		side_type	nodeSide = (parent->left() == node) ? RBT_LEFT : RBT_RIGHT;
+		base_type*	sibling = parent->next[!nodeSide];
+
+		if (sibling && sibling->color == RBT_RED) {
+			sibling->color = RBT_BLACK;
+			parent->color = RBT_RED;
+			parent->rotate(nodeSide);
+			sibling = parent->next[!nodeSide];
+		}
+		base_type* nearNephew = (sibling) ? sibling->next[nodeSide] : NULL;
+		base_type* farNephew  = (sibling) ? sibling->next[!nodeSide] : NULL;
+		bool isNearRed = (nearNephew && nearNephew->color == RBT_RED);
+		bool isFarRed  = (farNephew && farNephew->color == RBT_RED);
+		if (!isNearRed && !isFarRed) {
+			if (sibling)
+				sibling->color = RBT_RED;
+			node = parent;
+			parent = node->parent;
+			continue;
+		}
+		if (!isFarRed) {
+			if (nearNephew)
+				nearNephew->color = RBT_BLACK;
+			if (sibling) {
+				sibling->color = RBT_RED;
+				sibling->rotate(!nodeSide);
+			}
+			sibling = parent->next[!nodeSide];
+			farNephew = (sibling) ? sibling->next[!nodeSide] : NULL;
+		}
+		if (sibling)
+			sibling->color = parent->color;
+		parent->color = RBT_BLACK;
+		if (farNephew)
+			farNephew->color = RBT_BLACK;
+		parent->rotate(nodeSide);
+		node = _root;
+	}
+	if (node)
+		node->color = RBT_BLACK;
 }
 
 
@@ -369,7 +462,6 @@ oneChildRemove(ft::internal::rbt_node<T, Comp>* node)
 	typedef ft::internal::rbt_node<T, Comp>		node_type;
 	typedef typename node_type::remove_result	remove_result;
 
-
 	remove_result result(NULL, NULL, node->color);
 	node_type*	successor = node->left() ? NODE(node->left()) : NODE(node->right());
 	successor->parent = node->parent;
@@ -392,14 +484,18 @@ twoChildrenRemove(ft::internal::rbt_node<T, Comp>* node)
 
 	remove_result	result(NULL, NULL, 0);
 	node_type*		successor = NODE(node->right()->min());
-	side_type	successorSide = (successor->parent->left() == successor) ? RBT_LEFT : RBT_RIGHT;
+	side_type		successorSide = (successor->parent->left() == successor) ? RBT_LEFT : RBT_RIGHT;
+
 	// Fixup successor child before extracting the successor
 	node_type*	successorChild = NODE(successor->right());
 	if (successorChild)
 		successorChild->parent = successor->parent;
 	successor->parent->next[successorSide] = successorChild;
+
 	// Initialise the correct value of result
 	result.parentNode = NODE(successor->parent);
+	if (successor->parent == node)
+		result.parentNode = successor;
 	result.replacementNode = successorChild;
 	result.removedColor = successor->color;
 
@@ -415,7 +511,7 @@ twoChildrenRemove(ft::internal::rbt_node<T, Comp>* node)
 		successor->left() = NULL;
 	if (successor->right() == successor)
 		successor->right() = NULL;
-	result.replacementNode = successor;
+	successor->color = node->color;
 	return result;
 }
 
