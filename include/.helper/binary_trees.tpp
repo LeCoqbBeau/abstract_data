@@ -5,6 +5,9 @@
 #ifndef BINARY_TREES_TPP
 #define BINARY_TREES_TPP
 
+#ifndef BINARY_TREES_HPP
+# include "binary_trees.hpp"
+#endif
 
 #include "ftexcept.hpp"
 #include "new.hpp"
@@ -292,6 +295,7 @@ typename ft::internal::rb_tree<T, Comp, Allocator>::remove_result
 ft::internal::rb_tree<T, Comp, Allocator>::remove(value_type CREF val)
 {
 	node_type	*toRemove = find(val);
+	node_type	*rootReplacement = NULL;
 	if (toRemove == &_sentinel)
 		return remove_result(toRemove, toRemove, toRemove->color);
 	// Prefix the _sentinel
@@ -299,17 +303,21 @@ ft::internal::rb_tree<T, Comp, Allocator>::remove(value_type CREF val)
 		_sentinel.left() = _sentinel.left()->parent;
 	else if (toRemove == _sentinel.right())
 		_sentinel.right() = _sentinel.right()->parent;
+	if (toRemove == _root && !_root->left() && !_root->right())
+		_sentinel.left() = _sentinel.right() = NULL;
 	// Actually remove the node
+	if (toRemove == _root && toRemove->right())
+		rootReplacement = NODE(toRemove->right()->min());
 	remove_result result = toRemove->remove(_node_allocator(), _deallocateNode);
 	// Fixup the _root
 	if (toRemove == _root) {
-		if (!result.parentNode && result.replacementNode)
-			_root = result.replacementNode;
+		_root = rootReplacement;
 		if (_root) {
 			_root->color = RBT_BLACK;
-			_root->parent = &_sentinel;
+			_root->parent = NULL;
 		}
-	} else if (result.removedColor == RBT_BLACK)
+	}
+	if (result.removedColor == RBT_BLACK)
 		_removeFixup(result);
 	return result;
 }
@@ -366,6 +374,7 @@ template <typename T, typename Comp, typename Allocator>
 void
 ft::internal::rb_tree<T, Comp, Allocator>::_removeFixup(remove_result result)
 {
+	base_type*	rotatedNode = NULL;
 	base_type*	node = result.replacementNode;
 	base_type*	parent = result.parentNode;
 
@@ -378,7 +387,9 @@ ft::internal::rb_tree<T, Comp, Allocator>::_removeFixup(remove_result result)
 		if (sibling && sibling->color == RBT_RED) {
 			sibling->color = RBT_BLACK;
 			parent->color = RBT_RED;
-			parent->rotate(nodeSide);
+			rotatedNode = parent->rotate(nodeSide);
+			if (!rotatedNode->parent)
+				_root = NODE(rotatedNode);
 			sibling = parent->next[!nodeSide];
 		}
 		base_type* nearNephew = (sibling) ? sibling->next[nodeSide] : NULL;
@@ -397,7 +408,9 @@ ft::internal::rb_tree<T, Comp, Allocator>::_removeFixup(remove_result result)
 				nearNephew->color = RBT_BLACK;
 			if (sibling) {
 				sibling->color = RBT_RED;
-				sibling->rotate(!nodeSide);
+				rotatedNode = sibling->rotate(!nodeSide);
+				if (!rotatedNode->parent)
+					_root = NODE(rotatedNode);
 			}
 			sibling = parent->next[!nodeSide];
 			farNephew = (sibling) ? sibling->next[!nodeSide] : NULL;
@@ -407,7 +420,9 @@ ft::internal::rb_tree<T, Comp, Allocator>::_removeFixup(remove_result result)
 		parent->color = RBT_BLACK;
 		if (farNephew)
 			farNephew->color = RBT_BLACK;
-		parent->rotate(nodeSide);
+		rotatedNode = parent->rotate(nodeSide);
+		if (!rotatedNode->parent)
+			_root = NODE(rotatedNode);
 		node = _root;
 	}
 	if (node)
@@ -503,8 +518,10 @@ twoChildrenRemove(ft::internal::rbt_node<T, Comp>* node)
 	successor->parent = node->parent;
 	if (node->parent)
 		(node->parent->left() == node) ? node->parent->left() = successor : node->parent->right() = successor;
-	node->left()->parent = successor;
-	node->right()->parent = successor;
+	if (node->left())
+		node->left()->parent = successor;
+	if (node->right())
+		node->right()->parent = successor;
 	successor->left() = node->left();
 	successor->right() = node->right();
 	if (successor->left() == successor)

@@ -155,6 +155,7 @@ typename ft::internal::rbt_node<T, Comp>::remove_result
 twoChildrenRemove(ft::internal::rbt_node<T, Comp>* node);
 
 
+#include ".never_included/utils.h"
 #include "binary_trees.tpp"
 
 

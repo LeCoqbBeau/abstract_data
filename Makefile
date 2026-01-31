@@ -57,8 +57,12 @@ fclean: clean dclean
 
 re: fclean all
 
-run:
+run: $(NAME)
 	./$(NAME)
+
+val: $(NAME)
+	valgrind --leak-check=full --show-leak-kinds=all -q ./$(NAME)
+
 
 $(DOXYGEN_HTML): $(DOXYFILE) $(DOXYGEN_SRCS)
 	@echo "\033[0;35m Updated Doxygen documentation"
