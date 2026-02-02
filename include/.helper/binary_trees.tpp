@@ -135,53 +135,20 @@ ft::internal::rbt_node_base::prevNode()
 }
 
 
-inline
-void
-ft::internal::rbt_node_base::transplant(this_type* other)
-{
-	if (!this->parent)
-		;
-	else if (this == this->parent->left())
-		this->parent->left() = other;
-	else
-		this->parent->right() = other;
-	if (other)
-		other->parent = this->parent;
-}
-
-
 //
-//	rbt_node<T, Comp>
+//	rbt_node<T>
 //
 
 
-#define NODE(base) (static_cast<ft::internal::rbt_node<T, Comp>*>(base))	// baseToNode
-#define BASE(node) (static_cast<ft::internal::rbt_node_base*>(node))		// nodeToBase
-
-
-template <typename T, typename Comp>
-typename ft::internal::rbt_node<T, Comp>::this_type*
-ft::internal::rbt_node<T, Comp>::find(value_type CREF val)
-{
-	bool const isSmaller = comp(val, this->value);
-	bool const isBigger = comp(this->value, val);
-	if (!isSmaller && !isBigger)
-		return this;
-	side_type searchSide = (isSmaller) ? RBT_LEFT : RBT_RIGHT;
-	if (next[searchSide])
-		return NODE(next[searchSide])->find(val);
-	return NULL;
-}
-
-
-template <typename T, typename Comp>
-typename ft::internal::rbt_node<T, Comp>::this_type*
-ft::internal::rbt_node<T, Comp>::insert(this_type* node)
+template <typename T>
+template <typename Compare>
+typename ft::internal::rbt_node<T>::this_type*
+ft::internal::rbt_node<T>::insert(this_type* node, Compare comp)
 {
 	// node < this
 	side_type insertSide = (comp(node->value, this->value)) ? RBT_LEFT : RBT_RIGHT;
 	if (this->next[insertSide])
-		return NODE(this->next[insertSide])->insert(node);
+		return RBT_NODE(this->next[insertSide])->insert(node, comp);
 	this->next[insertSide] = node;
 	node->color = RBT_RED;
 	node->parent = this;
@@ -190,10 +157,10 @@ ft::internal::rbt_node<T, Comp>::insert(this_type* node)
 }
 
 
-template <typename T, typename Comp>
+template <typename T>
 template <typename Allocator, typename FreeFunc>
-typename ft::internal::rbt_node<T, Comp>::remove_result
-ft::internal::rbt_node<T, Comp>::remove(Allocator allocator, FreeFunc free)
+typename ft::internal::rbt_node<T>::remove_result
+ft::internal::rbt_node<T>::erase(Allocator allocator, FreeFunc free)
 {
 	remove_result	result;
 
@@ -208,65 +175,169 @@ ft::internal::rbt_node<T, Comp>::remove(Allocator allocator, FreeFunc free)
 }
 
 
+template <typename T>
+template <typename Compare>
+typename ft::internal::rbt_node<T>::this_type*
+ft::internal::rbt_node<T>::find(value_type CREF val, Compare comp) const
+{
+	bool const isSmaller = comp(val, this->value);
+	bool const isBigger = comp(this->value, val);
+	if (!isSmaller && !isBigger)
+		return this;
+	side_type searchSide = (isSmaller) ? RBT_LEFT : RBT_RIGHT;
+	if (next[searchSide])
+		return RBT_NODE(next[searchSide])->find(val, comp);
+	return NULL;
+}
+
+
+template <typename T>
+template <typename Compare>
+ft::size_t
+ft::internal::rbt_node<T>::count(value_type CREF val, Compare comp) const
+{
+	bool const isSmaller = comp(val, this->value);
+	bool const isBigger = comp(this->value, val);
+	ft::size_t count = (!isSmaller && !isBigger);
+	if (isSmaller && left())
+		return RBT_NODE(left())->count(val, comp);
+	if (isBigger && right())
+		return RBT_NODE(right())->count(val, comp);
+	if (left())
+		count += RBT_NODE(left())->count(val, comp);
+	if (right())
+		count += RBT_NODE(right())->count(val, comp);
+	return count;
+}
+
+
+template <typename T>
+template <typename Compare>
+typename ft::internal::rbt_node<T>::this_type const*
+ft::internal::rbt_node<T>::lower_bound(value_type CREF val, Compare comp) const
+{
+	this_type	const* iterator = this;
+	this_type	const* candidate = NULL;
+	bool 		isSmaller;
+	bool 		isBigger;
+	while (iterator) {
+		isSmaller = comp(val, iterator->value);
+		isBigger = comp(iterator->value, val);
+		if (!isSmaller && !isBigger)
+			return iterator;
+		if (isSmaller) {
+			candidate = iterator;
+			iterator = RBT_NODE(iterator->left());
+		} else
+			iterator = RBT_NODE(iterator->right());
+	}
+	return candidate;
+}
+
+
+template <typename T>
+template <typename Compare>
+typename ft::internal::rbt_node<T>::this_type const*
+ft::internal::rbt_node<T>::upper_bound(value_type CREF val, Compare comp) const
+{
+	this_type	const* iterator = this;
+	this_type	const* candidate = NULL;
+	bool 		isSmaller;
+	bool 		isBigger;
+	while (iterator) {
+		isSmaller = comp(val, iterator->value);
+		isBigger = comp(iterator->value, val);
+		if (!isSmaller && !isBigger)
+			return iterator;
+		if (isBigger) {
+			candidate = iterator;
+			iterator = RBT_NODE(iterator->left());
+		} else
+			iterator = RBT_NODE(iterator->right());
+	}
+	return candidate;
+}
+
+
 //
 //	rb_tree<T, Comp, Allocator>
 //
 
 
 template <typename T, typename Comp, typename Allocator>
-ft::internal::rb_tree<T, Comp, Allocator>::~rb_tree()
+ft::internal::rbt<T, Comp, Allocator>::~rbt()
 {
 	_clearTree(_root);
 }
 
 
 template <typename T, typename Comp, typename Allocator>
-typename ft::internal::rb_tree<T, Comp, Allocator>::node_type*
-ft::internal::rb_tree<T, Comp, Allocator>::begin()
+typename ft::internal::rbt<T, Comp, Allocator>::iterator
+ft::internal::rbt<T, Comp, Allocator>::begin()
 {
-	return NODE(_sentinel.left());
+	return iterator(&_sentinel, RBT_NODE(_sentinel.left()));
 }
 
 
 template <typename T, typename Comp, typename Allocator>
-typename ft::internal::rb_tree<T, Comp, Allocator>::node_type*
-ft::internal::rb_tree<T, Comp, Allocator>::begin() const
+typename ft::internal::rbt<T, Comp, Allocator>::const_iterator
+ft::internal::rbt<T, Comp, Allocator>::begin() const
 {
-	return NODE(_sentinel.left());
+	return const_iterator(&_sentinel,RBT_NODE(_sentinel.left()));
 }
 
 
 template <typename T, typename Comp, typename Allocator>
-typename ft::internal::rb_tree<T, Comp, Allocator>::node_type*
-ft::internal::rb_tree<T, Comp, Allocator>::end()
+typename ft::internal::rbt<T, Comp, Allocator>::iterator
+ft::internal::rbt<T, Comp, Allocator>::end()
 {
-	return NODE(&_sentinel);
+	return iterator(&_sentinel, RBT_NODE(&_sentinel));
 }
 
 
 template <typename T, typename Comp, typename Allocator>
-typename ft::internal::rb_tree<T, Comp, Allocator>::node_type*
-ft::internal::rb_tree<T, Comp, Allocator>::end() const
+typename ft::internal::rbt<T, Comp, Allocator>::const_iterator
+ft::internal::rbt<T, Comp, Allocator>::end() const
 {
-	return NODE(&_sentinel);
-}
-
-template <typename T, typename Comp, typename Allocator>
-typename ft::internal::rb_tree<T, Comp, Allocator>::node_type*
-ft::internal::rb_tree<T, Comp, Allocator>::find(value_type CREF val)
-{
-	if (!_root)
-		return NODE(&_sentinel);
-	node_type* ret = _root->find(val);
-	if (ret)
-		return ret;
-	return NODE(&_sentinel);
+	return const_iterator(&_sentinel, RBT_NODE(const_cast<base_type *>(&_sentinel)));
 }
 
 
 template <typename T, typename Comp, typename Allocator>
-typename ft::internal::rb_tree<T, Comp, Allocator>::node_type*
-ft::internal::rb_tree<T, Comp, Allocator>::insert(value_type CREF val)
+typename ft::internal::rbt<T, Comp, Allocator>::reverse_iterator
+ft::internal::rbt<T, Comp, Allocator>::rbegin()
+{
+	return reverse_iterator(end());
+}
+
+
+template <typename T, typename Comp, typename Allocator>
+typename ft::internal::rbt<T, Comp, Allocator>::const_reverse_iterator
+ft::internal::rbt<T, Comp, Allocator>::rbegin() const
+{
+	return const_reverse_iterator(end());
+}
+
+
+template <typename T, typename Comp, typename Allocator>
+typename ft::internal::rbt<T, Comp, Allocator>::reverse_iterator
+ft::internal::rbt<T, Comp, Allocator>::rend()
+{
+	return reverse_iterator(begin());
+}
+
+
+template <typename T, typename Comp, typename Allocator>
+typename ft::internal::rbt<T, Comp, Allocator>::const_reverse_iterator
+ft::internal::rbt<T, Comp, Allocator>::rend() const
+{
+	return const_reverse_iterator(begin());
+}
+
+
+template <typename T, typename Comp, typename Allocator>
+typename ft::internal::rbt<T, Comp, Allocator>::iterator
+ft::internal::rbt<T, Comp, Allocator>::insert(value_type CREF val)
 {
 	node_type	*insertNode = _createNode(val);
 
@@ -277,22 +348,22 @@ ft::internal::rb_tree<T, Comp, Allocator>::insert(value_type CREF val)
 		_sentinel.right() = _root;
 		_root->parent = NULL;
 		_root->color = RBT_BLACK;
-		return _root;
+		return iterator(&_sentinel, _root);
 	}
-	_root->insert(insertNode);
+	_root->insert(insertNode, key_comp());
 	_insertFixup(insertNode);
 	_root->color = RBT_BLACK;
 	if (insertNode->parent == _sentinel.left() && insertNode == _sentinel.left()->left())
 		_sentinel.left() = insertNode;
 	else if (insertNode->parent == _sentinel.right() && insertNode == _sentinel.right()->right())
 		_sentinel.right() = insertNode;
-	return insertNode;
+	return iterator(&_sentinel, insertNode);
 }
 
 
 template <typename T, typename Comp, typename Allocator>
-typename ft::internal::rb_tree<T, Comp, Allocator>::remove_result
-ft::internal::rb_tree<T, Comp, Allocator>::remove(value_type CREF val)
+typename ft::internal::rbt<T, Comp, Allocator>::remove_result
+ft::internal::rbt<T, Comp, Allocator>::erase(value_type CREF val)
 {
 	node_type	*toRemove = find(val);
 	node_type	*rootReplacement = NULL;
@@ -307,8 +378,8 @@ ft::internal::rb_tree<T, Comp, Allocator>::remove(value_type CREF val)
 		_sentinel.left() = _sentinel.right() = NULL;
 	// Actually remove the node
 	if (toRemove == _root && toRemove->right())
-		rootReplacement = NODE(toRemove->right()->min());
-	remove_result result = toRemove->remove(_node_allocator(), _deallocateNode);
+		rootReplacement = RBT_NODE(toRemove->right()->min());
+	remove_result result = toRemove->erase(_node_allocator(), _deallocateNode);
 	// Fixup the _root
 	if (toRemove == _root) {
 		_root = rootReplacement;
@@ -318,14 +389,94 @@ ft::internal::rb_tree<T, Comp, Allocator>::remove(value_type CREF val)
 		}
 	}
 	if (result.removedColor == RBT_BLACK)
-		_removeFixup(result);
+		_eraseFixup(result);
 	return result;
 }
 
 
 template <typename T, typename Comp, typename Allocator>
-typename ft::internal::rb_tree<T, Comp, Allocator>::node_type*
-ft::internal::rb_tree<T, Comp, Allocator>::_createNode(value_type CREF val)
+void
+ft::internal::rbt<T, Comp, Allocator>::swap(this_type REF other)
+{
+	ft::swap(this->_root, other._root);
+	ft::swap(this->_sentinel, other._sentinel);
+}
+
+
+template <typename T, typename Comp, typename Allocator>
+void
+ft::internal::rbt<T, Comp, Allocator>::clear()
+{
+	_clearTree(_root);
+	_root = NULL;
+	_sentinel.left() = NULL;
+	_sentinel.right() = NULL;
+	_sentinel.parent = NULL;
+}
+
+
+template <typename T, typename Comp, typename Allocator>
+typename ft::internal::rbt<T, Comp, Allocator>::key_compare
+ft::internal::rbt<T, Comp, Allocator>::key_comp() const
+{
+	return _comp;
+}
+
+
+template <typename T, typename Comp, typename Allocator>
+typename ft::internal::rbt<T, Comp, Allocator>::value_compare
+ft::internal::rbt<T, Comp, Allocator>::value_comp() const
+{
+	return _comp;
+}
+
+
+template <typename T, typename Comp, typename Allocator>
+typename ft::internal::rbt<T, Comp, Allocator>::iterator
+ft::internal::rbt<T, Comp, Allocator>::find(value_type CREF val) const
+{
+	if (!_root)
+		return end();
+	node_type* ret = _root->find(val, _comp);
+	if (ret)
+		return iterator(&_sentinel, ret);
+	return end();
+}
+
+
+template <typename T, typename Comp, typename Allocator>
+typename ft::internal::rbt<T, Comp, Allocator>::size_type
+ft::internal::rbt<T, Comp, Allocator>::count(value_type CREF val) const
+{
+	return _root->count(val, _comp);
+}
+
+
+template <typename T, typename Comp, typename Allocator>
+typename ft::internal::rbt<T, Comp, Allocator>::iterator
+ft::internal::rbt<T, Comp, Allocator>::lower_bound(value_type CREF val) const
+{
+	node_type const* bound = _root->lower_bound(val, _comp);
+	if (!bound)
+		return end();
+	return iterator(const_cast<base_type*>(&_sentinel), const_cast<node_type*>(bound));
+}
+
+
+template <typename T, typename Comp, typename Allocator>
+typename ft::internal::rbt<T, Comp, Allocator>::iterator
+ft::internal::rbt<T, Comp, Allocator>::upper_bound(value_type CREF val) const
+{
+	node_type const* bound = _root->upper_bound(val, _comp);
+	if (!bound)
+		return end();
+	return iterator(const_cast<base_type*>(&_sentinel), const_cast<node_type*>(bound));
+}
+
+
+template <typename T, typename Comp, typename Allocator>
+typename ft::internal::rbt<T, Comp, Allocator>::node_type*
+ft::internal::rbt<T, Comp, Allocator>::_createNode(value_type CREF val)
 {
 	node_type* newNode;
 	TRY_ALLOC(newNode = _node_allocator().allocate(1);,;);
@@ -336,7 +487,7 @@ ft::internal::rb_tree<T, Comp, Allocator>::_createNode(value_type CREF val)
 
 template <typename T, typename Comp, typename Allocator>
 void
-ft::internal::rb_tree<T, Comp, Allocator>::_insertFixup(node_type* inserted)
+ft::internal::rbt<T, Comp, Allocator>::_insertFixup(node_type* inserted)
 {
 	color_type	blackRef = RBT_BLACK;
 	while (inserted->parent && inserted->parent->color == RBT_RED) {
@@ -353,32 +504,33 @@ ft::internal::rb_tree<T, Comp, Allocator>::_insertFixup(node_type* inserted)
 			parent->color = RBT_BLACK;
 			uncleColor = RBT_BLACK;
 			parent->parent->color = RBT_RED;
-			inserted = NODE(parent->parent);
+			inserted = RBT_NODE(parent->parent);
 			continue;
 		}
 		if (inserted == parent->next[!parentSide]) {
-			inserted = NODE(parent);
+			inserted = RBT_NODE(parent);
 			base_type* rotatedNode = inserted->rotate(parentSide);
 			if (!rotatedNode->parent)
-				_root = NODE(rotatedNode);
+				_root = RBT_NODE(rotatedNode);
 		}
 		inserted->parent->color = RBT_BLACK;
 		inserted->parent->parent->color = RBT_RED;
 		base_type* rotatedNode = inserted->parent->parent->rotate(!parentSide);
 		if (!rotatedNode->parent)
-			_root = NODE(rotatedNode);
+			_root = RBT_NODE(rotatedNode);
 	}
 }
 
+
 template <typename T, typename Comp, typename Allocator>
 void
-ft::internal::rb_tree<T, Comp, Allocator>::_removeFixup(remove_result result)
+ft::internal::rbt<T, Comp, Allocator>::_eraseFixup(remove_result result)
 {
 	base_type*	rotatedNode = NULL;
 	base_type*	node = result.replacementNode;
 	base_type*	parent = result.parentNode;
 
-	while ((!node || node->color) && node != _root) {
+	while ((!node || node->color == RBT_BLACK) && node != _root) {
 		if (!parent)
 			break;
 		side_type	nodeSide = (parent->left() == node) ? RBT_LEFT : RBT_RIGHT;
@@ -389,7 +541,7 @@ ft::internal::rb_tree<T, Comp, Allocator>::_removeFixup(remove_result result)
 			parent->color = RBT_RED;
 			rotatedNode = parent->rotate(nodeSide);
 			if (!rotatedNode->parent)
-				_root = NODE(rotatedNode);
+				_root = RBT_NODE(rotatedNode);
 			sibling = parent->next[!nodeSide];
 		}
 		base_type* nearNephew = (sibling) ? sibling->next[nodeSide] : NULL;
@@ -410,7 +562,7 @@ ft::internal::rb_tree<T, Comp, Allocator>::_removeFixup(remove_result result)
 				sibling->color = RBT_RED;
 				rotatedNode = sibling->rotate(!nodeSide);
 				if (!rotatedNode->parent)
-					_root = NODE(rotatedNode);
+					_root = RBT_NODE(rotatedNode);
 			}
 			sibling = parent->next[!nodeSide];
 			farNephew = (sibling) ? sibling->next[!nodeSide] : NULL;
@@ -422,7 +574,7 @@ ft::internal::rb_tree<T, Comp, Allocator>::_removeFixup(remove_result result)
 			farNephew->color = RBT_BLACK;
 		rotatedNode = parent->rotate(nodeSide);
 		if (!rotatedNode->parent)
-			_root = NODE(rotatedNode);
+			_root = RBT_NODE(rotatedNode);
 		node = _root;
 	}
 	if (node)
@@ -432,83 +584,85 @@ ft::internal::rb_tree<T, Comp, Allocator>::_removeFixup(remove_result result)
 
 template <typename T, typename Comp, typename Allocator>
 void
-ft::internal::rb_tree<T, Comp, Allocator>::_clearTree(node_type* node)
+ft::internal::rbt<T, Comp, Allocator>::_clearTree(node_type* node)
 {
 	if (!node)
 		return ;
-	_clearTree(NODE(node->left()));
-	_clearTree(NODE(node->right()));
+	_clearTree(RBT_NODE(node->left()));
+	_clearTree(RBT_NODE(node->right()));
 	_deallocateNode(_node_allocator(), node);
 }
 
 
 template <typename T, typename Comp, typename Allocator>
 void
-ft::internal::rb_tree<T, Comp, Allocator>::_deallocateNode(_node_allocator_type allocator, node_type* node)
+ft::internal::rbt<T, Comp, Allocator>::_deallocateNode(_node_allocator_type allocator, node_type* node)
 {
 	allocator.destroy(node);
 	allocator.deallocate(node, 1);
 }
 
 
+//
 // Static Functions
+//
 
 
-template <typename T, typename Comp>
+template <typename T>
 static
-typename ft::internal::rbt_node<T, Comp>::remove_result
-noChildRemove(ft::internal::rbt_node<T, Comp>* node)
+typename ft::internal::rbt_node<T>::remove_result
+noChildRemove(ft::internal::rbt_node<T>* node)
 {
-	typedef typename ft::internal::rbt_node<T, Comp>::remove_result remove_result;
+	typedef typename ft::internal::rbt_node<T>::remove_result remove_result;
 
 	remove_result result(NULL, NULL, node->color);
 	if (node->parent)
 		(node->parent->left() == node) ? node->parent->left() = NULL : node->parent->right() = NULL;
-	result.parentNode = NODE(node->parent);
+	result.parentNode = RBT_NODE(node->parent);
 	return result;
 }
 
 
-template <typename T, typename Comp>
+template <typename T>
 static
-typename ft::internal::rbt_node<T, Comp>::remove_result
-oneChildRemove(ft::internal::rbt_node<T, Comp>* node)
+typename ft::internal::rbt_node<T>::remove_result
+oneChildRemove(ft::internal::rbt_node<T>* node)
 {
-	typedef ft::internal::rbt_node<T, Comp>		node_type;
+	typedef ft::internal::rbt_node<T>		node_type;
 	typedef typename node_type::remove_result	remove_result;
 
 	remove_result result(NULL, NULL, node->color);
-	node_type*	successor = node->left() ? NODE(node->left()) : NODE(node->right());
+	node_type*	successor = node->left() ? RBT_NODE(node->left()) : RBT_NODE(node->right());
 	successor->parent = node->parent;
 	if (node->parent)
 		(node->parent->left() == node) ? node->parent->left() = successor : node->parent->right() = successor;
 	result.replacementNode = successor;
-	result.parentNode = NODE(node->parent);
+	result.parentNode = RBT_NODE(node->parent);
 	return result;
 }
 
 
-template <typename T, typename Comp>
+template <typename T>
 static
-typename ft::internal::rbt_node<T, Comp>::remove_result
-twoChildrenRemove(ft::internal::rbt_node<T, Comp>* node)
+typename ft::internal::rbt_node<T>::remove_result
+twoChildrenRemove(ft::internal::rbt_node<T>* node)
 {
-	typedef ft::internal::rbt_node<T, Comp>		node_type;
+	typedef ft::internal::rbt_node<T>		node_type;
 	typedef typename node_type::side_type		side_type;
 	typedef typename node_type::remove_result	remove_result;
 
 	remove_result	result(NULL, NULL, 0);
-	node_type*		successor = NODE(node->right()->min());
+	node_type*		successor = RBT_NODE(node->right()->min());
 	side_type		successorSide = (successor->parent->left() == successor) ? RBT_LEFT : RBT_RIGHT;
 
 	// Fixup successor child before extracting the successor
-	node_type*	successorChild = NODE(successor->right());
+	node_type*	successorChild = RBT_NODE(successor->right());
 	if (successorChild)
 		successorChild->parent = successor->parent;
 	successor->parent->next[successorSide] = successorChild;
 
 	// Initialise the correct value of result
-	result.parentNode = NODE(successor->parent);
+	result.parentNode = RBT_NODE(successor->parent);
 	if (successor->parent == node)
 		result.parentNode = successor;
 	result.replacementNode = successorChild;
@@ -518,9 +672,9 @@ twoChildrenRemove(ft::internal::rbt_node<T, Comp>* node)
 	successor->parent = node->parent;
 	if (node->parent)
 		(node->parent->left() == node) ? node->parent->left() = successor : node->parent->right() = successor;
-	if (node->left())
+	if (node->left() && node->left()->parent != successor)
 		node->left()->parent = successor;
-	if (node->right())
+	if (node->right() && node->right()->parent != successor)
 		node->right()->parent = successor;
 	successor->left() = node->left();
 	successor->right() = node->right();
@@ -532,7 +686,5 @@ twoChildrenRemove(ft::internal::rbt_node<T, Comp>* node)
 	return result;
 }
 
-#undef NODE
-#undef BASE
 
 #endif //BINARY_TREES_TPP

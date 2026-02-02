@@ -26,15 +26,16 @@ struct _doublyLinkedList {
 };
 
 
-template <class T, class TRef, class TPtr>
+template <class T, class Ref, class Ptr>
 struct _listIterator
-	: public ft::iterator<ft::bidirectional_iterator_tag, T, ft::ptrdiff_t, TRef, TPtr>
+	: public ft::iterator<ft::bidirectional_iterator_tag, T, ft::ptrdiff_t, Ref, Ptr>
 {
 	// Typedef
-	typedef _listIterator<T, TRef, TPtr>				this_type;
+	typedef _listIterator<T, Ref, Ptr>					this_type;
 	typedef T											value_type;
-	typedef TRef										reference;
-	typedef TPtr										pointer;
+	typedef Ref											reference;
+	typedef Ptr											pointer;
+	typedef ft::ptrdiff_t								difference_type;
 	typedef typename ft::list<value_type>::node_type	node_type;
 
 	// Constructor

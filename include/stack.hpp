@@ -48,7 +48,7 @@ class stack {
 											(ft::stack<T, Container> CREF lhs, ft::stack<T, Container> CREF rhs)	\
 										{ return lhs.c op rhs.c; }
 
-l
+
 STACK_COMPARISON_OPERATOR(==);
 STACK_COMPARISON_OPERATOR(!=);
 STACK_COMPARISON_OPERATOR(<);
