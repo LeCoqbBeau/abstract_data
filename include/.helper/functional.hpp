@@ -60,37 +60,37 @@ struct negate : unary_function<T, T> {
 
 template <typename T>
 struct equal_to : binary_function<T, T, bool> {
-	bool operator () (T CREF x, T CREF y) { return x == y; }
+	bool operator () (T CREF x, T CREF y) const { return x == y; }
 };
 
 
 template <typename T>
 struct not_equal_to : binary_function<T, T, bool> {
-	bool operator () (T CREF x, T CREF y) { return x != y; }
+	bool operator () (T CREF x, T CREF y) const { return x != y; }
 };
 
 
 template <typename T>
 struct greater : binary_function<T, T, bool> {
-	bool operator () (T CREF x, T CREF y) { return x > y; }
+	bool operator () (T CREF x, T CREF y) const { return x > y; }
 };
 
 
 template <typename T>
 struct less : binary_function<T, T, bool> {
-	bool operator () (T CREF x, T CREF y) { return x < y; }
+	bool operator () (T CREF x, T CREF y) const { return x < y; }
 };
 
 
 template <typename T>
 struct greater_equal : binary_function<T, T, bool> {
-	bool operator () (T CREF x, T CREF y) { return x >= y; }
+	bool operator () (T CREF x, T CREF y) const { return x >= y; }
 };
 
 
 template <typename T>
 struct less_equal : binary_function<T, T, bool> {
-	bool operator () (T CREF x, T CREF y) { return x <= y; }
+	bool operator () (T CREF x, T CREF y) const { return x <= y; }
 };
 
 

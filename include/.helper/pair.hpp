@@ -16,8 +16,8 @@ struct pair {
 	typedef T2	second_type;
 
 	// Members
-	T1			mFirst;
-	T2			mSecond;
+	T1			first;
+	T2			second;
 
 	// Constructors
 	pair();
@@ -26,12 +26,6 @@ struct pair {
 	template <class U1, class U2> pair(pair<U1, U2> CREF p);
 	pair REF operator = (pair CREF rhs);
 	template <class U1, class U2> pair REF operator = (pair<U1, U2> CREF rhs);
-
-	// Methods
-	first_type REF first() FT_NOTHROW { return mFirst; };
-	first_type CREF first() const FT_NOTHROW { return mFirst; };
-	second_type REF second() FT_NOTHROW { return mSecond; };
-	second_type CREF second() const FT_NOTHROW { return mSecond; };
 
 };
 
@@ -45,34 +39,34 @@ ft::pair<T1, T2> make_pair(T1 x, T2 y);
 // Member functions
 template <class T1, class T2>
 ft::pair<T1, T2>::pair()
-	: mFirst(), mSecond() {}
+	: first(), second() {}
 
 
 template <class T1, class T2>
 ft::pair<T1, T2>::pair(
 	first_type CREF x,
 	second_type CREF y
-)	: mFirst(x), mSecond(y) {}
+)	: first(x), second(y) {}
 
 
 template <class T1, class T2>
-ft::pair<T1, T2>::pair(pair CREF p) {
-	*this = p;
-}
+ft::pair<T1, T2>::pair(pair CREF p)
+	: first(p.first), second(p.second)
+{}
 
 
 template <class T1, class T2>
 template <class U1, class U2>
-ft::pair<T1, T2>::pair(pair<U1, U2> CREF p) {
-	*this = p;
-}
+ft::pair<T1, T2>::pair(pair<U1, U2> CREF p)
+	: first(p.first), second(p.second)
+{}
 
 
 template <class T1, class T2>
 ft::pair<T1, T2> REF ft::pair<T1, T2>::operator = (pair CREF rhs) {
 	if (this != &rhs) {
-		mFirst = rhs.mFirst;
-		mSecond = rhs.mSecond;
+		const_cast<first_type REF>(first) = rhs.first;
+		const_cast<second_type REF>(second) = rhs.second;
 	}
 	return *this;
 }
@@ -82,8 +76,8 @@ template <class T1, class T2>
 template <class U1, class U2>
 ft::pair<T1, T2> REF ft::pair<T1, T2>::operator = (pair<U1, U2> CREF rhs) {
 	if (this != &rhs) {
-		mFirst = rhs.mFirst;
-		mSecond = rhs.mSecond;
+		const_cast<first_type REF>(first) = rhs.first;
+		const_cast<second_type REF>(second) = rhs.second;
 	}
 	return *this;
 }

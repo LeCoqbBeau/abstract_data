@@ -1,9 +1,14 @@
 
+#include <list>
+
 #include ".helper/ftdef.hpp"
 #include ".never_included/utils.h"
 #include ".helper/binary_trees.hpp"
-#include <cctype>
 #include <set>
+#include <map>
+
+#include "set.hpp"
+#include "map.hpp"
 
 
 struct Loud
@@ -25,115 +30,24 @@ void joblyContainer(T REF container) {
 
 
 template <typename T>
+void joblyMap(T REF container) {
+	for (typename T::iterator it = container.begin(); it != container.end(); ++it)
+		it->second.jobly();
+}
+
+
+template <typename T>
 void containerJobly(T REF container) {
 	for (typename T::reverse_iterator it = container.rbegin(); it != container.rend(); ++it)
 		it->jobly();
 }
 
+template <typename Map>
+void init_map(Map REF set) {
 
-typedef ft::internal::rbt<Loud> tree_type;
-typedef tree_type::node_type node_type;
-typedef tree_type::base_type base_type;
-
-void joblyRBTPrint(node_type* node, uint depth = 1) {
-	if (!node)
-		return;
-	PRINT (node->color == RBT_RED ? RED : CYN) AND node->value CENDL;
-	if (static_cast<node_type*>(node->left())) {
-		for (uint i = 0; i < depth; ++i)
-			PRINT TAB;
-		PRINT "L: ";
-		joblyRBTPrint(static_cast<node_type*>(node->left()), depth + 1);
-	}
-	if (static_cast<node_type*>(node->right())) {
-		for (uint i = 0; i < depth; ++i)
-			PRINT TAB;
-		PRINT "R: ";
-		joblyRBTPrint(static_cast<node_type*>(node->right()), depth + 1);
-	}
 }
-
-template <typename Compare>
-bool isValidBST(node_type* node, Compare comp) {
-	if (!node)
-		return true;
-	bool validLeft = true;
-	if (node->left()) {
-		if (comp(node->value, static_cast<node_type*>((node->left()))->value))
-			return false;
-		validLeft = isValidBST(static_cast<node_type*>(node->left()), comp);
-	}
-	bool validRight = true;
-	if (node->right()) {
-		if (comp(static_cast<node_type*>((node->right()))->value, node->value))
-			return false;
-		validRight = isValidBST(static_cast<node_type*>(node->right()), comp);
-	}
-	return validLeft && validRight;
-}
-
-bool areRedChildrenBlack(base_type *node) {
-	if (!node)
-		return true;
-	bool validLeft = true;
-	if (node->left()) {
-		if (node->color == RBT_RED)
-			if (node->left()->color == RBT_RED)
-				return false;
-		validLeft = areRedChildrenBlack(node->left());
-	}
-	bool validRight = true;
-	if (node->right()) {
-		if (node->color == RBT_RED)
-			if (node->right()->color == RBT_RED)
-				return false;
-		validRight = areRedChildrenBlack(node->right());
-	}
-	return validLeft && validRight;
-}
-
-int getBlackHeight(base_type *node) {
-	if (!node)
-		return 1;
-	int const leftBH = getBlackHeight(node->left());
-	int const rightBH = getBlackHeight(node->right());
-	if (leftBH != rightBH || leftBH == -1)
-		return -1;
-	return leftBH + (node->color == RBT_BLACK);
-}
-
-bool checkBlackHeight(base_type *node) {
-	return getBlackHeight(node) != -1;
-}
-
-bool isValidRBT(tree_type CREF tree) {
-	bool isBST = isValidBST(tree._root, tree.key_comp());
-	bool validRedChild = areRedChildrenBlack(tree._root);
-	bool validBlackHeight = checkBlackHeight(tree._root);
-	SHOWL(isBST);
-	SHOWL(validRedChild);
-	SHOWL(validBlackHeight);
-	return isBST && validRedChild && validBlackHeight;
-}
-
 
 int main() {
-	tree_type tree;
-	// std::set<Loud> tree;
 
-	tree.insert(8);
-	tree.insert(2);
-	tree.insert(5);
-	tree.insert(4);
-	tree.insert(6);
-	tree.insert(1);
-	tree.insert(64);
-	tree.insert(32);
-	tree.insert(16);
-	tree.insert(128);
-
-	SHOWL(*tree.upper_bound(40));
-	// joblyRBTPrint(tree._root);
-	// joblyContainer(tree);
 }
 

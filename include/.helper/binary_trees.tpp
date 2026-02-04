@@ -183,7 +183,7 @@ ft::internal::rbt_node<T>::find(value_type CREF val, Compare comp) const
 	bool const isSmaller = comp(val, this->value);
 	bool const isBigger = comp(this->value, val);
 	if (!isSmaller && !isBigger)
-		return this;
+		return const_cast<this_type*>(this);
 	side_type searchSide = (isSmaller) ? RBT_LEFT : RBT_RIGHT;
 	if (next[searchSide])
 		return RBT_NODE(next[searchSide])->find(val, comp);
@@ -247,9 +247,7 @@ ft::internal::rbt_node<T>::upper_bound(value_type CREF val, Compare comp) const
 	while (iterator) {
 		isSmaller = comp(val, iterator->value);
 		isBigger = comp(iterator->value, val);
-		if (!isSmaller && !isBigger)
-			return iterator;
-		if (isBigger) {
+		if (isSmaller) {
 			candidate = iterator;
 			iterator = RBT_NODE(iterator->left());
 		} else
@@ -259,88 +257,125 @@ ft::internal::rbt_node<T>::upper_bound(value_type CREF val, Compare comp) const
 }
 
 
+template <typename T>
+template <typename Compare>
+ft::pair<
+	typename ft::internal::rbt_node<T>::this_type const*,
+	typename ft::internal::rbt_node<T>::this_type const*
+>
+ft::internal::rbt_node<T>::equal_range(value_type CREF val, Compare comp) const
+{
+	return ft::make_pair(lower_bound(val, comp), upper_bound(val, comp));
+}
+
+
 //
 //	rb_tree<T, Comp, Allocator>
 //
 
 
-template <typename T, typename Comp, typename Allocator>
-ft::internal::rbt<T, Comp, Allocator>::~rbt()
+template <typename T, typename Comp, typename Allocator, typename extractKey, bool mutableIterators>
+ft::internal::rbt<T, Comp, Allocator, extractKey, mutableIterators>::~rbt()
 {
 	_clearTree(_root);
 }
 
 
-template <typename T, typename Comp, typename Allocator>
-typename ft::internal::rbt<T, Comp, Allocator>::iterator
-ft::internal::rbt<T, Comp, Allocator>::begin()
+template <typename T, typename Comp, typename Allocator, typename extractKey, bool mutableIterators>
+typename ft::internal::rbt<T, Comp, Allocator, extractKey, mutableIterators>::iterator
+ft::internal::rbt<T, Comp, Allocator, extractKey, mutableIterators>::begin()
 {
 	return iterator(&_sentinel, RBT_NODE(_sentinel.left()));
 }
 
 
-template <typename T, typename Comp, typename Allocator>
-typename ft::internal::rbt<T, Comp, Allocator>::const_iterator
-ft::internal::rbt<T, Comp, Allocator>::begin() const
+template <typename T, typename Comp, typename Allocator, typename extractKey, bool mutableIterators>
+typename ft::internal::rbt<T, Comp, Allocator, extractKey, mutableIterators>::const_iterator
+ft::internal::rbt<T, Comp, Allocator, extractKey, mutableIterators>::begin() const
 {
 	return const_iterator(&_sentinel,RBT_NODE(_sentinel.left()));
 }
 
 
-template <typename T, typename Comp, typename Allocator>
-typename ft::internal::rbt<T, Comp, Allocator>::iterator
-ft::internal::rbt<T, Comp, Allocator>::end()
+template <typename T, typename Comp, typename Allocator, typename extractKey, bool mutableIterators>
+typename ft::internal::rbt<T, Comp, Allocator, extractKey, mutableIterators>::iterator
+ft::internal::rbt<T, Comp, Allocator, extractKey, mutableIterators>::end()
 {
 	return iterator(&_sentinel, RBT_NODE(&_sentinel));
 }
 
 
-template <typename T, typename Comp, typename Allocator>
-typename ft::internal::rbt<T, Comp, Allocator>::const_iterator
-ft::internal::rbt<T, Comp, Allocator>::end() const
+template <typename T, typename Comp, typename Allocator, typename extractKey, bool mutableIterators>
+typename ft::internal::rbt<T, Comp, Allocator, extractKey, mutableIterators>::const_iterator
+ft::internal::rbt<T, Comp, Allocator, extractKey, mutableIterators>::end() const
 {
 	return const_iterator(&_sentinel, RBT_NODE(const_cast<base_type *>(&_sentinel)));
 }
 
 
-template <typename T, typename Comp, typename Allocator>
-typename ft::internal::rbt<T, Comp, Allocator>::reverse_iterator
-ft::internal::rbt<T, Comp, Allocator>::rbegin()
+template <typename T, typename Comp, typename Allocator, typename extractKey, bool mutableIterators>
+typename ft::internal::rbt<T, Comp, Allocator, extractKey, mutableIterators>::reverse_iterator
+ft::internal::rbt<T, Comp, Allocator, extractKey, mutableIterators>::rbegin()
 {
 	return reverse_iterator(end());
 }
 
 
-template <typename T, typename Comp, typename Allocator>
-typename ft::internal::rbt<T, Comp, Allocator>::const_reverse_iterator
-ft::internal::rbt<T, Comp, Allocator>::rbegin() const
+template <typename T, typename Comp, typename Allocator, typename extractKey, bool mutableIterators>
+typename ft::internal::rbt<T, Comp, Allocator, extractKey, mutableIterators>::const_reverse_iterator
+ft::internal::rbt<T, Comp, Allocator, extractKey, mutableIterators>::rbegin() const
 {
 	return const_reverse_iterator(end());
 }
 
 
-template <typename T, typename Comp, typename Allocator>
-typename ft::internal::rbt<T, Comp, Allocator>::reverse_iterator
-ft::internal::rbt<T, Comp, Allocator>::rend()
+template <typename T, typename Comp, typename Allocator, typename extractKey, bool mutableIterators>
+typename ft::internal::rbt<T, Comp, Allocator, extractKey, mutableIterators>::reverse_iterator
+ft::internal::rbt<T, Comp, Allocator, extractKey, mutableIterators>::rend()
 {
 	return reverse_iterator(begin());
 }
 
 
-template <typename T, typename Comp, typename Allocator>
-typename ft::internal::rbt<T, Comp, Allocator>::const_reverse_iterator
-ft::internal::rbt<T, Comp, Allocator>::rend() const
+template <typename T, typename Comp, typename Allocator, typename extractKey, bool mutableIterators>
+typename ft::internal::rbt<T, Comp, Allocator, extractKey, mutableIterators>::const_reverse_iterator
+ft::internal::rbt<T, Comp, Allocator, extractKey, mutableIterators>::rend() const
 {
 	return const_reverse_iterator(begin());
 }
 
 
-template <typename T, typename Comp, typename Allocator>
-typename ft::internal::rbt<T, Comp, Allocator>::iterator
-ft::internal::rbt<T, Comp, Allocator>::insert(value_type CREF val)
+template <typename T, typename Comp, typename Allocator, typename extractKey, bool mutableIterators>
+bool
+ft::internal::rbt<T, Comp, Allocator, extractKey, mutableIterators>::empty() const
+{
+	return _root->parent;
+}
+
+
+template <typename T, typename Comp, typename Allocator, typename extractKey, bool mutableIterators>
+typename ft::internal::rbt<T, Comp, Allocator, extractKey, mutableIterators>::size_type
+ft::internal::rbt<T, Comp, Allocator, extractKey, mutableIterators>::size() const
+{
+	return _size;
+}
+
+
+template <typename T, typename Comp, typename Allocator, typename extractKey, bool mutableIterators>
+typename ft::internal::rbt<T, Comp, Allocator, extractKey, mutableIterators>::size_type
+ft::internal::rbt<T, Comp, Allocator, extractKey, mutableIterators>::max_size() const
+{
+	return _node_allocator().max_size();
+}
+
+
+template <typename T, typename Comp, typename Allocator, typename extractKey, bool mutableIterators>
+typename ft::internal::rbt<T, Comp, Allocator, extractKey, mutableIterators>::iterator
+ft::internal::rbt<T, Comp, Allocator, extractKey, mutableIterators>::insert(value_type CREF val)
 {
 	node_type	*insertNode = _createNode(val);
 
+	++_size;
 	if (!_root) {
 		_root = insertNode;
 		_sentinel.parent = _root;
@@ -350,7 +385,7 @@ ft::internal::rbt<T, Comp, Allocator>::insert(value_type CREF val)
 		_root->color = RBT_BLACK;
 		return iterator(&_sentinel, _root);
 	}
-	_root->insert(insertNode, key_comp());
+	_root->insert(insertNode, ft::internal::ValueComparator<extractKey, Comp>(_comp));
 	_insertFixup(insertNode);
 	_root->color = RBT_BLACK;
 	if (insertNode->parent == _sentinel.left() && insertNode == _sentinel.left()->left())
@@ -361,51 +396,29 @@ ft::internal::rbt<T, Comp, Allocator>::insert(value_type CREF val)
 }
 
 
-template <typename T, typename Comp, typename Allocator>
-typename ft::internal::rbt<T, Comp, Allocator>::remove_result
-ft::internal::rbt<T, Comp, Allocator>::erase(value_type CREF val)
+template <typename T, typename Comp, typename Allocator, typename extractKey, bool mutableIterators>
+typename ft::internal::rbt<T, Comp, Allocator, extractKey, mutableIterators>::remove_result
+ft::internal::rbt<T, Comp, Allocator, extractKey, mutableIterators>::erase(value_type CREF val)
 {
 	node_type	*toRemove = find(val);
-	node_type	*rootReplacement = NULL;
 	if (toRemove == &_sentinel)
 		return remove_result(toRemove, toRemove, toRemove->color);
-	// Prefix the _sentinel
-	if (toRemove == _sentinel.left())
-		_sentinel.left() = _sentinel.left()->parent;
-	else if (toRemove == _sentinel.right())
-		_sentinel.right() = _sentinel.right()->parent;
-	if (toRemove == _root && !_root->left() && !_root->right())
-		_sentinel.left() = _sentinel.right() = NULL;
-	// Actually remove the node
-	if (toRemove == _root && toRemove->right())
-		rootReplacement = RBT_NODE(toRemove->right()->min());
-	remove_result result = toRemove->erase(_node_allocator(), _deallocateNode);
-	// Fixup the _root
-	if (toRemove == _root) {
-		_root = rootReplacement;
-		if (_root) {
-			_root->color = RBT_BLACK;
-			_root->parent = NULL;
-		}
-	}
-	if (result.removedColor == RBT_BLACK)
-		_eraseFixup(result);
-	return result;
+	return _fastErase(toRemove);
 }
 
 
-template <typename T, typename Comp, typename Allocator>
+template <typename T, typename Comp, typename Allocator, typename extractKey, bool mutableIterators>
 void
-ft::internal::rbt<T, Comp, Allocator>::swap(this_type REF other)
+ft::internal::rbt<T, Comp, Allocator, extractKey, mutableIterators>::swap(this_type REF other)
 {
 	ft::swap(this->_root, other._root);
 	ft::swap(this->_sentinel, other._sentinel);
 }
 
 
-template <typename T, typename Comp, typename Allocator>
+template <typename T, typename Comp, typename Allocator, typename extractKey, bool mutableIterators>
 void
-ft::internal::rbt<T, Comp, Allocator>::clear()
+ft::internal::rbt<T, Comp, Allocator, extractKey, mutableIterators>::clear()
 {
 	_clearTree(_root);
 	_root = NULL;
@@ -415,68 +428,108 @@ ft::internal::rbt<T, Comp, Allocator>::clear()
 }
 
 
-template <typename T, typename Comp, typename Allocator>
-typename ft::internal::rbt<T, Comp, Allocator>::key_compare
-ft::internal::rbt<T, Comp, Allocator>::key_comp() const
+template <typename T, typename Comp, typename Allocator, typename extractKey, bool mutableIterators>
+typename ft::internal::rbt<T, Comp, Allocator, extractKey, mutableIterators>::key_compare
+ft::internal::rbt<T, Comp, Allocator, extractKey, mutableIterators>::key_comp() const
 {
 	return _comp;
 }
 
 
-template <typename T, typename Comp, typename Allocator>
-typename ft::internal::rbt<T, Comp, Allocator>::value_compare
-ft::internal::rbt<T, Comp, Allocator>::value_comp() const
+template <typename T, typename Comp, typename Allocator, typename extractKey, bool mutableIterators>
+typename ft::internal::rbt<T, Comp, Allocator, extractKey, mutableIterators>::value_compare
+ft::internal::rbt<T, Comp, Allocator, extractKey, mutableIterators>::value_comp() const
 {
 	return _comp;
 }
 
 
-template <typename T, typename Comp, typename Allocator>
-typename ft::internal::rbt<T, Comp, Allocator>::iterator
-ft::internal::rbt<T, Comp, Allocator>::find(value_type CREF val) const
+template <typename T, typename Comp, typename Allocator, typename extractKey, bool mutableIterators>
+typename ft::internal::rbt<T, Comp, Allocator, extractKey, mutableIterators>::iterator
+ft::internal::rbt<T, Comp, Allocator, extractKey, mutableIterators>::find(value_type CREF val)
 {
 	if (!_root)
 		return end();
-	node_type* ret = _root->find(val, _comp);
+	node_type* ret = _root->find(val, ft::internal::ValueComparator<extractKey, Comp>(_comp));
 	if (ret)
 		return iterator(&_sentinel, ret);
 	return end();
 }
 
 
-template <typename T, typename Comp, typename Allocator>
-typename ft::internal::rbt<T, Comp, Allocator>::size_type
-ft::internal::rbt<T, Comp, Allocator>::count(value_type CREF val) const
+template <typename T, typename Comp, typename Allocator, typename extractKey, bool mutableIterators>
+typename ft::internal::rbt<T, Comp, Allocator, extractKey, mutableIterators>::const_iterator
+ft::internal::rbt<T, Comp, Allocator, extractKey, mutableIterators>::find(value_type CREF val) const
 {
-	return _root->count(val, _comp);
+	if (!_root)
+		return end();
+	node_type* ret = _root->find(val, ft::internal::ValueComparator<extractKey, Comp>(_comp));
+	if (ret)
+		return iterator(&_sentinel, ret);
+	return end();
 }
 
 
-template <typename T, typename Comp, typename Allocator>
-typename ft::internal::rbt<T, Comp, Allocator>::iterator
-ft::internal::rbt<T, Comp, Allocator>::lower_bound(value_type CREF val) const
+template <typename T, typename Comp, typename Allocator, typename extractKey, bool mutableIterators>
+typename ft::internal::rbt<T, Comp, Allocator, extractKey, mutableIterators>::size_type
+ft::internal::rbt<T, Comp, Allocator, extractKey, mutableIterators>::count(value_type CREF val) const
 {
-	node_type const* bound = _root->lower_bound(val, _comp);
+	return _root->count(val, ft::internal::ValueComparator<extractKey, Comp>(_comp));
+}
+
+
+template <typename T, typename Comp, typename Allocator, typename extractKey, bool mutableIterators>
+typename ft::internal::rbt<T, Comp, Allocator, extractKey, mutableIterators>::iterator
+ft::internal::rbt<T, Comp, Allocator, extractKey, mutableIterators>::lower_bound(value_type CREF val) const
+{
+	node_type const* bound = _root->lower_bound(val, ft::internal::ValueComparator<extractKey, Comp>(_comp));
 	if (!bound)
 		return end();
 	return iterator(const_cast<base_type*>(&_sentinel), const_cast<node_type*>(bound));
 }
 
 
-template <typename T, typename Comp, typename Allocator>
-typename ft::internal::rbt<T, Comp, Allocator>::iterator
-ft::internal::rbt<T, Comp, Allocator>::upper_bound(value_type CREF val) const
+template <typename T, typename Comp, typename Allocator, typename extractKey, bool mutableIterators>
+typename ft::internal::rbt<T, Comp, Allocator, extractKey, mutableIterators>::iterator
+ft::internal::rbt<T, Comp, Allocator, extractKey, mutableIterators>::upper_bound(value_type CREF val) const
 {
-	node_type const* bound = _root->upper_bound(val, _comp);
+	node_type const* bound = _root->upper_bound(val, ft::internal::ValueComparator<extractKey, Comp>(_comp));
 	if (!bound)
 		return end();
 	return iterator(const_cast<base_type*>(&_sentinel), const_cast<node_type*>(bound));
 }
 
 
-template <typename T, typename Comp, typename Allocator>
-typename ft::internal::rbt<T, Comp, Allocator>::node_type*
-ft::internal::rbt<T, Comp, Allocator>::_createNode(value_type CREF val)
+template <typename T, typename Comp, typename Allocator, typename extractKey, bool mutableIterators>
+ft::pair<
+	typename ft::internal::rbt<T, Comp, Allocator, extractKey, mutableIterators>::iterator,
+	typename ft::internal::rbt<T, Comp, Allocator, extractKey, mutableIterators>::iterator
+>
+ft::internal::rbt<T, Comp, Allocator, extractKey, mutableIterators>::equal_range(value_type CREF val) const
+{
+	ft::pair<node_type const*, node_type const*> nodeRange = _root->equal_range(val, ft::internal::ValueComparator<extractKey, Comp>(_comp));
+	if (!nodeRange.first())
+		nodeRange.first() = static_cast<node_type const*>(&_sentinel);
+	if (!nodeRange.second())
+		nodeRange.second() = static_cast<node_type const*>(&_sentinel);
+	return ft::make_pair(
+		iterator(const_cast<base_type*>(&_sentinel),  const_cast<node_type*>(nodeRange.first())),
+		iterator(const_cast<base_type*>(&_sentinel),  const_cast<node_type*>(nodeRange.second()))
+	);
+}
+
+
+template <typename T, typename Comp, typename Allocator, typename extractKey, bool mutableIterators>
+typename ft::internal::rbt<T, Comp, Allocator, extractKey, mutableIterators>::allocator_type
+ft::internal::rbt<T, Comp, Allocator, extractKey, mutableIterators>::get_allocator() const
+{
+	return _allocator;
+}
+
+
+template <typename T, typename Comp, typename Allocator, typename extractKey, bool mutableIterators>
+typename ft::internal::rbt<T, Comp, Allocator, extractKey, mutableIterators>::node_type*
+ft::internal::rbt<T, Comp, Allocator, extractKey, mutableIterators>::_createNode(value_type CREF val)
 {
 	node_type* newNode;
 	TRY_ALLOC(newNode = _node_allocator().allocate(1);,;);
@@ -485,9 +538,9 @@ ft::internal::rbt<T, Comp, Allocator>::_createNode(value_type CREF val)
 }
 
 
-template <typename T, typename Comp, typename Allocator>
+template <typename T, typename Comp, typename Allocator, typename extractKey, bool mutableIterators>
 void
-ft::internal::rbt<T, Comp, Allocator>::_insertFixup(node_type* inserted)
+ft::internal::rbt<T, Comp, Allocator, extractKey, mutableIterators>::_insertFixup(node_type* inserted)
 {
 	color_type	blackRef = RBT_BLACK;
 	while (inserted->parent && inserted->parent->color == RBT_RED) {
@@ -522,9 +575,41 @@ ft::internal::rbt<T, Comp, Allocator>::_insertFixup(node_type* inserted)
 }
 
 
-template <typename T, typename Comp, typename Allocator>
+template <typename T, typename Comp, typename Allocator, typename extractKey, bool mutableIterators>
+typename ft::internal::rbt<T, Comp, Allocator, extractKey, mutableIterators>::remove_result
+ft::internal::rbt<T, Comp, Allocator, extractKey, mutableIterators>::_fastErase(node_type* toRemove)
+{
+	node_type	*rootReplacement = NULL;
+
+	// Pre-fix the _sentinel
+	if (toRemove == _sentinel.left())
+		_sentinel.left() = _sentinel.left()->parent;
+	else if (toRemove == _sentinel.right())
+		_sentinel.right() = _sentinel.right()->parent;
+	if (toRemove == _root && !_root->left() && !_root->right())
+		_sentinel.left() = _sentinel.right() = NULL;
+	// Actually remove the node
+	if (toRemove == _root && toRemove->right())
+		rootReplacement = RBT_NODE(toRemove->right()->min());
+	remove_result result = toRemove->erase(_node_allocator(), _deallocateNode);
+	--_size;
+	// Fixup the _root
+	if (toRemove == _root) {
+		_root = rootReplacement;
+		if (_root) {
+			_root->color = RBT_BLACK;
+			_root->parent = NULL;
+		}
+	}
+	if (result.removedColor == RBT_BLACK)
+		_eraseFixup(result);
+	return result;
+}
+
+
+template <typename T, typename Comp, typename Allocator, typename extractKey, bool mutableIterators>
 void
-ft::internal::rbt<T, Comp, Allocator>::_eraseFixup(remove_result result)
+ft::internal::rbt<T, Comp, Allocator, extractKey, mutableIterators>::_eraseFixup(remove_result result)
 {
 	base_type*	rotatedNode = NULL;
 	base_type*	node = result.replacementNode;
@@ -582,9 +667,9 @@ ft::internal::rbt<T, Comp, Allocator>::_eraseFixup(remove_result result)
 }
 
 
-template <typename T, typename Comp, typename Allocator>
+template <typename T, typename Comp, typename Allocator, typename extractKey, bool mutableIterators>
 void
-ft::internal::rbt<T, Comp, Allocator>::_clearTree(node_type* node)
+ft::internal::rbt<T, Comp, Allocator, extractKey, mutableIterators>::_clearTree(node_type* node)
 {
 	if (!node)
 		return ;
@@ -594,9 +679,9 @@ ft::internal::rbt<T, Comp, Allocator>::_clearTree(node_type* node)
 }
 
 
-template <typename T, typename Comp, typename Allocator>
+template <typename T, typename Comp, typename Allocator, typename extractKey, bool mutableIterators>
 void
-ft::internal::rbt<T, Comp, Allocator>::_deallocateNode(_node_allocator_type allocator, node_type* node)
+ft::internal::rbt<T, Comp, Allocator, extractKey, mutableIterators>::_deallocateNode(_node_allocator_type allocator, node_type* node)
 {
 	allocator.destroy(node);
 	allocator.deallocate(node, 1);

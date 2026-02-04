@@ -10,6 +10,8 @@
 
 namespace ft
 {
+
+
 class bad_alloc : public exception {
 	public:
 		explicit bad_alloc(str CREF error = "ft::bad_alloc") FT_NOTHROW : exception(error) {}

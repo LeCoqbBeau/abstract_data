@@ -195,7 +195,8 @@ ft::deque<T, Allocator>::deque(deque CREF rhs)
 
 
 template <typename T, typename Allocator>
-ft::deque<T, Allocator> REF ft::deque<T, Allocator>::operator = (deque CREF rhs) {
+ft::deque<T, Allocator> REF
+ft::deque<T, Allocator>::operator = (deque CREF rhs) {
 	if (this != &rhs) {
 		// Cleanups before allocating
 		if (_map)

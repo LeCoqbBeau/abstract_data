@@ -32,28 +32,30 @@ DEPS_NAME		=	$(SRC_NAME:.cpp=.d)
 OBJ				=	$(patsubst %, $(OBJ_DIR)%, $(OBJ_NAME))
 DEPS			=	$(patsubst %, $(OBJ_DIR)%, $(DEPS_NAME))
 
+CLR				=	"\033[1;0m"
+
 all: $(NAME) doc
 
 $(OBJ_DIR)%.o:$(SRC_DIR)%.cpp
 	@mkdir -p $(dir $@)
 	@$(CXX) $(CFLAGS) $< -c -o $@
-	@echo "\033[1;36m Compiled" $(*F)
+	@echo "\033[1;36m Compiled" $(*F) $(CLR)
 
 $(NAME): $(OBJ)
 	@$(CXX) $(CFLAGS) -o $(NAME) $(OBJ)
-	@echo "\033[1;32m Executable" $(NAME) "created"
+	@echo "\033[1;32m Executable" $(NAME) "created" $(CLR)
 
 clean:
 	@rm -rf $(OBJ_DIR)
-	@echo "\033[1;31m Deleted all object files"
+	@echo "\033[1;31m Deleted all object files" $(CLR)
 
 dclean:
 	@rm -rf $(DOXYGEN_DIR)
-	@echo "\033[1;31m Deleted documentation"
+	@echo "\033[1;31m Deleted documentation" $(CLR)
 
 fclean: clean dclean
 	@rm -f $(NAME)
-	@echo "\033[1;31m Deleted $(NAME)"
+	@echo "\033[1;31m Deleted $(NAME)" $(CLR)
 
 re: fclean all
 
@@ -65,7 +67,7 @@ val: $(NAME)
 
 
 $(DOXYGEN_HTML): $(DOXYFILE) $(DOXYGEN_SRCS)
-	@echo "\033[0;35m Updated Doxygen documentation"
+	@echo "\033[0;35m Updated Doxygen documentation" $(CLR)
 	@doxygen $(DOXYFILE)
 
 doc: $(DOXYGEN_HTML)
