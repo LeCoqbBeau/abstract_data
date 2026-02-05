@@ -48,8 +48,11 @@ ft::vector<T, Allocator> REF
 ft::vector<T, Allocator>::operator = (vector CREF rhs)
 {
 	if (this != &rhs) {
-		if (_array)
+		if (_array) {
+			for (size_type i = 0; _array + i != _end; ++i)
+				_allocator.destroy(_array + i);
 			_allocator.deallocate(_array, _size);
+		}
 		_assignHelper(rhs._array, rhs._array + _size, ft::false_type());
 	}
 	return *this;

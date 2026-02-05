@@ -615,6 +615,19 @@ void pop_heap(
 }
 
 
+// Random function hihi :3
+inline void *memcpy(
+	void *dest,
+	void const* src,
+	size_t len
+) {
+	char* d = static_cast<char*>(dest);
+	char const* s = static_cast<char const*>(src);
+	while (len--)
+		*d++ = *s++;
+	return dest;
+}
+
 }
 
 #endif //ALGORITHM_H

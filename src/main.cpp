@@ -14,8 +14,9 @@
 struct Loud
 {
 	Loud(int const i) : i(i) { /*PRINT "Loud(" AND i AND ");" ENDL;*/ }
-	~Loud() { /* PRINT PRP "~Loud(" AND i AND ");" CENDL; */ }
+	~Loud() { PRINT PRP "~Loud(" AND i AND ");" CENDL; }
 	void jobly() const { PRINT "what a jobly day " AND i ENDL; }
+	operator int() const { return i; }
 	bool operator == (Loud CREF l) const { return i == l.i; }
 	bool operator < (Loud CREF l) const { return i < l.i; }
 	friend std::ostream REF operator << (std::ostream REF os, Loud CREF l) { os << l.i; return os; }
@@ -42,12 +43,19 @@ void containerJobly(T REF container) {
 		it->jobly();
 }
 
-template <typename Map>
-void init_map(Map REF set) {
+#include <utility>
+#include <functional>
+#include ".helper/hashmap.hpp"
 
-}
 
 int main() {
+	Loud shortTermMemoryLoss = 5;
+	Loud longTermMemoryLoss = 6;
+	ft::internal::hashmap<Loud> hashmap;
 
+	hashmap._array[0] = 1;
+	hashmap._array[0].jobly();
+
+	// SHOWL()
 }
 
