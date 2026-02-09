@@ -265,7 +265,7 @@ struct ValueComparator<ft::false_type, Comp>  { // Don't extract keys
 
 
 template <typename Comp>
-struct ValueComparator<ft::true_type, Comp>  { // Don't extract keys
+struct ValueComparator<ft::true_type, Comp>  { // Extract keys
 	explicit ValueComparator(Comp CREF comp) : _comp(comp) {}
 	template <typename T>	bool operator()(T CREF lhs, T CREF rhs) { return _comp(lhs.first, rhs.first); }
 	template <typename T>	bool operator()(T CREF lhs, T CREF rhs) const { return _comp(lhs.first, rhs.first); }

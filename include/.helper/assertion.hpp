@@ -20,7 +20,7 @@ struct assertion<true>
 };
 
 
-template<int A, int B>
+template <int A, int B>
 struct is_equal : ft::false_type{};
 
 
@@ -28,11 +28,11 @@ template<int A>
 struct is_equal<A, A> : ft::true_type{};
 
 
-template<int A, int B>
+template <int A, int B>
 struct is_not_equal : ft::true_type{};
 
 
-template<int A>
+template <int A>
 struct is_not_equal<A, A> : ft::false_type{};
 
 

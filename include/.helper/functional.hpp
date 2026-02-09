@@ -5,6 +5,8 @@
 #ifndef FUNCTIONAL_H
 #define FUNCTIONAL_H
 
+#include "assertion.hpp"
+#include "algorithm.hpp"
 
 namespace ft {
 
@@ -239,12 +241,39 @@ inline uint64_t doHash(void const* key, size_t len) {
 }
 
 
+template <typename T, typename Enable = void>
+struct hash_impl;
+
+
+template <typename T>
+struct hash_impl<
+	T,
+	typename ft::enable_if<ft::is_arithmetic<T>::value>::type
+> {
+	ft::uint64_t operator()(T CREF x) const { return doHash(&x, sizeof(x)); }
+};
+
+
+template <>
+struct hash_impl<str>
+{
+	ft::uint64_t operator()(str CREF x) const { return doHash(x.data(), x.length()); }
+};
+
+
+template <>
+struct hash_impl<char const*>
+{
+	ft::uint64_t operator()(char const* x) const { size_t len = 0; while (x && x[len]) len++; return doHash(x, len); }
+};
+
+
 } // internal
 
 
 template <typename T>
-struct hash : unary_function<T, ft::uint64_t> {
-	ft::uint64_t operator () (T CREF x) const { return ft::internal::doHash(&x, sizeof(x)); }
+struct hash : unary_function<T, ft::uint64_t>, internal::hash_impl<T> {
+	// ft::uint64_t operator()(T CREF x) const { return internal::hash_impl<T>()(x); }
 };
 
 

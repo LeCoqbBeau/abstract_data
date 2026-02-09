@@ -44,6 +44,8 @@ template <typename T, typename F>			struct conditional<false, T, F> { typedef F 
 
 template <typename T, typename U>			struct is_same : public false_type {};
 template <typename T>						struct is_same<T, T> : public true_type {};
+#define										IS_SAME_T(T, U) ft::is_same<T, U>::type
+#define										IS_SAME_TT(T, U) typename ft::is_same<T, U>::type
 #define										IS_SAME_V(T, U) ft::is_same<T, U>::value
 
 template <typename T>						struct is_const : public false_type {};

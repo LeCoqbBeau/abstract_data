@@ -1,39 +1,40 @@
 
-#include <list>
-
 #include ".helper/ftdef.hpp"
 #include ".never_included/utils.h"
-#include ".helper/binary_trees.hpp"
-#include <set>
-#include <map>
+#include ".helper/functional.hpp"
 
-#include "set.hpp"
-#include "map.hpp"
-
-
+template <typename T>
 struct Loud
 {
-	Loud(int const i) : i(i) { /*PRINT "Loud(" AND i AND ");" ENDL;*/ }
-	~Loud() { PRINT PRP "~Loud(" AND i AND ");" CENDL; }
-	void jobly() const { PRINT "what a jobly day " AND i ENDL; }
-	operator int() const { return i; }
-	bool operator == (Loud CREF l) const { return i == l.i; }
-	bool operator < (Loud CREF l) const { return i < l.i; }
-	friend std::ostream REF operator << (std::ostream REF os, Loud CREF l) { os << l.i; return os; }
-	int i;
+	Loud() {}
+	Loud(T CREF var) : var(var) { /* PRINT "Loud(" AND var AND ");" ENDL; */ }
+	~Loud() { /*PRINT PRP "~Loud(" AND var AND ");" CENDL;*/ }
+	void jobly() const { PRINT "what a jobly day " AND var ENDL; }
+	operator T() const { return var; }
+	bool operator == (Loud CREF l) const { return var == l.var; }
+	bool operator < (Loud CREF l) const { return var < l.var; }
+	friend std::ostream REF operator << (std::ostream REF os, Loud CREF l) { os << l.var; return os; }
+	T var;
+};
+
+
+template <typename T>
+struct LoudHasher : public ft::hash<T>
+{
+	ft::uint64_t operator()(T CREF x) const { return ft::hash<T>()(x); }
 };
 
 template <typename T>
 void joblyContainer(T REF container) {
 	for (typename T::iterator it = container.begin(); it != container.end(); ++it)
-		it->jobly();
+		PRINT *it ENDL;
 }
 
 
 template <typename T>
-void joblyMap(T REF container) {
-	for (typename T::iterator it = container.begin(); it != container.end(); ++it)
-		it->second.jobly();
+void joblyHashmap(T REF container) {
+	for (typename T::local_iterator it = container.begin(1); it != container.end(1); ++it)
+		PRINT *it ENDL;
 }
 
 
@@ -43,19 +44,30 @@ void containerJobly(T REF container) {
 		it->jobly();
 }
 
-#include <utility>
-#include <functional>
-#include ".helper/hashmap.hpp"
+// #include <utility>
+// #include <functional>
+// #include <unordered_set>
+// #include ".helper/hashmap.hpp"
 
+#include "list.hpp"
+#include "listTests.tpp"
 
 int main() {
-	Loud shortTermMemoryLoss = 5;
-	Loud longTermMemoryLoss = 6;
-	ft::internal::hashmap<Loud> hashmap;
 
-	hashmap._array[0] = 1;
-	hashmap._array[0].jobly();
+	testLists<ft::list<Loud<int> > >();
 
-	// SHOWL()
+	// typedef int hashed_type;
+	// typedef LoudHasher<hashed_type>::result_type hash_result;
+	// LoudHasher<hashed_type> hasher;
+	// std::vector<hash_result> results;
+	// hash_result hashed = hasher(5089) % 100;
+	// SHOWL(hashed);
+	// results.reserve(100);
+	// for (int i = 0; i < 100; ++i) {
+	// 	hash_result toPush = hasher(5089) % 100;
+	// 	results.push_back(toPush);
+	// }
+	// for (AUTO it = results.begin(); it != results.end(); ++it)
+	// 	PRINT *it ENDL;
 }
 

@@ -5,46 +5,90 @@
 #ifndef HASHMAP_TPP
 #define HASHMAP_TPP
 
-// Constructor
-template <class Key, class Hash, class KeyEqual, class Allocator>
-ft::internal::hashmap<Key, Hash, KeyEqual, Allocator>::~hashmap()
-{
-	if (_array)
-		clear();
-	_elemAllocator().deallocate(_array, _size);
-}
+#include "new.hpp"
 
-// Modifiers
-template <class Key, class Hash, class KeyEqual, class Allocator>
-void
-ft::internal::hashmap<Key, Hash, KeyEqual, Allocator>::clear()
-{
-	for (size_type i = 0; i < _size; ++i)
-		_elemAllocator().destroy(_array + i);
-}
 
-// Helper Member Functions
+// Iterators
 template <class Key, class Hash, class KeyEqual, class Allocator>
-void
-ft::internal::hashmap<Key, Hash, KeyEqual, Allocator>::_init(size_type n)
+typename ft::internal::bucket<Key, Hash, KeyEqual, Allocator>::iterator
+ft::internal::bucket<Key, Hash, KeyEqual, Allocator>::begin()
 {
-	if (n < HASHMAP_INIT_SIZE)
-		n = HASHMAP_INIT_SIZE;
-	ft::uint64_t	*newIndices;
-	value_type		*newArray;
-	TRY_ALLOC( newIndices = _indexAllocator().allocate(n);,;);
-	ft::fill_n(newIndices, n, this_type::npos);
-	TRY_ALLOC( newArray = _valueAllocator().allocate(n);, _indexAllocator().deallocate(newIndices, n); );
-	_size = HASHMAP_INIT_SIZE;
-
+	return _sentinel.next;
 }
 
 
 template <class Key, class Hash, class KeyEqual, class Allocator>
-void
-ft::internal::hashmap<Key, Hash, KeyEqual, Allocator>::_reallocate(size_type n)
+typename ft::internal::bucket<Key, Hash, KeyEqual, Allocator>::const_iterator
+ft::internal::bucket<Key, Hash, KeyEqual, Allocator>::begin() const
 {
+	return _sentinel.next;
+}
 
+
+template <class Key, class Hash, class KeyEqual, class Allocator>
+typename ft::internal::bucket<Key, Hash, KeyEqual, Allocator>::const_iterator
+ft::internal::bucket<Key, Hash, KeyEqual, Allocator>::cbegin() const
+{
+	return _sentinel.next;
+}
+
+
+template <class Key, class Hash, class KeyEqual, class Allocator>
+typename ft::internal::bucket<Key, Hash, KeyEqual, Allocator>::iterator
+ft::internal::bucket<Key, Hash, KeyEqual, Allocator>::end()
+{
+	return _sentinel;
+}
+
+
+template <class Key, class Hash, class KeyEqual, class Allocator>
+typename ft::internal::bucket<Key, Hash, KeyEqual, Allocator>::const_iterator
+ft::internal::bucket<Key, Hash, KeyEqual, Allocator>::end() const
+{
+	return _sentinel;
+}
+
+
+template <class Key, class Hash, class KeyEqual, class Allocator>
+typename ft::internal::bucket<Key, Hash, KeyEqual, Allocator>::const_iterator
+ft::internal::bucket<Key, Hash, KeyEqual, Allocator>::cend() const
+{
+	return _sentinel;
+}
+
+
+// Methods
+template <class Key, class Hash, class KeyEqual, class Allocator>
+typename ft::internal::bucket<Key, Hash, KeyEqual, Allocator>::size_type
+ft::internal::bucket<Key, Hash, KeyEqual, Allocator>::size() const
+{
+	size_type size = 0;
+	node_type	it = _sentinel.next;
+	while (it) {
+		++size;
+		++it;
+	}
+	return size;
+}
+
+
+template <class Key, class Hash, class KeyEqual, class Allocator>
+typename ft::internal::bucket<Key, Hash, KeyEqual, Allocator>::iterator
+ft::internal::bucket<Key, Hash, KeyEqual, Allocator>::insert(value_type CREF val)
+{
+	(void)val;
+}
+
+
+// Helper Methods
+template <class Key, class Hash, class KeyEqual, class Allocator>
+typename ft::internal::bucket<Key, Hash, KeyEqual, Allocator>::node_type
+ft::internal::bucket<Key, Hash, KeyEqual, Allocator>::_createNode(key_type CREF val) const
+{
+	node_type	node;
+	TRY_ALLOC( node = _nodeAllocator().allocate(1);,;);
+	_nodeAllocator().construct(node, val);
+	return node;
 }
 
 

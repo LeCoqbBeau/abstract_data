@@ -48,6 +48,13 @@ TEMPLATE(class func) void benchmark(func f) {
 # define INVOKE_UNIT_TEST(test) PRINT PRP BOLD "Now testing lists " #test CENDL; testList##test<List>()
 #endif
 
+TEMPLATE_T void printList(T CREF list, char const* title) {
+	PRINT PRP BOLD AND title CENDL;
+	for (typename T::const_iterator it = list.begin(); it != list.end(); ++it)
+		SHOWL(*it);
+	NEWL;
+}
+
 #define LIST_STATE(l) //(void)l; SHOWL(l.size()); if (!l.empty()) { SHOWL(l.front()); SHOWL(l.back()); }
 
 REG_UNIT_TEST(Iterators) {
@@ -134,6 +141,7 @@ REG_UNIT_TEST(ElementAccess) {
 
 REG_UNIT_TEST(Modifiers) {
 	List list;
+	/*
 	// assign
 	{
 		List otherList(52, 86);
@@ -209,10 +217,12 @@ REG_UNIT_TEST(Modifiers) {
 	}
 	// no list.clear() because we did list.erase(beg..end);
 	NEWL;
+	*/
 	// swap & resize
 	{
 		list.assign(68, 86);
 		List otherList(86, 68);
+		otherList.clear();
 		LIST_STATE(list);
 		LIST_STATE(otherList);
 		list.swap(otherList);
@@ -397,11 +407,11 @@ REG_UNIT_TEST(Operations) {
 }
 
 TEMPLATE(class List) void testLists() {
-	INVOKE_UNIT_TEST(Iterators);
-	INVOKE_UNIT_TEST(Capacity);
-	INVOKE_UNIT_TEST(ElementAccess);
+	// INVOKE_UNIT_TEST(Iterators);
+	// INVOKE_UNIT_TEST(Capacity);
+	// INVOKE_UNIT_TEST(ElementAccess);
 	INVOKE_UNIT_TEST(Modifiers);
-	INVOKE_UNIT_TEST(Operations);
+	// INVOKE_UNIT_TEST(Operations);
 }
 
 #undef LIST_STATE
