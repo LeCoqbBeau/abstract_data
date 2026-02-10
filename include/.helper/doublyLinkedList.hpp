@@ -51,7 +51,7 @@ struct _doublyLinkedList : _doublyLinkedListBase {
 	// Attributes
 	T					value;
 };
-# define FT_DLLNODE(node) dynamic_cast<ft::internal::_doublyLinkedList<T>* >(node)
+# define FT_DLLNODE(node) static_cast<ft::internal::_doublyLinkedList<T>* >(node)
 
 
 template <class T, class Ref, class Ptr>

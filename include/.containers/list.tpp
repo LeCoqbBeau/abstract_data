@@ -2,7 +2,9 @@
 #ifndef LIST_TPP
 # define LIST_TPP
 
+#include "../list.hpp"
 #include ".helper/algorithm.hpp"
+#include ".helper/doublyLinkedList.hpp"
 #include ".helper/functional.hpp"
 #include ".helper/new.hpp"
 #include ".helper/type_traits.hpp"
@@ -284,18 +286,26 @@ typename ft::list<T, Allocator>::iterator ft::list<T, Allocator>::erase(iterator
 
 template <class T, class Allocator>
 void ft::list<T, Allocator>::swap(list REF x) {
-	_base_type* xNext = x._sentinel.next();
-	_base_type* xPrev = x._sentinel.prev();
-
-	x._sentinel.next() = this->_sentinel.next();
-	x._sentinel.prev() = this->_sentinel.prev();
-	x._sentinel.next()->prev() = &x._sentinel;
-	x._sentinel.prev()->next() = &x._sentinel;
-
-	this->_sentinel.next() = xNext;
-	this->_sentinel.prev() = xPrev;
-	this->_sentinel.next()->prev() = &this->_sentinel;
-	this->_sentinel.prev()->next() = &this->_sentinel;
+	bool tEmpty = this->empty();
+	bool xEmpty = x.empty();
+	if (tEmpty && xEmpty)
+		return;
+	if (tEmpty && xEmpty) {
+		ft::swap(_sentinel.next(), x._sentinel.next());
+		ft::swap(_sentinel.prev(), x._sentinel.prev());
+		this->_sentinel.next()->prev() = &this->_sentinel;
+		this->_sentinel.prev()->next() = &this->_sentinel;
+		x._sentinel.next()->prev() = &x._sentinel;
+		x._sentinel.prev()->next() = &x._sentinel;
+		return;
+	}
+	_base_type* emptySentinel = (tEmpty) ? &this->_sentinel : &x._sentinel;
+	_base_type* otherSentinel = (tEmpty) ? &x._sentinel : &this->_sentinel;
+	emptySentinel->next() = otherSentinel->next();
+	emptySentinel->prev() = otherSentinel->prev();
+	otherSentinel->next() = otherSentinel->prev() = otherSentinel;
+	emptySentinel->next()->prev() = emptySentinel;
+	emptySentinel->prev()->next() = emptySentinel;
 }
 
 
@@ -609,20 +619,14 @@ void ft::list<T, Allocator>::_clearHelper() {
 	_base_type*	nextNode = NULL;
 
 	nodeIterator = _sentinel.next();
-	SHOWL(size());
-	int i = 0;
 	while (nodeIterator && nodeIterator != &_sentinel) {
 		nextNode = nodeIterator->next();
 		_node_type*	toDestroy = FT_DLLNODE(nodeIterator);
-		if (!toDestroy) {
-			SHOWL(i);
-			SHOWL(toDestroy);
+		if (!toDestroy)
 			break ;
-		}
 		_getNodeAllocator().destroy(toDestroy);
 		_getNodeAllocator().deallocate(toDestroy, 1);
 		nodeIterator = nextNode;
-		++i;
 	}
 	_sentinel.next() = &_sentinel;
 	_sentinel.prev() = &_sentinel;
@@ -735,7 +739,7 @@ void ft::list<T, Allocator>::_cleanList(_base_type* removed) {
 
 template <class T, class Allocator>
 typename ft::list<T, Allocator>::_nodeAllocator ft::list<T, Allocator>::_getNodeAllocator() const {
-	return _allocator;
+	return _nodeAllocator(_allocator);
 }
 
 
