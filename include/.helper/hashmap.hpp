@@ -16,65 +16,19 @@
 namespace ft { namespace internal {
 
 
-template <class T, class Ref, class Ptr>
-struct bucketIterator
-{
-	// Typedef
-	typedef bucketIterator<T, Ref, Ptr>		this_type;
-	typedef T								value_type;
-	typedef Ref								reference;
-	typedef Ptr								pointer;
-	typedef ft::ptrdiff_t					difference_type;
-	typedef _doublyLinkedList<value_type>*	node_type;
-
-	// Constructor
-	explicit	bucketIterator(node_type node = 0) : _iterator(node) {};
-	bucketIterator(bucketIterator<T, T REF, T*> CREF rhs) : _iterator(rhs._iterator) {};
-	~bucketIterator() {};
-
-	// In/Equality Operator
-	template <class U, class URef, class UPtr>
-	bool operator	== (bucketIterator<U, URef, UPtr> CREF rhs) { return this->_iterator == rhs._iterator; }
-	template <class U, class URef, class UPtr>
-	bool operator	!= (bucketIterator<U, URef, UPtr> CREF rhs) { return this->_iterator != rhs._iterator; }
-
-	// Dereference Operator
-	reference	operator  * () { return _iterator.operator*(); }
-	pointer		operator -> () { return _iterator.operator->(); }
-
-	// Shift Operators
-	this_type REF	operator ++ () { ++_iterator; return *this; }
-	this_type		operator ++ (int) { this_type tmp(*this); operator++(); return tmp; }
-
-protected:
-	// Attributes
-	_doublyLinkedListIterator<T, Ref, Ptr>	_iterator;
-};
-
-
-template <
-	class Key,
-	class Hash = ft::hash<Key>,
-	class KeyEqual = ft::equal_to<Key>,
-	class Allocator = ft::allocator<Key>
->
+template <class Key>
 struct bucket {
 	//  Typedefs
 	typedef Key															key_type;
 	typedef Key															value_type;
-	typedef Hash														hasher;
-	typedef KeyEqual													key_equal;
-	typedef Allocator													allocator_type;
 	typedef Key REF														reference;
 	typedef Key CREF													const_reference;
-	typedef typename allocator_type::pointer							pointer;
-	typedef typename allocator_type::const_pointer						const_pointer;
 	typedef _doublyLinkedListIterator<Key, Key REF, Key *>				iterator;
 	typedef _doublyLinkedListIterator<Key, Key CREF, Key const*>		const_iterator;
 	typedef ft::size_t													size_type;
 	typedef ft::ptrdiff_t												difference_type;
+	typedef _doublyLinkedListBase										base_type;
 	typedef _doublyLinkedList<Key>										node_type;
-	typedef typename allocator_type::template rebind<node_type >::other	node_allocator_type;
 
 	// Iterators
 	iterator		begin();
@@ -86,17 +40,22 @@ struct bucket {
 
 	// Methods
 	size_type		size() const;
-	iterator		insert(value_type CREF val);
+
+	template <typename Allocator>
+	iterator		insert(value_type CREF val, Allocator allocator);
+	
+	template <typename Allocator>
+	iterator		erase(const_iterator position, Allocator allocator);
+
+	template <typename Allocator, typename Predicate>
+	size_type		erase(key_type CREF key, Allocator allocator, Predicate pred);
 
 	// Helper Methods
-	node_type	_createNode(key_type CREF val) const;
+	template <typename Allocator>
+	base_type		*createNode(key_type CREF val, Allocator allocator) const;
 
 	//	Attributes
-	node_type				_sentinel;
-	hasher					_hasher;
-	key_equal				_equal;
-	mutable allocator_type	_allocator;
-	node_allocator_type		_nodeAllocator() const { return _node_allocator_type(_allocator); }
+	base_type				_sentinel;
 };
 
 
@@ -111,7 +70,7 @@ struct hashmap {
 		// Helper Typedefs
 		typedef hashmap<Key, Hash, KeyEqual, Allocator>	this_type;
 		typedef typename Hash::result_type				index_type;
-		typedef bucket<Key, Hash, KeyEqual, Allocator>	bucket_type;
+		typedef bucket<Key>								bucket_type;
 
 	public:
 		//  Typedefs

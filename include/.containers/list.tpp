@@ -2,7 +2,6 @@
 #ifndef LIST_TPP
 # define LIST_TPP
 
-#include "../list.hpp"
 #include ".helper/algorithm.hpp"
 #include ".helper/doublyLinkedList.hpp"
 #include ".helper/functional.hpp"

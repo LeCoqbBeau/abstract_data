@@ -5,66 +5,68 @@
 #ifndef HASHMAP_TPP
 #define HASHMAP_TPP
 
+#include ".helper/doublyLinkedList.hpp"
+#include "hashmap.hpp"
 #include "new.hpp"
 
 
 // Iterators
-template <class Key, class Hash, class KeyEqual, class Allocator>
-typename ft::internal::bucket<Key, Hash, KeyEqual, Allocator>::iterator
-ft::internal::bucket<Key, Hash, KeyEqual, Allocator>::begin()
+template <class Key>
+typename ft::internal::bucket<Key>::iterator
+ft::internal::bucket<Key>::begin()
 {
-	return _sentinel.next;
+	return _sentinel.next();
 }
 
 
-template <class Key, class Hash, class KeyEqual, class Allocator>
-typename ft::internal::bucket<Key, Hash, KeyEqual, Allocator>::const_iterator
-ft::internal::bucket<Key, Hash, KeyEqual, Allocator>::begin() const
+template <class Key>
+typename ft::internal::bucket<Key>::const_iterator
+ft::internal::bucket<Key>::begin() const
 {
-	return _sentinel.next;
+	return _sentinel.next();
 }
 
 
-template <class Key, class Hash, class KeyEqual, class Allocator>
-typename ft::internal::bucket<Key, Hash, KeyEqual, Allocator>::const_iterator
-ft::internal::bucket<Key, Hash, KeyEqual, Allocator>::cbegin() const
+template <class Key>
+typename ft::internal::bucket<Key>::const_iterator
+ft::internal::bucket<Key>::cbegin() const
 {
-	return _sentinel.next;
+	return _sentinel.next();
 }
 
 
-template <class Key, class Hash, class KeyEqual, class Allocator>
-typename ft::internal::bucket<Key, Hash, KeyEqual, Allocator>::iterator
-ft::internal::bucket<Key, Hash, KeyEqual, Allocator>::end()
+template <class Key>
+typename ft::internal::bucket<Key>::iterator
+ft::internal::bucket<Key>::end()
 {
-	return _sentinel;
+	return &_sentinel;
 }
 
 
-template <class Key, class Hash, class KeyEqual, class Allocator>
-typename ft::internal::bucket<Key, Hash, KeyEqual, Allocator>::const_iterator
-ft::internal::bucket<Key, Hash, KeyEqual, Allocator>::end() const
+template <class Key>
+typename ft::internal::bucket<Key>::const_iterator
+ft::internal::bucket<Key>::end() const
 {
-	return _sentinel;
+	return &_sentinel;
 }
 
 
-template <class Key, class Hash, class KeyEqual, class Allocator>
-typename ft::internal::bucket<Key, Hash, KeyEqual, Allocator>::const_iterator
-ft::internal::bucket<Key, Hash, KeyEqual, Allocator>::cend() const
+template <class Key>
+typename ft::internal::bucket<Key>::const_iterator
+ft::internal::bucket<Key>::cend() const
 {
-	return _sentinel;
+	return &_sentinel;
 }
 
 
 // Methods
-template <class Key, class Hash, class KeyEqual, class Allocator>
-typename ft::internal::bucket<Key, Hash, KeyEqual, Allocator>::size_type
-ft::internal::bucket<Key, Hash, KeyEqual, Allocator>::size() const
+template <class Key>
+typename ft::internal::bucket<Key>::size_type
+ft::internal::bucket<Key>::size() const
 {
-	size_type size = 0;
-	node_type	it = _sentinel.next;
-	while (it) {
+	size_type	size = 0;
+	base_type*	it = _sentinel.next();
+	while (it != &_sentinel) {
 		++size;
 		++it;
 	}
@@ -72,22 +74,69 @@ ft::internal::bucket<Key, Hash, KeyEqual, Allocator>::size() const
 }
 
 
-template <class Key, class Hash, class KeyEqual, class Allocator>
-typename ft::internal::bucket<Key, Hash, KeyEqual, Allocator>::iterator
-ft::internal::bucket<Key, Hash, KeyEqual, Allocator>::insert(value_type CREF val)
+template <class Key>
+template <typename Allocator>
+typename ft::internal::bucket<Key>::iterator
+ft::internal::bucket<Key>::insert(value_type CREF val, Allocator allocator)
 {
-	(void)val;
+	base_type	*inserted = createNode(val, allocator);
+	_sentinel.prev()->next() = inserted;
+	inserted->prev() = _sentinel.prev();
+	inserted->next() = &_sentinel;
+	_sentinel.prev() = inserted;
+}
+
+
+template <class Key>
+template <typename Allocator>
+typename ft::internal::bucket<Key>::iterator
+ft::internal::bucket<Key>::erase(const_iterator position, Allocator allocator)
+{
+	typedef typename Allocator::template rebind<value_type>::other	node_allocator_type;
+	typedef Key														T; // required by FT_DLLNODE
+
+	base_type	*erasedNode = position._currentNode;
+	node_allocator_type nodeAllocator(allocator);
+
+	++position;
+	erasedNode->prev()->next() = erasedNode->next();
+	erasedNode->next()->prev() = erasedNode->prev();
+	allocator.destroy(FT_DLLNODE(erasedNode));
+	allocator.deallocate(FT_DLLNODE(erasedNode), 1);
+	return position;
+}
+
+
+template <class Key>
+template <typename Allocator, typename Predicate>
+typename ft::internal::bucket<Key>::size_type
+ft::internal::bucket<Key>::erase(key_type CREF key, Allocator allocator, Predicate pred)
+{
+	typedef Key														T; // required by FT_DLLNODE
+
+	size_type	erased = 0;
+	for (base_type *it = _sentinel.next(); it != &_sentinel; ++it) {
+		if (!pred(FT_DLLNODE(it), key))
+			continue;
+		erase(const_iterator(it), allocator);
+		++erased;
+	}
+	return erased;
 }
 
 
 // Helper Methods
-template <class Key, class Hash, class KeyEqual, class Allocator>
-typename ft::internal::bucket<Key, Hash, KeyEqual, Allocator>::node_type
-ft::internal::bucket<Key, Hash, KeyEqual, Allocator>::_createNode(key_type CREF val) const
+template <class Key>
+template <typename Allocator>
+typename ft::internal::bucket<Key>::base_type*
+ft::internal::bucket<Key>::createNode(value_type CREF val, Allocator allocator) const
 {
-	node_type	node;
-	TRY_ALLOC( node = _nodeAllocator().allocate(1);,;);
-	_nodeAllocator().construct(node, val);
+	typedef typename Allocator::template rebind<value_type>::other	node_allocator_type;
+
+	node_type	*node;
+	node_allocator_type nodeAllocator(allocator);
+	TRY_ALLOC( node = nodeAllocator.allocate(1);,;);
+	nodeAllocator.construct(node, val);
 	return node;
 }
 

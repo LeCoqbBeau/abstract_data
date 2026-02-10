@@ -47,14 +47,10 @@ void containerJobly(T REF container) {
 // #include <utility>
 // #include <functional>
 // #include <unordered_set>
-// #include ".helper/hashmap.hpp"
+#include ".helper/hashmap.hpp"
 
-#include "list.hpp"
-#include "listTests.tpp"
 
 int main() {
-
-	testLists<ft::list<Loud<int> > >();
 
 	// typedef int hashed_type;
 	// typedef LoudHasher<hashed_type>::result_type hash_result;
