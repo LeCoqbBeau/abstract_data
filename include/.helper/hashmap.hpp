@@ -10,6 +10,7 @@
 #include "ftexcept.hpp"
 #include "pair.hpp"
 #include "doublyLinkedList.hpp"
+#include "ValueComparator.hpp"
 
 
 # define HASHMAP_INIT_SIZE 16
@@ -34,6 +35,7 @@ struct bucket {
 
 	// Constructor
 	bucket() { _sentinel.next() = _sentinel.prev() = &_sentinel; }
+	bucket(bucket REF rhs) { rhs.duplicate(this->_sentinel); }
 	~bucket() { if (_sentinel.next() != &_sentinel) throw ft::runtime_error("Memory is leaked!"); }
 
 	// Iterators
@@ -46,22 +48,20 @@ struct bucket {
 
 	// Methods
 	size_type		size() const;
-
 	template <typename Predicate>
 	iterator		find(key_type CREF key, Predicate predicate);
-
 	template <typename Allocator>
 	iterator		insert(value_type CREF val, Allocator allocator);
-
+	void			insert(base_type *node);
 	template <typename Allocator>
 	iterator		erase(const_iterator position, Allocator allocator);
 	template <typename Allocator, typename Predicate>
 	size_type		erase(key_type CREF key, Allocator allocator, Predicate pred);
-
-	// Helper Methods
 	template <typename Allocator>
 	base_type		*createNode(key_type CREF val, Allocator allocator) const;
-
+	template <typename Allocator>
+	void			duplicate(base_type *newSentinel, Allocator allocator) const;
+	void			swap(bucket REF x);
 	template <typename Allocator>
 	void			clear(Allocator allocator);
 
@@ -92,15 +92,8 @@ struct hashmap_iterator
 		_curr = current;
 		if (_curr)
 			return;
-		for (; _bucket_idx < bucket_count; ++_bucket_idx) {
-			if (_bucket[_bucket_idx].begin() == _bucket[_bucket_idx].end())
-				continue;
-			_curr = _bucket[_bucket_idx].begin()._currentNode;
-			return;
-		}
 	}
-
-	hashmap_iterator(iterator<T, T REF, T*> CREF rhs) : _curr(rhs._curr), _bucket(rhs._bucket), _bucket_idx(rhs._bucket_idx), _bucket_count(rhs._bucket_count) {}
+	hashmap_iterator(iterator<T, T REF, T*> CREF rhs) : _curr(rhs._curr), _bucket(rhs._bucket), _bucket_count(rhs._bucket_count), _bucket_idx(rhs._bucket_idx) {}
 	~hashmap_iterator() {}
 
 	// In/Equality Operator
@@ -115,26 +108,41 @@ struct hashmap_iterator
 
 	// Shift Operators
 	this_type REF	operator ++ () {
+		if (_bucket_idx == _bucket_count)
+			return *this;
 		_curr = _curr->next();
-		if (dynamic_cast<node_type*>(_curr) == NULL) {
-
-		}
+		if (dynamic_cast<node_type*>(_curr) == NULL)
+			_getNextBucket();
 		return *this;
 	}
 	this_type		operator ++ (int) { this_type tmp = *this; operator++(); return tmp; }
 
+	// Helper Function
+	void _getNextBucket() {
+		for (; _bucket_idx < _bucket_count; ++_bucket_idx) {
+			if (_bucket[_bucket_idx].begin() == _bucket[_bucket_idx].end())
+				continue;
+			_curr = _bucket[_bucket_idx].begin()._currentNode;
+			return;
+		}
+		_curr = NULL;
+	}
+
 	// Attributes
 	base_type*		_curr;
 	bucket_type*	_bucket;
-	ft::size_t		_bucket_idx;
 	ft::size_t		_bucket_count;
+	ft::size_t		_bucket_idx;
 };
+
 
 template <
 	class Key,
 	class Hash = ft::hash<Key>,
 	class KeyEqual = ft::equal_to<Key>,
-	class Allocator = ft::allocator<Key>
+	class Allocator = ft::allocator<Key>,
+	typename extractKey = ft::false_type,
+	bool mutableIterators = false
 >
 struct hashmap {
 	protected:
@@ -143,7 +151,7 @@ struct hashmap {
 		typedef typename Hash::result_type								index_type;
 		typedef bucket<Key>												bucket_type;
 		typedef bucket_type*											array_type;
-		typedef typename Allocator::template rebind<bucket_type>::other	array_allocator_type;
+		typedef typename Allocator::template rebind<bucket_type>::other	bucket_allocator_type;
 
 	public:
 		//  Typedefs
@@ -156,8 +164,11 @@ struct hashmap {
 		typedef Key CREF												const_reference;
 		typedef typename allocator_type::pointer						pointer;
 		typedef typename allocator_type::const_pointer					const_pointer;
-		typedef void													iterator;
-		typedef void													const_iterator;
+		typedef hashmap_iterator<Key,
+			CONDITIONAL_TT(mutableIterators, Key REF, Key CREF),
+			CONDITIONAL_TT(mutableIterators, Key *, Key const*)
+		>																iterator;
+		typedef hashmap_iterator<Key, Key CREF, Key const*>				const_iterator;
 		typedef typename bucket_type::iterator							local_iterator;
 		typedef typename bucket_type::const_iterator					const_local_iterator;
 		typedef ft::size_t												size_type;
@@ -165,7 +176,7 @@ struct hashmap {
 
 		// Constructor
 		hashmap(hasher CREF hash = hasher(), key_equal CREF equal = key_equal(), allocator_type CREF allocator = allocator_type())
-			: _array(NULL), _arraySize(0), _size(0), _hasher(hash), _equal(equal), _allocator(allocator)
+			: _bucketArray(NULL), _bucketNum(0), _elemNum(0), _maxLoadFactor(1), _hasher(hash), _equal(equal), _allocator(allocator)
 		{ _init(HASHMAP_INIT_SIZE); }
 		~hashmap() { _deallocate(); };
 
@@ -211,22 +222,48 @@ struct hashmap {
 		// Observers
 		hasher						hash_function() const;
 		key_equal					key_eq() const;
-		allocator_type				get_allocator() const noexcept;
+		allocator_type				get_allocator() const;
 
 	protected:
 		// Helper Member Function
-		void		_init(size_type n);
-		void		_reallocate(size_type n);
-		void		_deallocate();
+		void						_init(size_type n);
+		void						_reallocate(size_type n);
+		void						_deallocate();
 
 		// Attributes
-		array_type				_array;
-		size_type				_arraySize;
-		size_type				_size;
-		hasher					_hasher;
-		key_equal				_equal;
-		mutable allocator_type	_allocator;
-		array_allocator_type	_arrayAllocator() const { return array_allocator_type(_allocator); }
+		array_type					_bucketArray;
+		size_type					_bucketNum;
+		size_type					_elemNum;
+		iterator					_first;
+		float						_maxLoadFactor;
+		hasher						_hasher;
+		key_equal					_equal;
+		mutable allocator_type		_allocator;
+		bucket_allocator_type		_bucketAllocator() const { return bucket_allocator_type(_allocator); }
+		bool						_shouldRehash(size_type newElem) const { return _elemNum + newElem > _bucketNum * _maxLoadFactor; }
+};
+
+
+// Helper Class Definition
+template <typename extractKey, typename Hash>
+struct KeyHasher {};
+
+
+template <typename Hash>
+struct KeyHasher<ft::false_type, Hash>  { // Don't extract keys
+	explicit KeyHasher(Hash CREF hasher) : _hasher(hasher) {}
+	template <typename T>	bool operator()(T CREF x) { return _hasher(x); }
+	template <typename T>	bool operator()(T CREF x) const { return _hasher(x); }
+	Hash CREF _hasher;
+};
+
+
+template <typename Hash>
+struct KeyHasher<ft::true_type, Hash>  { // Extract keys
+	explicit KeyHasher(Hash CREF hasher) : _hasher(hasher) {}
+	template <typename T>	ft::uint64_t operator()(T CREF x) { return _hasher(x.first); }
+	template <typename T>	ft::uint64_t operator()(T CREF x) const { return _hasher(x.first); }
+	Hash CREF _hasher;
 };
 
 

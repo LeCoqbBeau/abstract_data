@@ -243,10 +243,8 @@ ft::internal::rbt_node<T>::upper_bound(value_type CREF val, Compare comp) const
 	this_type	const* iterator = this;
 	this_type	const* candidate = NULL;
 	bool 		isSmaller;
-	bool 		isBigger;
 	while (iterator) {
 		isSmaller = comp(val, iterator->value);
-		isBigger = comp(iterator->value, val);
 		if (isSmaller) {
 			candidate = iterator;
 			iterator = RBT_NODE(iterator->left());

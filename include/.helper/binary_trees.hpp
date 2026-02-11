@@ -2,12 +2,11 @@
 #ifndef BINARY_TREE_HPP
 #define BINARY_TREE_HPP
 
-#include <bits/this_thread_sleep.h>
-
 #include "ftdef.hpp"
 #include "algorithm.hpp"
 #include "functional.hpp"
 #include "pair.hpp"
+#include "ValueComparator.hpp"
 
 
 #define RBT_LEFT	0
@@ -90,29 +89,29 @@ struct rbt_node : rbt_node_base {
 };
 
 
-template <typename T, typename Ref, typename Ptr, typename extractKey>
+template <typename T, typename Ref, typename Ptr>
 struct rbt_iterator
 	: iterator<ft::bidirectional_iterator_tag, T, ft::ptrdiff_t, Ptr, Ref>
 {
 	// Typedefs
-	typedef rbt_iterator<T, Ref, Ptr, extractKey>	this_type;
-	typedef T										value_type;
-	typedef Ref										reference;
-	typedef Ptr										pointer;
-	typedef ft::ptrdiff_t							difference_type;
-	typedef ft::internal::rbt_node<T>				node_type;
-	typedef ft::internal::rbt_node_base				base_type;
+	typedef rbt_iterator<T, Ref, Ptr>	this_type;
+	typedef T							value_type;
+	typedef Ref							reference;
+	typedef Ptr							pointer;
+	typedef ft::ptrdiff_t				difference_type;
+	typedef ft::internal::rbt_node<T>	node_type;
+	typedef ft::internal::rbt_node_base	base_type;
 
 	// Constructors
 	explicit	rbt_iterator(base_type const* sentinel = NULL, node_type *node = NULL) : _current(node), _sentinel(sentinel) {}
-				rbt_iterator(iterator<T, T REF, T*, extractKey> CREF rhs) : _current(rhs._current), _sentinel(rhs._sentinel) {}
+				rbt_iterator(iterator<T, T REF, T*> CREF rhs) : _current(rhs._current), _sentinel(rhs._sentinel) {}
 				~rbt_iterator() {}
 
 	// In/Equality Operator
-	template <class U, class URef, class UPtr, class UExtractKey>
-	bool operator	== (rbt_iterator<U, URef, UPtr, UExtractKey> CREF rhs) { return this->_current == rhs._current; }
-	template <class U, class URef, class UPtr, class UExtractKey>
-	bool operator	!= (rbt_iterator<U, URef, UPtr, UExtractKey> CREF rhs) { return this->_current != rhs._current; }
+	template <class U, class URef, class UPtr>
+	bool operator	== (rbt_iterator<U, URef, UPtr> CREF rhs) { return this->_current == rhs._current; }
+	template <class U, class URef, class UPtr>
+	bool operator	!= (rbt_iterator<U, URef, UPtr> CREF rhs) { return this->_current != rhs._current; }
 
 	// Dereference Operator
 	reference	operator  * () { return _current->value; }
@@ -145,9 +144,6 @@ struct rbt_iterator
 };
 
 
-
-
-
 template <
 	typename T,
 	typename Comp = ft::less<T>,
@@ -170,22 +166,21 @@ struct rbt {
 
 		typedef rbt_iterator<T,
 			CONDITIONAL_TT(mutableIterators, T REF, T CREF),
-			CONDITIONAL_TT(mutableIterators, T *, T const*),
-			extractKey
+			CONDITIONAL_TT(mutableIterators, T *, T const*)
 		>														iterator;
-		typedef rbt_iterator<T, T CREF, T const*, extractKey>	const_iterator;
+		typedef rbt_iterator<T, T CREF, T const*>				const_iterator;
 		typedef ft::reverse_iterator<iterator>					reverse_iterator;
 		typedef ft::reverse_iterator<const_iterator>			const_reverse_iterator;
 		typedef ft::ptrdiff_t									difference_type;
 		typedef ft::size_t										size_type;
 
 		// Inherited typedefs wrapper
-		typedef rbt<T, Comp, Allocator>					this_type;
-		typedef rbt_node<T>								node_type;
-		typedef rbt_node_base							base_type;
-		typedef base_type::color_type					color_type;
-		typedef base_type::side_type					side_type;
-		typedef typename node_type::remove_result		remove_result;
+		typedef rbt<T, Comp, Allocator>							this_type;
+		typedef rbt_node<T>										node_type;
+		typedef rbt_node_base									base_type;
+		typedef base_type::color_type							color_type;
+		typedef base_type::side_type							side_type;
+		typedef typename node_type::remove_result				remove_result;
 
 		// Constructors
 		rbt(key_compare CREF comp = key_compare(), allocator_type CREF alloc = allocator_type())
@@ -250,29 +245,6 @@ struct rbt {
 		size_type				_size;
 		mutable allocator_type	_allocator;
 		_node_allocator_type	_node_allocator() { return _node_allocator_type(_allocator); }
-};
-
-
-// Helper Class Definition
-template <typename extractKey, typename Comp>
-struct ValueComparator {};
-
-
-template <typename Comp>
-struct ValueComparator<ft::false_type, Comp>  { // Don't extract keys
-	explicit ValueComparator(Comp CREF comp) : _comp(comp) {}
-	template <typename T>	bool operator()(T CREF lhs, T CREF rhs) { return _comp(lhs, rhs); }
-	template <typename T>	bool operator()(T CREF lhs, T CREF rhs) const { return _comp(lhs, rhs); }
-	Comp CREF _comp;
-};
-
-
-template <typename Comp>
-struct ValueComparator<ft::true_type, Comp>  { // Extract keys
-	explicit ValueComparator(Comp CREF comp) : _comp(comp) {}
-	template <typename T>	bool operator()(T CREF lhs, T CREF rhs) { return _comp(lhs.first, rhs.first); }
-	template <typename T>	bool operator()(T CREF lhs, T CREF rhs) const { return _comp(lhs.first, rhs.first); }
-	Comp CREF _comp;
 };
 
 

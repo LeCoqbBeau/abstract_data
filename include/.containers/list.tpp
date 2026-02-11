@@ -289,7 +289,7 @@ void ft::list<T, Allocator>::swap(list REF x) {
 	bool xEmpty = x.empty();
 	if (tEmpty && xEmpty)
 		return;
-	if (tEmpty && xEmpty) {
+	if (!tEmpty && !xEmpty) {
 		ft::swap(_sentinel.next(), x._sentinel.next());
 		ft::swap(_sentinel.prev(), x._sentinel.prev());
 		this->_sentinel.next()->prev() = &this->_sentinel;
