@@ -470,7 +470,8 @@ ft::vector<T, Allocator>::_reallocate(size_type n)
 		newSize *= 2;
 	value_type* newArray = _allocator.allocate(newSize);
 	_size = newSize;
-	ft::copy(_array, _end, newArray);
+	for (value_type *it = _array; it != _end; ++it)
+		_allocator.construct(newArray + (it - _array), *it);
 	size_type const arraySize = _end - _array;
 	_allocator.deallocate(_array);
 	_array = newArray;

@@ -3,7 +3,7 @@
 #include ".never_included/utils.h"
 #include ".helper/functional.hpp"
 
-template <typename T>
+template <typename T = int>
 struct Loud
 {
 	Loud() {}
@@ -51,7 +51,18 @@ void containerJobly(T REF container) {
 
 
 int main() {
+	ft::allocator<Loud<> >			allocator;
+	ft::internal::bucket<Loud<> >	test;
 
+	test.insert(1, allocator);
+	test.insert(2, allocator);
+	test.insert(3, allocator);
+	test.insert(4, allocator);
+	test.insert(5, allocator);
+	test.insert(6, allocator);
+
+	joblyContainer(test);
+	test.clear(allocator);
 	// typedef int hashed_type;
 	// typedef LoudHasher<hashed_type>::result_type hash_result;
 	// LoudHasher<hashed_type> hasher;

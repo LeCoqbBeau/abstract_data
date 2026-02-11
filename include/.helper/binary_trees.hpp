@@ -145,6 +145,9 @@ struct rbt_iterator
 };
 
 
+
+
+
 template <
 	typename T,
 	typename Comp = ft::less<T>,
@@ -190,29 +193,29 @@ struct rbt {
 		~rbt();
 
 		// Iterators
-		iterator				begin();
-		const_iterator			begin() const;
-		iterator				end();
-		const_iterator			end() const;
-		reverse_iterator		rbegin();
-		const_reverse_iterator	rbegin() const;
-		reverse_iterator		rend();
-		const_reverse_iterator	rend() const;
+		iterator						begin();
+		const_iterator					begin() const;
+		iterator						end();
+		const_iterator					end() const;
+		reverse_iterator				rbegin();
+		const_reverse_iterator			rbegin() const;
+		reverse_iterator				rend();
+		const_reverse_iterator			rend() const;
 
 		// Capacity
-		bool		empty() const;
-		size_type	size() const;
-		size_type	max_size() const;
+		bool							empty() const;
+		size_type						size() const;
+		size_type						max_size() const;
 
 		// Modifiers
-		iterator		insert(value_type CREF val);
-		remove_result	erase(value_type CREF val);
-		void			swap(this_type REF other);
-		void			clear();
+		iterator						insert(value_type CREF val);
+		remove_result					erase(value_type CREF val);
+		void							swap(this_type REF other);
+		void							clear();
 
 		// Observers
-		key_compare		key_comp() const;
-		value_compare	value_comp() const;
+		key_compare						key_comp() const;
+		value_compare					value_comp() const;
 
 		// Operations
 		iterator						find(value_type CREF val);
@@ -223,7 +226,7 @@ struct rbt {
 		ft::pair<iterator, iterator>	equal_range(value_type CREF val) const;
 
 		// Allocator
-		allocator_type	get_allocator() const;
+		allocator_type					get_allocator() const;
 
 
 	public:

@@ -603,8 +603,6 @@ void ft::list<T, Allocator>::_shrinkHelper(size_type n) {
 	while (nodeIterator != &_sentinel) {
 		nextNode = nodeIterator->next();
 		_node_type*	toDestroy = FT_DLLNODE(nodeIterator);
-		if (!toDestroy)
-			break;
 		_getNodeAllocator().destroy(toDestroy);
 		_getNodeAllocator().deallocate(toDestroy, 1);
 		nodeIterator = nextNode;
@@ -621,8 +619,6 @@ void ft::list<T, Allocator>::_clearHelper() {
 	while (nodeIterator && nodeIterator != &_sentinel) {
 		nextNode = nodeIterator->next();
 		_node_type*	toDestroy = FT_DLLNODE(nodeIterator);
-		if (!toDestroy)
-			break ;
 		_getNodeAllocator().destroy(toDestroy);
 		_getNodeAllocator().deallocate(toDestroy, 1);
 		nodeIterator = nextNode;
