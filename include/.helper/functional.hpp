@@ -96,6 +96,7 @@ struct less_equal : binary_function<T, T, bool> {
 	bool operator () (T CREF x, T CREF y) const { return x <= y; }
 };
 
+
 // Hash Functor
 namespace internal {
 static const ft::uint64_t	hash_secret[8] = {

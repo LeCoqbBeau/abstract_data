@@ -63,18 +63,18 @@ class priority_queue {
 			: c(container), comp(comp) { c.insert(c.end(), first, last); ft::make_heap(c.begin(), c.end(), comp); }
 
 		// Element Access
-		reference		front() { return c.front(); }
-		const_reference	front() const { return c.front(); }
-		reference		back() { return c.back(); }
-		const_reference	back() const { return c.back(); }
+		reference		front()						{ return c.front(); }
+		const_reference	front() const				{ return c.front(); }
+		reference		back()						{ return c.back(); }
+		const_reference	back() const				{ return c.back(); }
 
 		// Capacity
-		bool	empty() const { return c.empty(); }
-		bool	size() const { return c.size(); }
+		bool			empty() const				{ return c.empty(); }
+		bool			size() const				{ return c.size(); }
 
 		// Modifiers
-		void	push(value_type CREF value) { c.push_back(value); ft::push_heap(c.begin(), c.end(), comp); }
-		void	pop() { ft::pop_heap(c.begin(), c.end(), comp); c.pop_front(); }
+		void			push(value_type CREF value)	{ c.push_back(value); ft::push_heap(c.begin(), c.end(), comp); }
+		void			pop()						{ ft::pop_heap(c.begin(), c.end(), comp); c.pop_front(); }
 
 	protected:
 		container_type	c;

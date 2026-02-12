@@ -19,9 +19,9 @@ struct Loud
 
 
 template <typename T>
-struct LoudHasher : public ft::hash<T>
+struct LoudHasher : ft::unary_function<Loud<T>, ft::uint64_t>
 {
-	ft::uint64_t operator()(T CREF x) const { return ft::hash<T>()(x); }
+	ft::uint64_t operator()(Loud<T> CREF x) const { return ft::hash<T>()(x.var); }
 };
 
 template <typename T>
@@ -30,51 +30,55 @@ void joblyContainer(T REF container) {
 		PRINT *it ENDL;
 }
 
-
-template <typename T>
-void joblyHashmap(T REF container) {
-	for (typename T::local_iterator it = container.begin(1); it != container.end(1); ++it)
-		PRINT *it ENDL;
-}
-
-
 template <typename T>
 void containerJobly(T REF container) {
 	for (typename T::reverse_iterator it = container.rbegin(); it != container.rend(); ++it)
 		it->jobly();
 }
 
+#include ".helper/hashmap.hpp"
+
+typedef int	type;
+typedef ft::internal::hashmap<Loud<type>, LoudHasher<type> > hashmap;
+
+void containerHashmap(hashmap CREF hashmap) {
+	typedef Loud<type>							T;
+	typedef ft::internal::bucket<T>				bucket_type;
+	typedef ft::internal::_doublyLinkedListBase base_type;
+
+	bucket_type *buckets = hashmap.begin()._bucket;
+	ft::size_t size = hashmap.begin()._bucket_count;
+	for (ft::size_t i = 0; i < size; ++i) {
+		PRINT "hashmap[";
+		RPRINT(2) i;
+		PRINT "]: { ";
+		size_t count;
+		count = 0;
+		for (base_type *node = buckets[i]._sentinel.next(); node != &buckets[i]._sentinel; node = node->next()) {
+			PRINT FT_DLLNODE(node)->value AND " > ";
+			++count;
+		}
+		PRINT "} ";
+		if (count)
+			PRINT "has " AND count AND " elements";
+		NEWL;
+	}
+}
+
 // #include <utility>
 // #include <functional>
 // #include <unordered_set>
-#include ".helper/hashmap.hpp"
 
 
 int main() {
-	ft::allocator<Loud<> >			allocator;
-	ft::internal::bucket<Loud<> >	test;
 
-	test.insert(1, allocator);
-	test.insert(2, allocator);
-	test.insert(3, allocator);
-	test.insert(4, allocator);
-	test.insert(5, allocator);
-	test.insert(6, allocator);
+	hashmap lookup;
+	for (int i = 0; i < 63; ++i)
+		lookup.insert(1);
 
-	joblyContainer(test);
-	test.clear(allocator);
-	// typedef int hashed_type;
-	// typedef LoudHasher<hashed_type>::result_type hash_result;
-	// LoudHasher<hashed_type> hasher;
-	// std::vector<hash_result> results;
-	// hash_result hashed = hasher(5089) % 100;
-	// SHOWL(hashed);
-	// results.reserve(100);
-	// for (int i = 0; i < 100; ++i) {
-	// 	hash_result toPush = hasher(5089) % 100;
-	// 	results.push_back(toPush);
-	// }
-	// for (AUTO it = results.begin(); it != results.end(); ++it)
-	// 	PRINT *it ENDL;
+	// SHOWL(lookup.size());
+	// SHOWL(ft::distance(lookup.begin(), lookup.end()));
+	// joblyContainer(lookup);
+	containerHashmap(lookup);
 }
 

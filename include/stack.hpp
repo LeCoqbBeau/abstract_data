@@ -25,16 +25,16 @@ class stack {
 		~stack() {}
 
 		// Element Access
-		reference		top() { return c.back(); }
-		const_reference	top() const { return c.back(); }
+		reference		top()						{ return c.back(); }
+		const_reference	top() const					{ return c.back(); }
 
 		// Capacity
-		bool	empty() const { return c.empty(); }
-		bool	size() const { return c.size(); }
+		bool			empty() const				{ return c.empty(); }
+		bool			size() const				{ return c.size(); }
 
 		// Modifiers
-		void	push(value_type CREF value) { c.push_back(value); }
-		void	pop() { c.pop_back(); }
+		void			push(value_type CREF value)	{ c.push_back(value); }
+		void			pop()						{ c.pop_back(); }
 
 	protected:
 		container_type	c;

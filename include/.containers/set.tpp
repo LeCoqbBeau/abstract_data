@@ -161,9 +161,10 @@ typename ft::set<T, Comp, Allocator>::iterator
 ft::set<T, Comp, Allocator>::insert(iterator position, value_type CREF val)
 {
 	(void)position;
-	if (_tree.find(val) == _tree.end())
-		return ;
-	return _tree.insert(val);
+	iterator inserted = _tree.find(val);
+	if (inserted == _tree.end())
+		inserted = _tree.insert(val);
+	return inserted;
 }
 
 

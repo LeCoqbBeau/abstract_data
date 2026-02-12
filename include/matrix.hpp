@@ -5,10 +5,10 @@
 #ifndef MATRIX_HPP
 #define MATRIX_HPP
 
-#include "../.helper/algorithm.hpp"
-#include "../.helper/ftdef.hpp"
-#include "../.helper/ftexcept.hpp"
-#include "../.helper/iterator.hpp"
+#include ".helper/algorithm.hpp"
+#include ".helper/ftdef.hpp"
+#include ".helper/ftexcept.hpp"
+#include ".helper/iterator.hpp"
 
 #define MATRIX_AT_EXCEPTION_MSG ("matrix::at(): index n out of bounds")
 #define MATRIX_ROW_AT_EXCEPTION_MSG ("matrix::row()::at(): index n out of bounds")
@@ -210,7 +210,7 @@ MATRIX_COMPARISON_OPERATOR(>=) {
 }
 
 
-#include "matrix.tpp"
+#include ".containers/matrix.tpp"
 
 
 #undef MATRIX_COMPARISON_OPERATOR

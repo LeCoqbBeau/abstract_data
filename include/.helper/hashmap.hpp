@@ -10,11 +10,8 @@
 #include "ftexcept.hpp"
 #include "pair.hpp"
 #include "doublyLinkedList.hpp"
-#include "ValueComparator.hpp"
-
 
 # define HASHMAP_INIT_SIZE 16
-
 
 namespace ft { namespace internal {
 
@@ -34,8 +31,9 @@ struct bucket {
 	typedef _doublyLinkedList<Key>										node_type;
 
 	// Constructor
-	bucket() { _sentinel.next() = _sentinel.prev() = &_sentinel; }
-	bucket(bucket REF rhs) { rhs.duplicate(this->_sentinel); }
+	bucket() : _sentinel() { _sentinel.next() = &_sentinel; _sentinel.prev() = &_sentinel; }
+	template <typename Allocator>
+	bucket(bucket CREF rhs, Allocator allocator) { rhs.duplicate(this->_sentinel, allocator); }
 	~bucket() { if (_sentinel.next() != &_sentinel) throw ft::runtime_error("Memory is leaked!"); }
 
 	// Iterators
@@ -48,10 +46,8 @@ struct bucket {
 
 	// Methods
 	size_type		size() const;
-	template <typename Predicate>
-	iterator		find(key_type CREF key, Predicate predicate);
-	template <typename Allocator>
-	iterator		insert(value_type CREF val, Allocator allocator);
+	template <typename Allocator, typename Predicate>
+	iterator		insert(value_type CREF val, Allocator allocator, Predicate predicate);
 	void			insert(base_type *node);
 	template <typename Allocator>
 	iterator		erase(const_iterator position, Allocator allocator);
@@ -92,15 +88,16 @@ struct hashmap_iterator
 		_curr = current;
 		if (_curr)
 			return;
+		_getNextBucket();
 	}
-	hashmap_iterator(iterator<T, T REF, T*> CREF rhs) : _curr(rhs._curr), _bucket(rhs._bucket), _bucket_count(rhs._bucket_count), _bucket_idx(rhs._bucket_idx) {}
+	hashmap_iterator(hashmap_iterator<T, T REF, T*> CREF rhs) : _curr(rhs._curr), _bucket(rhs._bucket), _bucket_count(rhs._bucket_count), _bucket_idx(rhs._bucket_idx) {}
 	~hashmap_iterator() {}
 
 	// In/Equality Operator
 	template <class U, class URef, class UPtr>
 	bool operator	== (hashmap_iterator<U, URef, UPtr> CREF rhs) { return _bucket == rhs._bucket && this->_curr == rhs._curr; }
 	template <class U, class URef, class UPtr>
-	bool operator	!= (hashmap_iterator<U, URef, UPtr> CREF rhs) { return _bucket != rhs._bucket && this->_curr != rhs._curr; }
+	bool operator	!= (hashmap_iterator<U, URef, UPtr> CREF rhs) { return _bucket != rhs._bucket || this->_curr != rhs._curr; }
 
 	// Dereference Operator
 	reference	operator  * () { return FT_DLLNODE(_curr)->value; }
@@ -119,6 +116,8 @@ struct hashmap_iterator
 
 	// Helper Function
 	void _getNextBucket() {
+		if (_curr != NULL)
+			++_bucket_idx;
 		for (; _bucket_idx < _bucket_count; ++_bucket_idx) {
 			if (_bucket[_bucket_idx].begin() == _bucket[_bucket_idx].end())
 				continue;
@@ -169,78 +168,94 @@ struct hashmap {
 			CONDITIONAL_TT(mutableIterators, Key *, Key const*)
 		>																iterator;
 		typedef hashmap_iterator<Key, Key CREF, Key const*>				const_iterator;
-		typedef typename bucket_type::iterator							local_iterator;
+		typedef CONDITIONAL_TT(
+			mutableIterators,
+			typename bucket_type::iterator,
+			typename bucket_type::const_iterator
+		)																local_iterator;
 		typedef typename bucket_type::const_iterator					const_local_iterator;
 		typedef ft::size_t												size_type;
 		typedef ft::ptrdiff_t											difference_type;
 
 		// Constructor
-		hashmap(hasher CREF hash = hasher(), key_equal CREF equal = key_equal(), allocator_type CREF allocator = allocator_type())
-			: _bucketArray(NULL), _bucketNum(0), _elemNum(0), _maxLoadFactor(1), _hasher(hash), _equal(equal), _allocator(allocator)
-		{ _init(HASHMAP_INIT_SIZE); }
+		hashmap(size_type n = HASHMAP_INIT_SIZE, hasher CREF hash = hasher(), key_equal CREF equal = key_equal(), allocator_type CREF allocator = allocator_type())
+			: _bucketArray(NULL), _bucketNum(0), _elemNum(0), _first(NULL, 0, 0, NULL), _maxLoadFactor(1), _hasher(hash), _equal(equal), _allocator(allocator)
+		{ _init(n); }
+		hashmap(hashmap CREF rhs);
+		hashmap REF operator = (hashmap CREF rhs);
 		~hashmap() { _deallocate(); };
 
-		// Modifiers
-		bool						empty() const;
-		size_type					size() const;
-		size_type					max_size() const;
+		// Capacity
+		bool									empty() const;
+		size_type								size() const;
+		size_type								max_size() const;
 
 		// Iterators
-		iterator					begin();
-		const_iterator				begin() const;
-		local_iterator				begin(size_type n);
-		const_local_iterator		begin(size_type n) const;
-		iterator					end();
-		const_iterator				end() const;
-		local_iterator				end(size_type n);
-		const_local_iterator		end(size_type n) const;
+		iterator								begin();
+		const_iterator							begin() const;
+		local_iterator							begin(size_type n);
+		const_local_iterator					begin(size_type n) const;
+		const_iterator							cbegin() const;
+		const_local_iterator					cbegin(size_type n) const;
+		iterator								end();
+		const_iterator							end() const;
+		local_iterator							end(size_type n);
+		const_local_iterator					end(size_type n) const;
+		const_iterator							cend() const;
+		const_local_iterator					cend(size_type n) const;
+
+		// Element Lookup
+		iterator								find(key_type CREF key);
+		const_iterator							find(key_type CREF key) const;
+		size_type								count(key_type CREF key) const;
+		ft::pair<iterator,iterator>				equal_range(key_type CREF key);
+		ft::pair<const_iterator,const_iterator>	equal_range(key_type CREF key) const;
 
 		// Modifiers
-		iterator					insert(value_type CREF value);
-		iterator					insert(const_iterator hint, value_type CREF value);
+		iterator								insert(value_type CREF value);
+		iterator								insert(const_iterator hint, value_type CREF value);
 		template <class InputIt>
-		void						insert(InputIt first, InputIt last);
-		iterator					erase(const_iterator position);
-		size_type					erase(key_type CREF key);
-		iterator					erase(const_iterator first, const_iterator last);
-		void						clear();
-		void						swap(this_type REF rhs);
+		void									insert(InputIt first, InputIt last);
+		iterator								erase(const_iterator position);
+		size_type								erase(key_type CREF key);
+		iterator								erase(const_iterator first, const_iterator last);
+		void									clear();
+		void									swap(this_type REF rhs);
 
 		// Buckets
-		size_type					bucket_count() const;
-		size_type					max_bucket_count() const;
-		size_type					bucket_size(size_type n) const;
-		size_type					bucket(key_type CREF key) const;
+		size_type								bucket_count() const;
+		size_type								max_bucket_count() const;
+		size_type								bucket_size(size_type n) const;
+		size_type								bucket(key_type CREF key) const;
 
 		// Hash Policy
-		float						load_factor() const;
-		float						max_load_factor() const;
-		void						max_load_factor(float f);
-		void						rehash(size_type n);
-		void						reserve(size_type n);
+		float									load_factor() const;
+		float									max_load_factor() const;
+		void									max_load_factor(float f);
+		void									rehash(size_type n);
+		void									reserve(size_type n);
 
 		// Observers
-		hasher						hash_function() const;
-		key_equal					key_eq() const;
-		allocator_type				get_allocator() const;
+		hasher									hash_function() const;
+		key_equal								key_eq() const;
+		allocator_type							get_allocator() const;
 
 	protected:
 		// Helper Member Function
-		void						_init(size_type n);
-		void						_reallocate(size_type n);
-		void						_deallocate();
+		void									_init(size_type n);
+		void									_deallocate();
 
 		// Attributes
-		array_type					_bucketArray;
-		size_type					_bucketNum;
-		size_type					_elemNum;
-		iterator					_first;
-		float						_maxLoadFactor;
-		hasher						_hasher;
-		key_equal					_equal;
-		mutable allocator_type		_allocator;
-		bucket_allocator_type		_bucketAllocator() const { return bucket_allocator_type(_allocator); }
-		bool						_shouldRehash(size_type newElem) const { return _elemNum + newElem > _bucketNum * _maxLoadFactor; }
+		array_type								_bucketArray;
+		size_type								_bucketNum;
+		size_type								_elemNum;
+		iterator								_first;
+		float									_maxLoadFactor;
+		hasher									_hasher;
+		key_equal								_equal;
+		mutable allocator_type					_allocator;
+		bucket_allocator_type					_bucketAllocator() const { return bucket_allocator_type(_allocator); }
+		bool									_shouldRehash(size_type newElem) const { return _elemNum + newElem > _bucketNum * _maxLoadFactor; }
 };
 
 
@@ -252,8 +267,7 @@ struct KeyHasher {};
 template <typename Hash>
 struct KeyHasher<ft::false_type, Hash>  { // Don't extract keys
 	explicit KeyHasher(Hash CREF hasher) : _hasher(hasher) {}
-	template <typename T>	bool operator()(T CREF x) { return _hasher(x); }
-	template <typename T>	bool operator()(T CREF x) const { return _hasher(x); }
+	template <typename T>	ft::uint64_t operator()(T CREF x) const { return _hasher(x); }
 	Hash CREF _hasher;
 };
 
@@ -261,9 +275,30 @@ struct KeyHasher<ft::false_type, Hash>  { // Don't extract keys
 template <typename Hash>
 struct KeyHasher<ft::true_type, Hash>  { // Extract keys
 	explicit KeyHasher(Hash CREF hasher) : _hasher(hasher) {}
-	template <typename T>	ft::uint64_t operator()(T CREF x) { return _hasher(x.first); }
 	template <typename T>	ft::uint64_t operator()(T CREF x) const { return _hasher(x.first); }
 	Hash CREF _hasher;
+};
+
+
+template <typename extractKey, typename Comp>
+struct KeyComparator {};
+
+
+template <typename Comp>
+struct KeyComparator<ft::false_type, Comp>  { // Don't extract keys
+	explicit KeyComparator(Comp CREF comp) : _comp(comp) {}
+	template <typename T>	bool operator()(T CREF key, T CREF elem) { return _comp(key, elem); }
+	template <typename T>	bool operator()(T CREF key, T CREF elem) const { return _comp(key, elem); }
+	Comp CREF _comp;
+};
+
+
+template <typename Comp>
+struct KeyComparator<ft::true_type, Comp>  { // Extract keys
+	explicit KeyComparator(Comp CREF comp) : _comp(comp) {}
+	template <typename T>	bool operator()(T CREF key, T CREF elem) { return _comp(key, elem.first); }
+	template <typename T>	bool operator()(T CREF key, T CREF elem) const { return _comp(key, elem.first); }
+	Comp CREF _comp;
 };
 
 

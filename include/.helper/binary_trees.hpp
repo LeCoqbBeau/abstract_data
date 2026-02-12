@@ -6,7 +6,6 @@
 #include "algorithm.hpp"
 #include "functional.hpp"
 #include "pair.hpp"
-#include "ValueComparator.hpp"
 
 
 #define RBT_LEFT	0
@@ -245,6 +244,29 @@ struct rbt {
 		size_type				_size;
 		mutable allocator_type	_allocator;
 		_node_allocator_type	_node_allocator() { return _node_allocator_type(_allocator); }
+};
+
+
+// Helper Class Definition
+template <typename extractKey, typename Comp>
+struct ValueComparator {};
+
+
+template <typename Comp>
+struct ValueComparator<ft::false_type, Comp>  { // Don't extract keys
+	explicit ValueComparator(Comp CREF comp) : _comp(comp) {}
+	template <typename T>	bool operator()(T CREF lhs, T CREF rhs) { return _comp(lhs, rhs); }
+	template <typename T>	bool operator()(T CREF lhs, T CREF rhs) const { return _comp(lhs, rhs); }
+	Comp CREF _comp;
+};
+
+
+template <typename Comp>
+struct ValueComparator<ft::true_type, Comp>  { // Extract keys
+	explicit ValueComparator(Comp CREF comp) : _comp(comp) {}
+	template <typename T>	bool operator()(T CREF lhs, T CREF rhs) { return _comp(lhs.first, rhs.first); }
+	template <typename T>	bool operator()(T CREF lhs, T CREF rhs) const { return _comp(lhs.first, rhs.first); }
+	Comp CREF _comp;
 };
 
 

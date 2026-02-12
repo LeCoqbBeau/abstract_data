@@ -18,7 +18,11 @@ DOXYGEN_SRCS	=	include/deque.hpp			\
 					include/queue.hpp			\
 					include/stack.hpp			\
 					include/vector.hpp			\
-					include/bonus/matrix.hpp
+					include/set.hpp				\
+					include/unordered_set.hpp	\
+					include/unordered_map.hpp	\
+					include/map.hpp				\
+					include/matrix.hpp
 
 DOXYFILE		=	Doxyfile
 DOXYGEN_DOC		=	.doxygen_doc/
