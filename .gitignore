@@ -6,4 +6,4 @@ output.txt
 .cache/
 compile_commands.json
 *.diff
-.doxygen_*/
+.doxygen/
