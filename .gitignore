@@ -7,3 +7,5 @@ output.txt
 compile_commands.json
 *.diff
 .doxygen/
+gtest/
+*.tar.gz
