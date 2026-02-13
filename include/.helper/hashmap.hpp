@@ -8,7 +8,7 @@
 #include "ftdef.hpp"
 #include "functional.hpp"
 #include "ftexcept.hpp"
-#include "pair.hpp"
+#include "utility.hpp"
 #include "doublyLinkedList.hpp"
 
 # define HASHMAP_INIT_SIZE 16
@@ -186,76 +186,76 @@ struct hashmap {
 		~hashmap() { _deallocate(); };
 
 		// Capacity
-		bool									empty() const;
-		size_type								size() const;
-		size_type								max_size() const;
+		bool						empty() const;
+		size_type					size() const;
+		size_type					max_size() const;
 
 		// Iterators
-		iterator								begin();
-		const_iterator							begin() const;
-		local_iterator							begin(size_type n);
-		const_local_iterator					begin(size_type n) const;
-		const_iterator							cbegin() const;
-		const_local_iterator					cbegin(size_type n) const;
-		iterator								end();
-		const_iterator							end() const;
-		local_iterator							end(size_type n);
-		const_local_iterator					end(size_type n) const;
-		const_iterator							cend() const;
-		const_local_iterator					cend(size_type n) const;
+		iterator					begin();
+		const_iterator				begin() const;
+		local_iterator				begin(size_type n);
+		const_local_iterator		begin(size_type n) const;
+		const_iterator				cbegin() const;
+		const_local_iterator		cbegin(size_type n) const;
+		iterator					end();
+		const_iterator				end() const;
+		local_iterator				end(size_type n);
+		const_local_iterator		end(size_type n) const;
+		const_iterator				cend() const;
+		const_local_iterator		cend(size_type n) const;
 
 		// Element Lookup
-		iterator								find(key_type CREF key);
-		const_iterator							find(key_type CREF key) const;
-		size_type								count(key_type CREF key) const;
-		ft::pair<iterator,iterator>				equal_range(key_type CREF key);
-		ft::pair<const_iterator,const_iterator>	equal_range(key_type CREF key) const;
+		iterator					find(key_type CREF key);
+		const_iterator				find(key_type CREF key) const;
+		size_type					count(key_type CREF key) const;
+		ft::utility<iterator>			equal_range(key_type CREF key);
+		ft::utility<const_iterator>	equal_range(key_type CREF key) const;
 
 		// Modifiers
-		iterator								insert(value_type CREF value);
-		iterator								insert(const_iterator hint, value_type CREF value);
+		iterator					insert(value_type CREF value);
+		iterator					insert(const_iterator hint, value_type CREF value);
 		template <class InputIt>
-		void									insert(InputIt first, InputIt last);
-		iterator								erase(const_iterator position);
-		size_type								erase(key_type CREF key);
-		iterator								erase(const_iterator first, const_iterator last);
-		void									clear();
-		void									swap(this_type REF rhs);
+		void						insert(InputIt first, InputIt last);
+		iterator					erase(const_iterator position);
+		size_type					erase(key_type CREF key);
+		iterator					erase(const_iterator first, const_iterator last);
+		void						clear();
+		void						swap(this_type REF rhs);
 
 		// Buckets
-		size_type								bucket_count() const;
-		size_type								max_bucket_count() const;
-		size_type								bucket_size(size_type n) const;
-		size_type								bucket(key_type CREF key) const;
+		size_type					bucket_count() const;
+		size_type					max_bucket_count() const;
+		size_type					bucket_size(size_type n) const;
+		size_type					bucket(key_type CREF key) const;
 
 		// Hash Policy
-		float									load_factor() const;
-		float									max_load_factor() const;
-		void									max_load_factor(float f);
-		void									rehash(size_type n);
-		void									reserve(size_type n);
+		float						load_factor() const;
+		float						max_load_factor() const;
+		void						max_load_factor(float f);
+		void						rehash(size_type n);
+		void						reserve(size_type n);
 
 		// Observers
-		hasher									hash_function() const;
-		key_equal								key_eq() const;
-		allocator_type							get_allocator() const;
+		hasher						hash_function() const;
+		key_equal					key_eq() const;
+		allocator_type				get_allocator() const;
 
 	protected:
 		// Helper Member Function
-		void									_init(size_type n);
-		void									_deallocate();
+		void						_init(size_type n);
+		void						_deallocate();
 
 		// Attributes
-		array_type								_bucketArray;
-		size_type								_bucketNum;
-		size_type								_elemNum;
-		iterator								_first;
-		float									_maxLoadFactor;
-		hasher									_hasher;
-		key_equal								_equal;
-		mutable allocator_type					_allocator;
-		bucket_allocator_type					_bucketAllocator() const { return bucket_allocator_type(_allocator); }
-		bool									_shouldRehash(size_type newElem) const { return _elemNum + newElem > _bucketNum * _maxLoadFactor; }
+		array_type					_bucketArray;
+		size_type					_bucketNum;
+		size_type					_elemNum;
+		iterator					_first;
+		float						_maxLoadFactor;
+		hasher						_hasher;
+		key_equal					_equal;
+		mutable allocator_type		_allocator;
+		bucket_allocator_type		_bucketAllocator() const { return bucket_allocator_type(_allocator); }
+		bool						_shouldRehash(size_type newElem) const { return _elemNum + newElem > _bucketNum * _maxLoadFactor; }
 };
 
 

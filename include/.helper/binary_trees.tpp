@@ -257,10 +257,7 @@ ft::internal::rbt_node<T>::upper_bound(value_type CREF val, Compare comp) const
 
 template <typename T>
 template <typename Compare>
-ft::pair<
-	typename ft::internal::rbt_node<T>::this_type const*,
-	typename ft::internal::rbt_node<T>::this_type const*
->
+ft::utility<typename ft::internal::rbt_node<T>::this_type const*>
 ft::internal::rbt_node<T>::equal_range(value_type CREF val, Compare comp) const
 {
 	return ft::make_pair(lower_bound(val, comp), upper_bound(val, comp));
@@ -499,13 +496,10 @@ ft::internal::rbt<T, Comp, Allocator, extractKey, mutableIterators>::upper_bound
 
 
 template <typename T, typename Comp, typename Allocator, typename extractKey, bool mutableIterators>
-ft::pair<
-	typename ft::internal::rbt<T, Comp, Allocator, extractKey, mutableIterators>::iterator,
-	typename ft::internal::rbt<T, Comp, Allocator, extractKey, mutableIterators>::iterator
->
+ft::utility<typename ft::internal::rbt<T, Comp, Allocator, extractKey, mutableIterators>::iterator>
 ft::internal::rbt<T, Comp, Allocator, extractKey, mutableIterators>::equal_range(value_type CREF val) const
 {
-	ft::pair<node_type const*, node_type const*> nodeRange = _root->equal_range(val, ft::internal::ValueComparator<extractKey, Comp>(_comp));
+	ft::utility<node_type const*> nodeRange = _root->equal_range(val, ft::internal::ValueComparator<extractKey, Comp>(_comp));
 	if (!nodeRange.first())
 		nodeRange.first() = static_cast<node_type const*>(&_sentinel);
 	if (!nodeRange.second())

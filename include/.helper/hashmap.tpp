@@ -446,7 +446,7 @@ ft::internal::hashmap<Key, Hash, KeyEqual, Allocator, extractKey, mutableIterato
 
 
 template <typename Key, typename Hash, typename KeyEqual, typename Allocator, typename extractKey, bool mutableIterators>
-ft::pair<typename ft::internal::hashmap<Key, Hash, KeyEqual, Allocator, extractKey, mutableIterators>::iterator, typename ft::internal::hashmap<Key, Hash, KeyEqual, Allocator, extractKey, mutableIterators>::iterator>
+ft::utility<typename ft::internal::hashmap<Key, Hash, KeyEqual, Allocator, extractKey, mutableIterators>::iterator>
 ft::internal::hashmap<Key, Hash, KeyEqual, Allocator, extractKey, mutableIterators>::equal_range(key_type CREF key)
 {
 	iterator	first = find(key);
@@ -463,7 +463,7 @@ ft::internal::hashmap<Key, Hash, KeyEqual, Allocator, extractKey, mutableIterato
 
 
 template <typename Key, typename Hash, typename KeyEqual, typename Allocator, typename extractKey, bool mutableIterators>
-ft::pair<typename ft::internal::hashmap<Key, Hash, KeyEqual, Allocator, extractKey, mutableIterators>::const_iterator, typename ft::internal::hashmap<Key, Hash, KeyEqual, Allocator, extractKey, mutableIterators>::const_iterator>
+ft::utility<typename ft::internal::hashmap<Key, Hash, KeyEqual, Allocator, extractKey, mutableIterators>::const_iterator>
 ft::internal::hashmap<Key, Hash, KeyEqual, Allocator, extractKey, mutableIterators>::equal_range(key_type CREF key) const
 {
 	const_iterator	first = find(key);

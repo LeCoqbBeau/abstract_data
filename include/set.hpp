@@ -40,29 +40,29 @@ class set
 		typedef	typename rbt_type::size_type				size_type;
 
 		// Constructors
-		explicit					set(key_compare CREF comp = key_compare(), allocator_type CREF allocator = allocator_type());
-		template <typename InputIt>	set(InputIt first, InputIt last, key_compare CREF comp = key_compare(), allocator_type CREF allocator = allocator_type());
-									set(set CREF rhs);
-		set REF	operator			=  (set CREF rhs);
+		explicit							set(key_compare CREF comp = key_compare(), allocator_type CREF allocator = allocator_type());
+		template <typename InputIt>			set(InputIt first, InputIt last, key_compare CREF comp = key_compare(), allocator_type CREF allocator = allocator_type());
+											set(set CREF rhs);
+		set REF					operator	=  (set CREF rhs);
 		~set();
 
 		// Iterators
-		iterator				begin();
-		const_iterator			begin() const;
-		iterator				end();
-		const_iterator			end() const;
-		reverse_iterator		rbegin();
-		const_reverse_iterator	rbegin() const;
-		reverse_iterator		rend();
-		const_reverse_iterator	rend() const;
+		iterator							begin();
+		const_iterator						begin() const;
+		iterator							end();
+		const_iterator						end() const;
+		reverse_iterator					rbegin();
+		const_reverse_iterator				rbegin() const;
+		reverse_iterator					rend();
+		const_reverse_iterator				rend() const;
 
 		// Capacity
-		bool		empty() const;
-		size_type	size() const;
-		size_type	max_size() const;
+		bool								empty() const;
+		size_type							size() const;
+		size_type							max_size() const;
 
 		// Modifiers
-		ft::pair<iterator, bool>			insert(value_type CREF val);
+		ft::utility<iterator, bool>			insert(value_type CREF val);
 		iterator							insert(iterator position, value_type CREF val);
 		template <typename InputIt> void	insert(InputIt first, InputIt last);
 		void								erase(iterator position);
@@ -72,15 +72,15 @@ class set
 		void								clear();
 
 		// Observers
-		key_compare		key_comp() const;
-		value_compare	value_comp() const;
+		key_compare							key_comp() const;
+		value_compare						value_comp() const;
 
 		// Operations
-		iterator						find(value_type CREF val) const;
-		size_type						count(value_type CREF val) const;
-		iterator						lower_bound(value_type CREF val) const;
-		iterator						upper_bound(value_type CREF val) const;
-		ft::pair<iterator, iterator>	equal_range(value_type CREF val) const;
+		iterator							find(value_type CREF val) const;
+		size_type							count(value_type CREF val) const;
+		iterator							lower_bound(value_type CREF val) const;
+		iterator							upper_bound(value_type CREF val) const;
+		ft::utility<iterator>					equal_range(value_type CREF val) const;
 
 		// Allocator
 		allocator_type	get_allocator() const;
@@ -121,26 +121,26 @@ class multiset
 		typedef	typename rbt_type::size_type				size_type;
 
 		// Constructors
-		explicit					multiset(key_compare CREF comp = key_compare(), allocator_type CREF allocator = allocator_type());
-		template <typename InputIt>	multiset(InputIt first, InputIt last, key_compare CREF comp = key_compare(), allocator_type CREF allocator = allocator_type());
-									multiset(multiset CREF rhs);
-		multiset REF	operator	=  (multiset CREF rhs);
+		explicit							multiset(key_compare CREF comp = key_compare(), allocator_type CREF allocator = allocator_type());
+		template <typename InputIt>			multiset(InputIt first, InputIt last, key_compare CREF comp = key_compare(), allocator_type CREF allocator = allocator_type());
+											multiset(multiset CREF rhs);
+		multiset REF			operator	=  (multiset CREF rhs);
 		~multiset();
 
 		// Iterators
-		iterator				begin();
-		const_iterator			begin() const;
-		iterator				end();
-		const_iterator			end() const;
-		reverse_iterator		rbegin();
-		const_reverse_iterator	rbegin() const;
-		reverse_iterator		rend();
-		const_reverse_iterator	rend() const;
+		iterator							begin();
+		const_iterator						begin() const;
+		iterator							end();
+		const_iterator						end() const;
+		reverse_iterator					rbegin();
+		const_reverse_iterator				rbegin() const;
+		reverse_iterator					rend();
+		const_reverse_iterator				rend() const;
 
 		// Capacity
-		bool		empty() const;
-		size_type	size() const;
-		size_type	max_size() const;
+		bool								empty() const;
+		size_type							size() const;
+		size_type							max_size() const;
 
 		// Modifiers
 		iterator							insert(value_type CREF val);
@@ -153,18 +153,18 @@ class multiset
 		void								clear();
 
 		// Observers
-		key_compare		key_comp() const;
-		value_compare	value_comp() const;
+		key_compare							key_comp() const;
+		value_compare						value_comp() const;
 
 		// Operations
-		iterator						find(value_type CREF val) const;
-		size_type						count(value_type CREF val) const;
-		iterator						lower_bound(value_type CREF val) const;
-		iterator						upper_bound(value_type CREF val) const;
-		ft::pair<iterator, iterator>	equal_range(value_type CREF val) const;
+		iterator							find(value_type CREF val) const;
+		size_type							count(value_type CREF val) const;
+		iterator							lower_bound(value_type CREF val) const;
+		iterator							upper_bound(value_type CREF val) const;
+		ft::utility<iterator>					equal_range(value_type CREF val) const;
 
 		// Allocator
-		allocator_type	get_allocator() const;
+		allocator_type						get_allocator() const;
 
 	protected:
 		// Attributes

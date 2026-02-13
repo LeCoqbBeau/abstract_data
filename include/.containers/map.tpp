@@ -177,7 +177,7 @@ ft::map<Key, T, Comp, Allocator>::at(key_type CREF key) const
 
 // Modifiers
 template <typename Key, typename T, typename Comp, typename Allocator>
-ft::pair<typename ft::map<Key, T, Comp, Allocator>::iterator, bool>
+ft::utility<typename ft::map<Key, T, Comp, Allocator>::iterator, bool>
 ft::map<Key, T, Comp, Allocator>::insert(value_type CREF val)
 {
 	iterator	elem = _tree.find(val);
@@ -321,10 +321,7 @@ ft::map<Key, T, Comp, Allocator>::upper_bound(value_type CREF val) const
 
 
 template <typename Key, typename T, typename Comp, typename Allocator>
-ft::pair<
-	typename ft::map<Key, T, Comp, Allocator>::iterator,
-	typename ft::map<Key, T, Comp, Allocator>::iterator
->
+ft::utility<typename ft::map<Key, T, Comp, Allocator>::iterator>
 ft::map<Key, T, Comp, Allocator>::equal_range(value_type CREF val) const
 {
 	return _tree.equal_range(val);
@@ -652,10 +649,7 @@ ft::multimap<Key, T, Comp, Allocator>::upper_bound(value_type CREF val) const
 
 
 template <typename Key, typename T, typename Comp, typename Allocator>
-ft::pair<
-	typename ft::multimap<Key, T, Comp, Allocator>::iterator,
-	typename ft::multimap<Key, T, Comp, Allocator>::iterator
->
+ft::utility<typename ft::multimap<Key, T, Comp, Allocator>::iterator>
 ft::multimap<Key, T, Comp, Allocator>::equal_range(value_type CREF val) const
 {
 	return _tree.equal_range(val);

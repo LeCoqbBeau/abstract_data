@@ -5,7 +5,7 @@
 #include "ftdef.hpp"
 #include "algorithm.hpp"
 #include "functional.hpp"
-#include "pair.hpp"
+#include "utility.hpp"
 
 
 #define RBT_LEFT	0
@@ -79,7 +79,7 @@ struct rbt_node : rbt_node_base {
 	COMPARE_TEMPLATE 	ft::size_t										count(value_type CREF val, Compare comp) const;
 	COMPARE_TEMPLATE	this_type const*								lower_bound(value_type CREF val, Compare comp) const;
 	COMPARE_TEMPLATE	this_type const*								upper_bound(value_type CREF val, Compare comp) const;
-	COMPARE_TEMPLATE	ft::pair<this_type const*, this_type const*>	equal_range(value_type CREF val, Compare comp) const;
+	COMPARE_TEMPLATE	ft::utility<this_type const*, this_type const*>	equal_range(value_type CREF val, Compare comp) const;
 #undef COMPARE_TEMPLATE
 
 
@@ -187,40 +187,40 @@ struct rbt {
 		~rbt();
 
 		// Iterators
-		iterator						begin();
-		const_iterator					begin() const;
-		iterator						end();
-		const_iterator					end() const;
-		reverse_iterator				rbegin();
-		const_reverse_iterator			rbegin() const;
-		reverse_iterator				rend();
-		const_reverse_iterator			rend() const;
+		iterator				begin();
+		const_iterator			begin() const;
+		iterator				end();
+		const_iterator			end() const;
+		reverse_iterator		rbegin();
+		const_reverse_iterator	rbegin() const;
+		reverse_iterator		rend();
+		const_reverse_iterator	rend() const;
 
 		// Capacity
-		bool							empty() const;
-		size_type						size() const;
-		size_type						max_size() const;
+		bool					empty() const;
+		size_type				size() const;
+		size_type				max_size() const;
 
 		// Modifiers
-		iterator						insert(value_type CREF val);
-		remove_result					erase(value_type CREF val);
-		void							swap(this_type REF other);
-		void							clear();
+		iterator				insert(value_type CREF val);
+		remove_result			erase(value_type CREF val);
+		void					swap(this_type REF other);
+		void					clear();
 
 		// Observers
-		key_compare						key_comp() const;
-		value_compare					value_comp() const;
+		key_compare				key_comp() const;
+		value_compare			value_comp() const;
 
 		// Operations
-		iterator						find(value_type CREF val);
-		const_iterator					find(value_type CREF val) const;
-		size_type						count(value_type CREF val) const;
-		iterator						lower_bound(value_type CREF val) const;
-		iterator						upper_bound(value_type CREF val) const;
-		ft::pair<iterator, iterator>	equal_range(value_type CREF val) const;
+		iterator				find(value_type CREF val);
+		const_iterator			find(value_type CREF val) const;
+		size_type				count(value_type CREF val) const;
+		iterator				lower_bound(value_type CREF val) const;
+		iterator				upper_bound(value_type CREF val) const;
+		ft::utility<iterator>		equal_range(value_type CREF val) const;
 
 		// Allocator
-		allocator_type					get_allocator() const;
+		allocator_type			get_allocator() const;
 
 
 	public:

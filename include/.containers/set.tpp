@@ -143,7 +143,7 @@ ft::set<T, Comp, Allocator>::max_size() const
 
 // Modifiers
 template <typename T, typename Comp, typename Allocator>
-ft::pair<typename ft::set<T, Comp, Allocator>::iterator, bool>
+ft::utility<typename ft::set<T, Comp, Allocator>::iterator, bool>
 ft::set<T, Comp, Allocator>::insert(value_type CREF val)
 {
 	iterator	elem = _tree.find(val);
@@ -280,10 +280,7 @@ ft::set<T, Comp, Allocator>::upper_bound(value_type CREF val) const
 
 
 template <typename T, typename Comp, typename Allocator>
-ft::pair<
-	typename ft::set<T, Comp, Allocator>::iterator,
-	typename ft::set<T, Comp, Allocator>::iterator
->
+ft::utility<typename ft::set<T, Comp, Allocator>::iterator>
 ft::set<T, Comp, Allocator>::equal_range(value_type CREF val) const
 {
 	return _tree.equal_range(val);
@@ -569,10 +566,7 @@ ft::multiset<T, Comp, Allocator>::upper_bound(value_type CREF val) const
 
 
 template <typename T, typename Comp, typename Allocator>
-ft::pair<
-	typename ft::multiset<T, Comp, Allocator>::iterator,
-	typename ft::multiset<T, Comp, Allocator>::iterator
->
+ft::utility<typename ft::multiset<T, Comp, Allocator>::iterator>
 ft::multiset<T, Comp, Allocator>::equal_range(value_type CREF val) const
 {
 	return _tree.equal_range(val);

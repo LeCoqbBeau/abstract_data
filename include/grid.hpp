@@ -2,39 +2,39 @@
 // Created by mscheman on 1/24/26.
 //
 
-#ifndef MATRIX_HPP
-#define MATRIX_HPP
+#ifndef GRID_HPP
+#define GRID_HPP
 
 #include ".helper/algorithm.hpp"
 #include ".helper/ftdef.hpp"
 #include ".helper/ftexcept.hpp"
 #include ".helper/iterator.hpp"
 
-#define MATRIX_AT_EXCEPTION_MSG ("matrix::at(): index n out of bounds")
-#define MATRIX_ROW_AT_EXCEPTION_MSG ("matrix::row()::at(): index n out of bounds")
+#define GRID_AT_EXCEPTION_MSG ("matrix::at(): index n out of bounds")
+#define GRID_ROW_AT_EXCEPTION_MSG ("matrix::row()::at(): index n out of bounds")
 
 namespace ft {
 
 
 template <typename T, class Ref, class Ptr, ft::size_t M, ft::size_t N>
-struct _matrixIterator
+struct _gridIterator
 	: public ft::iterator<ft::random_access_iterator_tag, T, Ptr, Ref>
 {
 	// Typedefs
-	typedef _matrixIterator<T, Ref, Ptr, M, N>	this_type;
-	typedef _matrixIterator<T, T REF, T*, M, N>	iterator;
+	typedef _gridIterator<T, Ref, Ptr, M, N>	this_type;
+	typedef _gridIterator<T, T REF, T*, M, N>	iterator;
 	typedef ft::size_t							size_type;
 	typedef Ref									reference;
 	typedef Ptr									pointer;
 	typedef ft::ptrdiff_t						difference_type;
 
 	// Constructor
-	_matrixIterator(T** matrix, size_type pos) : matrix(matrix), pos(pos) {}
-	_matrixIterator(iterator it) : matrix(it.matrix), pos(it.pos) {}
+	_gridIterator(T** matrix, size_type pos) : matrix(matrix), pos(pos) {}
+	_gridIterator(iterator it) : matrix(it.matrix), pos(it.pos) {}
 
 	// Dereference operators
-	reference	operator * () { return matrix[pos / N][pos % N]; }
-	pointer		operator ->() { return &operator*(); }
+	reference		operator	* () 					{ return matrix[pos / N][pos % N]; }
+	pointer			operator	->() 					{ return &operator*(); }
 
 	// Shift operators
 	this_type REF	operator	++ ()					{ ++pos; return *this; };
@@ -53,9 +53,9 @@ struct _matrixIterator
 
 
 /**
- * @brief ft::matrix is a container that encapsulates fixed sized matrices.
+ * @brief ft::grid is a container that encapsulates fixed sized matrices.
  *
- * ft::matrix has been designed with std::array as inspiration. However, unlike std::array which creates a fixed-sized
+ * ft::grid has been designed with std::array as inspiration. However, unlike std::array which creates a fixed-sized
  * array on the stack and therefore doesn't have to handle memory, ft::array, allocates the matrices using the templated
  * allocator type.
  *
@@ -65,7 +65,7 @@ struct _matrixIterator
  * @tparam Allocator	The allocator to use to allocate the matrix, and construct the elements.
  */
 template <typename T, ft::size_t M, ft::size_t N, typename Allocator = ft::allocator<T> >
-class matrix {
+class grid {
 	protected:
 		// Proxy Structure to allow for the use of matrix[][] and matrix.at().at()
 		struct _row;
@@ -73,8 +73,8 @@ class matrix {
 	public:
 		// Typedefs
 		typedef	T											value_type;
-		typedef T*											row_type;
-		typedef T**											matrix_type;
+		typedef _row										row_type;
+		typedef T**											grid_type;
 		typedef Allocator									allocator_type;
 		typedef	ft::size_t									size_type;
 		typedef ft::ptrdiff_t								difference_type;
@@ -82,19 +82,19 @@ class matrix {
 		typedef value_type CREF								const_reference;
 		typedef typename Allocator::pointer					pointer;
 		typedef typename Allocator::const_pointer			const_pointer;
-		typedef _matrixIterator<T, T REF, T*, M, N>			iterator;
-		typedef _matrixIterator<T, T CREF, T const*, M, N>	const_iterator;
+		typedef _gridIterator<T, T REF, T*, M, N>			iterator;
+		typedef _gridIterator<T, T CREF, T const*, M, N>	const_iterator;
 		typedef ft::reverse_iterator<iterator>				reverse_iterator;
 		typedef ft::reverse_iterator<const_iterator>		const_reverse_iterator;
 
 		// Constructors
-								matrix(allocator_type CREF alloc = allocator_type());
-								matrix(size_type n, value_type CREF val = value_type(), allocator_type CREF alloc = allocator_type());
-		template<class InputIt>	matrix(InputIt first, InputIt last, allocator_type CREF alloc = allocator_type(),
-										ENABLE_IF_TT(!IS_INTEGRAL_V(InputIt), InputIt)* = 0);
-								matrix(matrix CREF x);
-		matrix REF operator		= (matrix CREF rhs);
-		~matrix();
+									grid(allocator_type CREF alloc = allocator_type());
+									grid(size_type n, value_type CREF value = value_type(), allocator_type CREF alloc = allocator_type());
+		template<class InputIt>		grid(InputIt first, InputIt last, allocator_type CREF alloc = allocator_type(),
+											ENABLE_IF_TT(!IS_INTEGRAL_V(InputIt), InputIt)* = 0);
+									grid(grid CREF x);
+		grid REF		operator	=(grid CREF rhs);
+		~grid();
 
 		// Iterators
 		iterator					begin();
@@ -116,24 +116,24 @@ class matrix {
 		const_reference	operator	[](size_type n) const;
 		reference 					at(size_type n);
 		const_reference	 			at(size_type n) const;
-		_row						row(size_type m);
-		_row const					row(size_type m) const;
+		row_type					row(size_type m);
+		row_type const				row(size_type m) const;
 		reference					front();
 		const_reference				front() const;
 		reference					back();
 		const_reference				back() const;
-		matrix_type					data();
-		matrix_type const			data() const;
+		grid_type					data();
+		grid_type const				data() const;
 
 		// Modifiers
 		void						fill(value_type CREF value);
-		void						swap(matrix REF other);
+		void						swap(grid REF other);
 
 	protected:
 		// Proxy Structure
 		struct _row {
 			// Constructor
-			_row(row_type row, size_type length) : row(row), length(length) {}
+			_row(pointer row) : row(row) {}
 
 			// Element Access
 			reference		operator	[](size_type n);
@@ -146,73 +146,74 @@ class matrix {
 			const_reference				front() const;
 			reference					back();
 			const_reference				back() const;
-			row_type					data();
-			row_type const				data() const;
+			pointer						data();
+			pointer const				data() const;
 
 			// Attributes
-			row_type	row;
-			size_type	length;
+			pointer						row;
 		};
 
 	protected:
 		// Typedefs
-		typedef typename allocator_type::template rebind<row_type>::other _matrixAllocator;
+		typedef typename allocator_type::template rebind<pointer>::other _grid_allocator_type;
 
 		// Helper Functions
-		void	_init();
-		void	_clean();
+		void					_init();
+		void					_init(value_type CREF value);
+		void					_clean();
 
 		// Attributes
-		matrix_type				_matrix;
+		grid_type				_grid;
 		size_type				_size;
 		mutable allocator_type	_allocator;
-		_matrixAllocator		_rowAllocator() { return _matrixAllocator(_allocator); }
+		_grid_allocator_type	_gridAllocator() { return _grid_allocator_type(_allocator); }
+		void					_initUnleak(size_type lastM, size_type lastN);
 };
 
 
 }
 
 
-#define MATRIX_COMPARISON_OPERATOR(op)	\
+#define GRID_COMPARISON_OPERATOR(op)	\
 	template <typename T, ft::size_t M, ft::size_t N, typename Allocator>	\
-		bool operator op (ft::matrix<T, M, N, Allocator> CREF lhs, ft::matrix<T, M, N, Allocator> CREF rhs)
+		bool operator op (ft::grid<T, M, N, Allocator> CREF lhs, ft::grid<T, M, N, Allocator> CREF rhs)
 
 
-MATRIX_COMPARISON_OPERATOR(==) {
+GRID_COMPARISON_OPERATOR(==) {
 	if (lhs.size() != rhs.size())
 		return false;
 	return ft::equal(lhs.begin(), lhs.end(), rhs.begin());
 }
 
 
-MATRIX_COMPARISON_OPERATOR(!=) {
+GRID_COMPARISON_OPERATOR(!=) {
 	return !(lhs == rhs);
 }
 
 
-MATRIX_COMPARISON_OPERATOR(<) {
+GRID_COMPARISON_OPERATOR(<) {
 	return ft::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
 }
 
 
-MATRIX_COMPARISON_OPERATOR(<=) {
+GRID_COMPARISON_OPERATOR(<=) {
 	return !(rhs < lhs);
 }
 
 
-MATRIX_COMPARISON_OPERATOR(>) {
+GRID_COMPARISON_OPERATOR(>) {
 	return (rhs < lhs);
 }
 
 
-MATRIX_COMPARISON_OPERATOR(>=) {
+GRID_COMPARISON_OPERATOR(>=) {
 	return !(lhs < rhs);
 }
 
 
-#include ".containers/matrix.tpp"
+#include ".containers/grid.tpp"
 
 
-#undef MATRIX_COMPARISON_OPERATOR
+#undef GRID_COMPARISON_OPERATOR
 
-#endif //MATRIX_HPP
+#endif //GRID_HPP

@@ -17,13 +17,13 @@ template <
 	class Key,
 	class T,
 	class Compare = ft::less<Key>,
-	class Allocator = ft::allocator<ft::pair<const Key, T> >
+	class Allocator = ft::allocator<ft::utility<const Key, T> >
 >
 class map
 {
 	protected:
 		// Typedefs
-		typedef ft::internal::rbt<ft::pair<const Key, T>, Compare, Allocator, ft::true_type, true>	rbt_type;
+		typedef ft::internal::rbt<ft::utility<const Key, T>, Compare, Allocator, ft::true_type, true>	rbt_type;
 
 	public:
 		// Typedefs
@@ -45,34 +45,34 @@ class map
 		typedef	typename rbt_type::size_type							size_type;
 
 		// Constructors
-		explicit					map(key_compare CREF comp = key_compare(), allocator_type CREF allocator = allocator_type());
-		template <typename InputIt>	map(InputIt first, InputIt last, key_compare CREF comp = key_compare(), allocator_type CREF allocator = allocator_type());
-									map(map CREF rhs);
-		map REF				operator=(map CREF rhs);
+		explicit							map(key_compare CREF comp = key_compare(), allocator_type CREF allocator = allocator_type());
+		template <typename InputIt>			map(InputIt first, InputIt last, key_compare CREF comp = key_compare(), allocator_type CREF allocator = allocator_type());
+											map(map CREF rhs);
+		map REF					operator	=(map CREF rhs);
 		~map();
 
 		// Iterators
-		iterator				begin();
-		const_iterator			begin() const;
-		iterator				end();
-		const_iterator			end() const;
-		reverse_iterator		rbegin();
-		const_reverse_iterator	rbegin() const;
-		reverse_iterator		rend();
-		const_reverse_iterator	rend() const;
+		iterator							begin();
+		const_iterator						begin() const;
+		iterator							end();
+		const_iterator						end() const;
+		reverse_iterator					rbegin();
+		const_reverse_iterator				rbegin() const;
+		reverse_iterator					rend();
+		const_reverse_iterator				rend() const;
 
 		// Capacity
-		bool		empty() const;
-		size_type	size() const;
-		size_type	max_size() const;
+		bool								empty() const;
+		size_type							size() const;
+		size_type							max_size() const;
 
 		// Element Access
-		mapped_type REF		operator[](key_type CREF key);
-		mapped_type REF				at(key_type CREF key);
-		mapped_type CREF			at(key_type CREF key) const;
+		mapped_type REF			operator	[](key_type CREF key);
+		mapped_type REF						at(key_type CREF key);
+		mapped_type CREF					at(key_type CREF key) const;
 
 		// Modifiers
-		ft::pair<iterator, bool>			insert(value_type CREF val);
+		ft::utility<iterator, bool>			insert(value_type CREF val);
 		iterator							insert(iterator position, value_type CREF val);
 		template <typename InputIt> void	insert(InputIt first, InputIt last);
 		void								erase(iterator position);
@@ -82,19 +82,19 @@ class map
 		void								clear();
 
 		// Observers
-		key_compare		key_comp() const;
-		value_compare	value_comp() const;
+		key_compare							key_comp() const;
+		value_compare						value_comp() const;
 
 		// Operations
-		iterator						find(value_type CREF val);
-		const_iterator					find(value_type CREF val) const;
-		size_type						count(value_type CREF val) const;
-		iterator						lower_bound(value_type CREF val) const;
-		iterator						upper_bound(value_type CREF val) const;
-		ft::pair<iterator, iterator>	equal_range(value_type CREF val) const;
+		iterator							find(value_type CREF val);
+		const_iterator						find(value_type CREF val) const;
+		size_type							count(value_type CREF val) const;
+		iterator							lower_bound(value_type CREF val) const;
+		iterator							upper_bound(value_type CREF val) const;
+		ft::utility<iterator>					equal_range(value_type CREF val) const;
 
 		// Allocator
-		allocator_type	get_allocator() const;
+		allocator_type						get_allocator() const;
 
 	protected:
 		// Attributes
@@ -106,13 +106,13 @@ template <
 	class Key,
 	class T,
 	class Compare = ft::less<Key>,
-	class Allocator = ft::allocator<ft::pair<const Key, T> >
+	class Allocator = ft::allocator<ft::utility<const Key, T> >
 >
 class multimap
 {
 	protected:
 		// Typedefs
-		typedef ft::internal::rbt<ft::pair<const Key, T>, Compare, Allocator, ft::true_type, true>	rbt_type;
+		typedef ft::internal::rbt<ft::utility<const Key, T>, Compare, Allocator, ft::true_type, true>	rbt_type;
 
 	public:
 		// Typedefs
@@ -141,24 +141,24 @@ class multimap
 		~multimap();
 
 		// Iterators
-		iterator				begin();
-		const_iterator			begin() const;
-		iterator				end();
-		const_iterator			end() const;
-		reverse_iterator		rbegin();
-		const_reverse_iterator	rbegin() const;
-		reverse_iterator		rend();
-		const_reverse_iterator	rend() const;
+		iterator							begin();
+		const_iterator						begin() const;
+		iterator							end();
+		const_iterator						end() const;
+		reverse_iterator					rbegin();
+		const_reverse_iterator				rbegin() const;
+		reverse_iterator					rend();
+		const_reverse_iterator				rend() const;
 
 		// Capacity
-		bool		empty() const;
-		size_type	size() const;
-		size_type	max_size() const;
+		bool								empty() const;
+		size_type							size() const;
+		size_type							max_size() const;
 
 		// Element Access
-		mapped_type REF	operator	[](key_type CREF key);
-		mapped_type REF				at(key_type CREF key);
-		mapped_type CREF			at(key_type CREF key) const;
+		mapped_type REF			operator	[](key_type CREF key);
+		mapped_type REF						at(key_type CREF key);
+		mapped_type CREF					at(key_type CREF key) const;
 
 		// Modifiers
 		iterator							insert(value_type CREF val);
@@ -171,19 +171,19 @@ class multimap
 		void								clear();
 
 		// Observers
-		key_compare		key_comp() const;
-		value_compare	value_comp() const;
+		key_compare							key_comp() const;
+		value_compare						value_comp() const;
 
 		// Operations
-		iterator						find(value_type CREF val);
-		const_iterator					find(value_type CREF val) const;
-		size_type						count(value_type CREF val) const;
-		iterator						lower_bound(value_type CREF val) const;
-		iterator						upper_bound(value_type CREF val) const;
-		ft::pair<iterator, iterator>	equal_range(value_type CREF val) const;
+		iterator							find(value_type CREF val);
+		const_iterator						find(value_type CREF val) const;
+		size_type							count(value_type CREF val) const;
+		iterator							lower_bound(value_type CREF val) const;
+		iterator							upper_bound(value_type CREF val) const;
+		ft::utility<iterator>					equal_range(value_type CREF val) const;
 
 		// Allocator
-		allocator_type	get_allocator() const;
+		allocator_type						get_allocator() const;
 
 	protected:
 		// Attributes

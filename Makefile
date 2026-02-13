@@ -10,7 +10,7 @@ INCLUDES		=	-I$(INC)#$(foreach d, $(INC), -I$d)
 CFLAGS			=	$(INCLUDES) -Wall -Werror -Wextra -g -std=c++98 -MMD -MP
 CXX				=	c++
 
-SRC_DIR			=	src/
+SRC_DIR			=	tests/
 SRC_NAME		=	main.cpp
 
 DOXYGEN_SRCS	=	include/deque.hpp			\
@@ -22,13 +22,14 @@ DOXYGEN_SRCS	=	include/deque.hpp			\
 					include/unordered_set.hpp	\
 					include/unordered_map.hpp	\
 					include/map.hpp				\
-					include/matrix.hpp
+					include/grid.hpp
 
 DOXYFILE		=	Doxyfile
-DOXYGEN_DOC		=	.doxygen_doc/
+DOXYGEN_DIR		=	.doxygen/
+DOXYGEN_DOC		=	$(DOXYGEN_DIR)doc/
 DOXYGEN_HTML	=	$(DOXYGEN_DOC)index.html
-DOXYGEN_LATEX	=	.doxygen_latex/
-DOXYGEN_DIR		=	$(DOXYGEN_DOC) $(DOXYGEN_LATEX)
+DOXYGEN_LATEX	=	$(DOXYGEN_DIR)latex/
+DOXYGEN_SUBDIR	=	$(DOXYGEN_DOC) $(DOXYGEN_LATEX)
 
 OBJ_DIR			=	.build/
 OBJ_NAME		=	$(SRC_NAME:.cpp=.o)
@@ -54,7 +55,7 @@ clean:
 	@echo "\033[1;31m Deleted all object files" $(CLR)
 
 dclean:
-	@rm -rf $(DOXYGEN_DIR)
+	@rm -rf $(DOXYGEN_SUBDIR)
 	@echo "\033[1;31m Deleted documentation" $(CLR)
 
 fclean: clean dclean

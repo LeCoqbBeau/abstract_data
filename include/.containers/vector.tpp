@@ -157,12 +157,12 @@ ft::vector<T, Allocator>::resize(size_type n, value_type CREF val)
 {
 	size_type const arraySize = size();
 	if (arraySize < n)
-		for (difference_type i = arraySize; i != n; ++i) {
+		for (size_type i = arraySize; i != n; ++i) {
 			--_end;
 			_allocator.destroy(*_end);
 		}
 	else
-		for (difference_type i = arraySize; i != n; ++i)
+		for (size_type i = arraySize; i != n; ++i)
 			push_back(val);
 
 }
