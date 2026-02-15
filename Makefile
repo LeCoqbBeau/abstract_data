@@ -3,26 +3,21 @@ MAKEFLAGS		=	--no-print-directory
 
 NAME			=	abstract_data
 
-INC				=	include
-
-INCLUDES		=	-I$(INC) #$(foreach d, $(INC), -I$d)
-
-CFLAGS			=	$(INCLUDES) -Wall -Werror -Wextra -g -std=c++98 -MMD -MP
-CXX				=	c++
+INC				=	include/
 
 SRC_DIR			=	tests/
 SRC_NAME		=	main.cpp
 
-DOXYGEN_SRCS	=	include/deque.hpp			\
-					include/list.hpp			\
-					include/queue.hpp			\
-					include/stack.hpp			\
-					include/vector.hpp			\
-					include/set.hpp				\
-					include/unordered_set.hpp	\
-					include/unordered_map.hpp	\
-					include/map.hpp				\
-					include/grid.hpp
+DOXYGEN_SRCS	=	$(INC)deque.hpp			\
+					$(INC)list.hpp			\
+					$(INC)queue.hpp			\
+					$(INC)stack.hpp			\
+					$(INC)vector.hpp		\
+					$(INC)set.hpp			\
+					$(INC)unordered_set.hpp	\
+					$(INC)unordered_map.hpp	\
+					$(INC)map.hpp			\
+					$(INC)grid.hpp
 
 DOXYFILE		=	Doxyfile
 DOXYGEN_DIR		=	.doxygen/
@@ -39,10 +34,12 @@ GTEST_GTEST		=	$(GTEST_DIR)googletest/
 GTEST_BUILD		=	$(GTEST_GTEST)build/
 GTEST_ALL_A		=	$(GTEST_BUILD)libgtest.a
 GTEST_MAIN_A	=	$(GTEST_BUILD)libgtest_main.a
-GTEST_INCLUDE	=	$(GTEST_GTEST)include
+GTEST_INCLUDE	=	$(GTEST_GTEST)include/
 
 
-CFLAGS			+= -I$(GTEST_INCLUDE)
+INCLUDES		=	-I$(INC) -I$(GTEST_INCLUDE)
+CFLAGS			=	$(INCLUDES) -Wall -Werror -Wextra -g -std=c++98 -MMD -MP
+CXX				=	c++
 
 OBJ_DIR			=	.build/
 OBJ_NAME		=	$(SRC_NAME:.cpp=.o)

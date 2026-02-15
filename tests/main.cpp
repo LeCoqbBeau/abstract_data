@@ -8,7 +8,6 @@
 typedef std::string	str;
 #include "Fat.hpp"
 
-
 #include "SequenceContainersTests.tpp"
 
 int main(int argc, char *argv[]) {
