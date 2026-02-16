@@ -109,22 +109,22 @@ class reverse_iterator {
 		reverse_iterator REF operator = (reverse_iterator<U> CREF rhs) { _current = rhs.base(); return *this; }
 
 		// Method
-		iterator_type base() const { return _current; };
+		iterator_type		base() const					{ return _current; };
 
 		// Access Operators Overload
-		reference operator * () { Iter tmp = _current; return *(--tmp); }
-		pointer operator -> () { return &(operator*()); }
-		reference operator[] (difference_type n) const { return base()[-n - 1]; }
+		reference	operator *  ()							{ Iter tmp = _current; return *(--tmp); }
+		pointer		operator -> ()							{ return &(operator*()); }
+		reference	operator [] (difference_type n) const	{ return base()[-n - 1]; }
 
 		// Shift Operators Overload
-		reverse_iterator REF operator ++ () { --_current; return *this; }
-		reverse_iterator REF operator -- () { ++_current; return *this; }
-		reverse_iterator operator ++ ( int ) { reverse_iterator tmp = *this; --_current; return tmp;}
-		reverse_iterator operator -- ( int ) { reverse_iterator tmp = *this; ++_current; return tmp;}
-		reverse_iterator operator + ( difference_type n ) const { return reverse_iterator(_current - n); }
-		reverse_iterator operator - ( difference_type n ) const { return reverse_iterator(_current + n); }
-		reverse_iterator REF operator += ( difference_type n ) { _current -= n; return *this; }
-		reverse_iterator REF operator -= ( difference_type n ) { _current += n; return *this; }
+		reverse_iterator REF	operator ++ () { --_current; return *this; }
+		reverse_iterator REF	operator -- () { ++_current; return *this; }
+		reverse_iterator 		operator ++ (int) { reverse_iterator tmp = *this; --_current; return tmp;}
+		reverse_iterator 		operator -- (int) { reverse_iterator tmp = *this; ++_current; return tmp;}
+		reverse_iterator 		operator +  (difference_type n) const { return reverse_iterator(_current - n); }
+		reverse_iterator 		operator -  (difference_type n) const { return reverse_iterator(_current + n); }
+		reverse_iterator REF	operator += (difference_type n) { _current -= n; return *this; }
+		reverse_iterator REF	operator -= (difference_type n) { _current += n; return *this; }
 
 	private:
 		Iter _current;

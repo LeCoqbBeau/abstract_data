@@ -15,6 +15,48 @@
 
 namespace ft {
 
+template <typename T, typename Ref, typename Ptr>
+struct _vectorIterator : iterator<ft::random_access_iterator_tag, T, ft::ptrdiff_t, Ptr, Ref>
+{
+	// Typedefs
+	typedef _vectorIterator<T, Ref, Ptr>	this_type;
+	typedef T								value_type;
+	typedef ft::ptrdiff_t					difference_type;
+	typedef Ptr								pointer;
+	typedef Ref								reference;
+
+	// Constructors
+	_vectorIterator(value_type *current = NULL) : _curr(current) {}
+	_vectorIterator(_vectorIterator<T, T REF, T*> CREF iterator) : _curr(iterator._curr) {}
+	~_vectorIterator() {}
+
+	// In/Equality Operator
+	template <class U, class URef, class UPtr>
+	bool		operator	== (_vectorIterator<U, URef, UPtr> CREF rhs) const { return _curr == rhs._curr; }
+	template <class U, class URef, class UPtr>
+	bool		operator	!= (_vectorIterator<U, URef, UPtr> CREF rhs) const { return _curr != rhs._curr; }
+
+	// Dereference Operator
+	reference	operator	* ()								{ return *_curr; }
+	pointer		operator	->()								{ return _curr; }
+
+	// Shift Operators
+	this_type REF	operator	++ ()							{ ++_curr; return *this; }
+	this_type		operator	++ (int)						{ this_type tmp(*this); operator++(); return tmp; }
+	this_type REF	operator	+= (difference_type n)			{ _curr += n; return *this; }
+	this_type		operator	+  (difference_type n) const	{ return this_type(*this).operator+=(n); }
+	this_type REF	operator	-- ()							{ --_curr; return *this; }
+	this_type		operator	-- (int)						{ this_type tmp(*this); operator--(); return tmp; }
+	this_type REF	operator	-= (difference_type n)			{ _curr -= n; return *this; }
+	this_type		operator	-  (difference_type n) const	{ return this_type(*this).operator-=(n); }
+	template <class U, class URef, class UPtr>
+	difference_type	operator	- (_vectorIterator<U, URef, UPtr> CREF rhs) const { return _curr - rhs._curr; }
+
+
+	// Attributes
+	value_type	*_curr;
+};
+
 
 template <typename T, typename Allocator = ft::allocator<T> >
 class vector {
@@ -28,46 +70,46 @@ class vector {
 		typedef value_type CREF							const_reference;
 		typedef typename Allocator::pointer				pointer;
 		typedef typename Allocator::const_pointer		const_pointer;
-		typedef value_type *							iterator;
-		typedef value_type const*						const_iterator;
+		typedef _vectorIterator<T, T REF, T*>			iterator;
+		typedef _vectorIterator<T, T CREF, T const*>	const_iterator;
 		typedef ft::reverse_iterator<iterator>			reverse_iterator;
 		typedef ft::reverse_iterator<const_iterator>	const_reverse_iterator;
 
 		// Constructors
-		explicit 						vector(allocator_type CREF alloc = allocator_type());
-		explicit 						vector(size_type n, value_type CREF val = value_type(), allocator_type CREF alloc = allocator_type());
-		template <class InputIterator>	vector(InputIterator first, InputIterator last, allocator_type CREF alloc = allocator_type());
-										vector(vector CREF rhs);
-		vector REF operator				= (vector CREF rhs);
+		explicit 								vector(allocator_type CREF alloc = allocator_type());
+		explicit 								vector(size_type n, value_type CREF val = value_type(), allocator_type CREF alloc = allocator_type());
+		template <class InputIterator>			vector(InputIterator first, InputIterator last, allocator_type CREF alloc = allocator_type());
+		vector(vector CREF rhs);
+		vector REF					operator	= (vector CREF rhs);
 		~vector();
 
 		// Iterators
-		iterator				begin();
-		const_iterator			begin() const;
-		iterator				end();
-		const_iterator			end() const;
-		reverse_iterator		rbegin();
-		const_reverse_iterator	rbegin() const;
-		reverse_iterator		rend();
-		const_reverse_iterator	rend() const;
+		iterator								begin();
+		const_iterator							begin() const;
+		iterator								end();
+		const_iterator							end() const;
+		reverse_iterator						rbegin();
+		const_reverse_iterator					rbegin() const;
+		reverse_iterator						rend();
+		const_reverse_iterator					rend() const;
 
 		// Capacity
-		size_type	size() const;
-		size_type	max_size() const;
-		void		resize(size_type n, value_type CREF val = value_type());
-		size_type	capacity() const;
-		bool		empty() const;
-		void		reserve(size_type n);
+		size_type								size() const;
+		size_type								max_size() const;
+		void									resize(size_type n, value_type CREF val = value_type());
+		size_type								capacity() const;
+		bool									empty() const;
+		void									reserve(size_type n);
 
 		// Element Access
-		reference		operator	[] (size_type n);
-		const_reference operator	[] (size_type n) const;
-		reference 					at(size_type n);
-		const_reference 			at(size_type n) const;
-		reference					front();
-		const_reference				front() const;
-		reference					back();
-		const_reference				back() const;
+		reference		operator				[] (size_type n);
+		const_reference operator				[] (size_type n) const;
+		reference 								at(size_type n);
+		const_reference 						at(size_type n) const;
+		reference								front();
+		const_reference							front() const;
+		reference								back();
+		const_reference							back() const;
 
 		// Modifiers
 		void									assign(size_type n, value_type CREF value);
@@ -109,11 +151,8 @@ void swap(ft::vector<T, Allocator> x, ft::vector<T, Allocator> y) {
 }
 
 
-}
-
-
-# define VECTOR_COMPARISON_OPERATOR(op) template <class T, class Allocator> bool operator op						\
-											(ft::vector<T, Allocator> CREF lhs, ft::vector<T, Allocator> CREF rhs)
+# define VECTOR_COMPARISON_OPERATOR(op)	template <class T, class Allocator> bool operator op						\
+										(ft::vector<T, Allocator> CREF lhs, ft::vector<T, Allocator> CREF rhs)
 
 VECTOR_COMPARISON_OPERATOR(==) {
 	if (lhs.size() != rhs.size())
@@ -144,6 +183,9 @@ VECTOR_COMPARISON_OPERATOR(>) {
 
 VECTOR_COMPARISON_OPERATOR(>=) {
 	return !(lhs < rhs);
+}
+
+
 }
 
 

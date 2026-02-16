@@ -28,14 +28,34 @@ ft::_dequeIterator<T, TRef, TPtr>::_dequeIterator(value_type** map, value_type *
 
 template <typename T, typename TRef, typename TPtr>
 ft::_dequeIterator<T, TRef, TPtr>::_dequeIterator(_dequeIterator<T, T REF, T*> CREF iterator)
-	: _mCurrent(iterator._mCurrent), _mBegin(iterator.begin), _mEnd(iterator.end), _mMap(iterator.map)
+	: _mCurrent(iterator._mCurrent), _mBegin(iterator._mBegin), _mEnd(iterator._mEnd), _mMap(iterator._mMap)
 {}
+
+
+// In/Equality Operator
+template <typename T, typename TRef, typename TPtr>
+template <class U, class URef, class UPtr>
+bool
+ft::_dequeIterator<T, TRef, TPtr>::operator ==(_dequeIterator<U, URef, UPtr> CREF rhs) const
+{
+	return _mCurrent == rhs._mCurrent;
+}
+
+
+template <typename T, typename TRef, typename TPtr>
+template <class U, class URef, class UPtr>
+bool
+ft::_dequeIterator<T, TRef, TPtr>::operator !=(_dequeIterator<U, URef, UPtr> CREF rhs) const
+{
+	return _mCurrent != rhs._mCurrent;
+}
 
 
 // Shift Operators
 template <typename T, typename TRef, typename TPtr>
 typename ft::_dequeIterator<T, TRef, TPtr>::this_type REF
-ft::_dequeIterator<T, TRef, TPtr>::operator ++ () {
+ft::_dequeIterator<T, TRef, TPtr>::operator ++()
+{
 	if (FT_UNLIKELY(++_mCurrent == _mEnd)) {
 		_mBegin = *++_mMap;
 		_mCurrent = _mBegin;
@@ -117,14 +137,23 @@ ft::_dequeIterator<T, TRef, TPtr>::operator - (difference_type n) {
 	return this_type(*this).operator+=(-n);
 }
 
+
+template <typename T, typename TRef, typename TPtr>
+template <class U, class URef, class UPtr>
+typename ft::_dequeIterator<T, TRef, TPtr>::difference_type
+ft::_dequeIterator<T, TRef, TPtr>::operator - (_dequeIterator<U, URef, UPtr> CREF rhs) const {
+	typedef typename ft::_dequeIterator<T, TRef, TPtr>::difference_type difference_type;
+	difference_type const bufferSize = static_cast<difference_type>(DEQUE_ARRAY_SIZE);
+	difference_type const nodeDiff = this->_mMap - rhs._mMap;
+	difference_type const offset = (this->_mCurrent - this->_mBegin) - (rhs._mCurrent - rhs._mBegin);
+	return bufferSize * nodeDiff + offset;
+}
+
 // Comparison Operators
 #define TWO_DEQUEIT_TEMPLATE template <typename U, typename RefA, typename PtrA, typename RefB, typename PtrB>
 #define TWO_DEQUEIT_PARAMETERS ft::_dequeIterator<U, RefA, PtrA> CREF a, ft::_dequeIterator<U, RefB, PtrB> CREF b
 #define TWO_DEQUEIT_COMPARISON(op) TWO_DEQUEIT_TEMPLATE inline bool operator op (TWO_DEQUEIT_PARAMETERS)
 
-
-TWO_DEQUEIT_COMPARISON(==)	{ return a._mCurrent == b._mCurrent; }
-TWO_DEQUEIT_COMPARISON(!=)	{ return !(a == b); }
 TWO_DEQUEIT_COMPARISON(<)	{ return (a.map == b.map) ? (a._mCurrent < b._mCurrent) : (a.map < b.map); }
 TWO_DEQUEIT_COMPARISON(<=)	{ return !(b < a); }
 TWO_DEQUEIT_COMPARISON(>)	{ return (b < a); }
@@ -136,17 +165,6 @@ template <typename T, typename Ref, typename Ptr>
 ft::_dequeIterator<T, Ref, Ptr>
 operator + (ft::ptrdiff_t n, ft::_dequeIterator<T, Ref, Ptr> CREF iterator) {
 	return iterator + n;
-}
-
-
-TWO_DEQUEIT_TEMPLATE
-typename ft::_dequeIterator<U, RefA, PtrA>::difference_type
-operator - (TWO_DEQUEIT_PARAMETERS) {
-	typedef typename ft::_dequeIterator<U, RefA, PtrA>::difference_type difference_type;
-	difference_type const bufferSize = static_cast<difference_type>(DEQUE_ARRAY_SIZE);
-	difference_type const nodeDiff = a.map - b.map;
-	difference_type const offset = (a._mCurrent - a.begin) - (b._mCurrent - b.begin);
-	return bufferSize * nodeDiff + offset;
 }
 
 
@@ -217,8 +235,8 @@ ft::deque<T, Allocator>::operator = (deque CREF rhs) {
 		_end = _start;
 		// Copy content
 		try {
-			for (const_iterator it = rhs.begin(); it != rhs._end; ++it)
-				push_back(*it);			// can throw, shouldn't throw
+			for (const_iterator it = rhs.begin(); it != rhs.end(); ++it)
+				push_back(*it);	// can throw, shouldn't throw
 		} catch (...) {
 			while (_start != _end)
 				pop_back();
@@ -390,7 +408,7 @@ void ft::deque<T, Allocator>::assign(InputIt first, InputIt last) {
 
 template <typename T, typename Allocator>
 void ft::deque<T, Allocator>::push_back(value_type CREF value) {
-	if (FT_UNLIKELY(_end._mCurrent == _end.end))
+	if (FT_UNLIKELY(_end._mCurrent == _end._mEnd))
 		_expandBack();
 	_allocator.construct(_end._mCurrent, value);
 	++_end._mCurrent;
@@ -399,7 +417,7 @@ void ft::deque<T, Allocator>::push_back(value_type CREF value) {
 
 template <typename T, typename Allocator>
 void ft::deque<T, Allocator>::push_front(value_type CREF value) {
-	if (FT_UNLIKELY(_start._mCurrent == _start.begin - 1))
+	if (FT_UNLIKELY(_start._mCurrent == _start._mBegin - 1))
 		_expandFront();
 	_allocator.construct(&(_start._mCurrent[-1]), value);
 	--_start._mCurrent;
@@ -555,6 +573,9 @@ template <typename T, typename Allocator>
 void ft::deque<T, Allocator>::_assignHelper(size_type n, value_type CREF val, ft::true_type) {
 	if (_map)
 		_clearHelper();
+	size_type	newSize = _mapSize;
+	if (!newSize)
+		newSize = DEQUE_INIT_ARRAY_NUM;
 	while (_mapSize * DEQUE_ARRAY_SIZE < n)
 		_mapSize *= 2;
 	_init(_mapSize);
@@ -583,13 +604,13 @@ void ft::deque<T, Allocator>::_assignHelper(InputIt first, InputIt last, ft::fal
 
 template <typename T, typename Allocator>
 void ft::deque<T, Allocator>::_expandBack() {
-	if (FT_UNLIKELY(_end.map == _map + _mapSize - 1))
+	if (FT_UNLIKELY(_end._mMap == _map + _mapSize - 1))
 		_reallocateMap(_mapSize * 2);
-	_end.map[1] = _allocateBuffer();
-	++_end.map;
-	_end._mCurrent = *_end.map;
-	_end.begin = _end._mCurrent;
-	_end.end = _end.begin + DEQUE_ARRAY_SIZE;
+	_end._mMap[1] = _allocateBuffer();
+	++_end._mMap;
+	_end._mCurrent = *_end._mMap;
+	_end._mBegin = _end._mCurrent;
+	_end._mEnd = _end._mBegin + DEQUE_ARRAY_SIZE;
 }
 
 
@@ -600,8 +621,8 @@ void ft::deque<T, Allocator>::_expandFront() {
 	_start.map[-1] = _allocateBuffer();
 	--_start.map;
 	_start._mCurrent = *_start.map + DEQUE_ARRAY_SIZE - 1;
-	_start.begin = *_start.map;
-	_start.end = _start.begin + DEQUE_ARRAY_SIZE;
+	_start._mBegin = *_start.map;
+	_start._mEnd = _start._mBegin + DEQUE_ARRAY_SIZE;
 }
 
 
@@ -609,11 +630,11 @@ template <typename T, typename Allocator>
 void ft::deque<T, Allocator>::_reserveBack(size_type n) {
 	if (_end._mCurrent + n < _end.end)
 		return ;
-	if (FT_UNLIKELY(_end.map > &_map[_mapSize]))
+	if (FT_UNLIKELY(_end._mMap > &_map[_mapSize]))
 		_reallocateMap(_mapSize + n);
 	size_type j = 1;
 	for (difference_type i = n; i > 0; i -= DEQUE_ARRAY_SIZE) {
-		*(_end.map + j) = _allocateBuffer();
+		*(_end._mMap + j) = _allocateBuffer();
 		++j;
 	}
 }
@@ -621,13 +642,13 @@ void ft::deque<T, Allocator>::_reserveBack(size_type n) {
 
 template <typename T, typename Allocator>
 void ft::deque<T, Allocator>::_reserveFront(size_type n) {
-	if (_start.end - _start._mCurrent > static_cast<difference_type>(n))
+	if (_start._mEnd - _start._mCurrent > static_cast<difference_type>(n))
 		return ;
 	if (FT_UNLIKELY(_start.map == _map))
 		_reallocateMap(_mapSize + n);
 	size_type j = 1;
 	for (difference_type i = n; i > 0; i -= DEQUE_ARRAY_SIZE) {
-		*(_start.map - j) = _allocateBuffer();
+		*(_start._mMap - j) = _allocateBuffer();
 		++j;
 	}
 }
@@ -754,10 +775,10 @@ void ft::deque<T, Allocator>::_reallocateMap(size_type n) {
 	// Move the data and update iterator position
 	size_type const copyStart = (n - _mapSize) / 2;
 	copy_n(oldMap, _mapSize, _map + copyStart);
-	size_type const startOffset = _start.map - oldMap;
-	size_type const endOffset = _end.map - oldMap;
-	_start.map = _map + copyStart + startOffset;
-	_end.map = _map + copyStart + endOffset;
+	size_type const startOffset = _start._mMap - oldMap;
+	size_type const endOffset = _end._mMap - oldMap;
+	_start._mMap = _map + copyStart + startOffset;
+	_end._mMap = _map + copyStart + endOffset;
 	// Cleanup
 	_mapAllocator().deallocate(oldMap, _mapSize);
 	_mapSize = n;

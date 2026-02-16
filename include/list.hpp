@@ -31,7 +31,7 @@ class list {
 		explicit								list(allocator_type CREF alloc = allocator_type());
 		explicit								list(size_type n, value_type CREF val = value_type(), allocator_type CREF alloc = allocator_type());
 		template<class InputIt>					list (InputIt first, InputIt last, allocator_type CREF alloc = allocator_type());
-												list(list CREF x);
+		list(list CREF x);
 		list REF operator						= (list CREF rhs);
 		~list();
 
@@ -125,22 +125,21 @@ void swap(list<T, Allocator> REF x, list<T, Allocator> REF y) {
 }
 
 
-}
-
-
-# define LIST_COMPARISON_OPERATOR(op) template <class T, class Allocator> bool operator op					\
+# define LIST_COMPARISON_OPERATOR(op)	template <class T, class Allocator> bool operator op					\
 										(ft::list<T, Allocator> CREF lhs, ft::list<T, Allocator> CREF rhs)
 
 LIST_COMPARISON_OPERATOR(==) {
-	typedef typename ft::list<T, Allocator>::iterator iterator;
-	iterator	leftIt = lhs.begin();
-	iterator	rightIt = rhs.begin();
+	typedef typename ft::list<T, Allocator>::const_iterator const_iterator;
+	const_iterator	leftIt = lhs.begin();
+	const_iterator	rightIt = rhs.begin();
 	while (leftIt != lhs.end() && rightIt != rhs.end()) {
 		if (*leftIt != *rightIt)
 			return false;
 		++leftIt;
 		++rightIt;
 	}
+	if (leftIt != lhs.end() || rightIt != rhs.end())
+		return false;
 	return true;
 }
 
@@ -151,9 +150,9 @@ LIST_COMPARISON_OPERATOR(!=) {
 
 
 LIST_COMPARISON_OPERATOR(<) {
-	typedef typename ft::list<T, Allocator>::iterator iterator;
-	iterator	leftIt = lhs.begin();
-	iterator	rightIt = rhs.begin();
+	typedef typename ft::list<T, Allocator>::const_iterator const_iterator;
+	const_iterator	leftIt = lhs.begin();
+	const_iterator	rightIt = rhs.begin();
 	while (leftIt != lhs.end() && rightIt != rhs.end()) {
 		if (*rightIt < *leftIt)
 			return false;
@@ -179,7 +178,9 @@ LIST_COMPARISON_OPERATOR(>=) {
 }
 
 
+}
 # undef LIST_COMPARISON_OPERATOR
+
 
 #include ".containers/list.tpp"
 

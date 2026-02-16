@@ -73,19 +73,19 @@ struct _doublyLinkedListIterator
 
 	// In/Equality Operator
 	template <class U, class URef, class UPtr>
-	bool operator	== (_doublyLinkedListIterator<U, URef, UPtr> CREF rhs) { return this->_currentNode == rhs._currentNode; }
+	bool		operator	== (_doublyLinkedListIterator<U, URef, UPtr> CREF rhs) const { return this->_currentNode == rhs._currentNode; }
 	template <class U, class URef, class UPtr>
-	bool operator	!= (_doublyLinkedListIterator<U, URef, UPtr> CREF rhs) { return this->_currentNode != rhs._currentNode; }
+	bool		operator	!= (_doublyLinkedListIterator<U, URef, UPtr> CREF rhs) const { return this->_currentNode != rhs._currentNode; }
 
 	// Dereference Operator
-	reference	operator  * () { return FT_DLLNODE(_currentNode)->value; }
-	pointer		operator -> () { return &(operator*()); }
+	reference		operator  * ()		{ return FT_DLLNODE(_currentNode)->value; }
+	pointer			operator -> ()		{ return &(operator*()); }
 
 	// Shift Operators
-	this_type REF	operator ++ () { _currentNode = _currentNode->next(); return *this; }
-	this_type		operator ++ (int) { this_type tmp = *this; operator++(); return tmp; }
-	this_type REF	operator -- () { _currentNode = _currentNode->prev(); return *this; }
-	this_type		operator -- (int) { this_type tmp = *this; operator--(); return tmp; }
+	this_type REF	operator ++ ()		{ _currentNode = _currentNode->next(); return *this; }
+	this_type		operator ++ (int)	{ this_type tmp = *this; operator++(); return tmp; }
+	this_type REF	operator -- ()		{ _currentNode = _currentNode->prev(); return *this; }
+	this_type		operator -- (int)	{ this_type tmp = *this; operator--(); return tmp; }
 
 	// Attributes
 	node_type	*_currentNode;
@@ -93,6 +93,10 @@ struct _doublyLinkedListIterator
 
 
 } // internal
+
+
+
+
 } // ft
 
 

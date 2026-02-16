@@ -164,7 +164,7 @@ typename ft::list<T, Allocator>::const_reference ft::list<T, Allocator>::back() 
 template <class T, class Allocator>
 void ft::list<T, Allocator>::assign(size_type count, value_type CREF value) {
 	_clearHelper();
-	_assignHelper(count, value);
+	_assignHelper(count, value, ft::true_type());
 }
 
 

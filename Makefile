@@ -1,12 +1,7 @@
 MAKEFLAGS		=	--no-print-directory
 .DEFAULT_GOAL	:=	all
 
-NAME			=	abstract_data
-
-INC				=	include/
-
-SRC_DIR			=	tests/
-SRC_NAME		=	main.cpp
+CLR				=	"\033[1;0m"
 
 DOXYGEN_SRCS	=	$(INC)deque.hpp			\
 					$(INC)list.hpp			\
@@ -36,29 +31,49 @@ GTEST_ALL_A		=	$(GTEST_BUILD)libgtest.a
 GTEST_MAIN_A	=	$(GTEST_BUILD)libgtest_main.a
 GTEST_INCLUDE	=	$(GTEST_GTEST)include/
 
+NAME			=	abstract_data
+NAME_FT			=	ft_$(NAME)
+NAME_STD		=	std_$(NAME)
+
+INC				=	include/
+SRC_DIR			=	src/
+SRC_NAME		=	main.cpp
 
 INCLUDES		=	-I$(INC) -I$(GTEST_INCLUDE)
 CFLAGS			=	$(INCLUDES) -Wall -Werror -Wextra -g -std=c++98 -MMD -MP
 CXX				=	c++
 
 OBJ_DIR			=	.build/
-OBJ_NAME		=	$(SRC_NAME:.cpp=.o)
-DEPS_NAME		=	$(SRC_NAME:.cpp=.d)
-OBJ				=	$(patsubst %, $(OBJ_DIR)%, $(OBJ_NAME))
-DEPS			=	$(patsubst %, $(OBJ_DIR)%, $(DEPS_NAME))
-
-CLR				=	"\033[1;0m"
+OBJ_FT_DIR		=	$(OBJ_DIR)ft/
+OBJ_STD_DIR		=	$(OBJ_DIR)std/
+OBJ_FT			=	$(addprefix $(OBJ_FT_DIR), $(SRC_NAME:.cpp=.o))
+OBJ_STD			=	$(addprefix $(OBJ_STD_DIR), $(SRC_NAME:.cpp=.o))
+DEPS_FT_SRC		=	$(SRC_NAME:.cpp=.d)
+DEPS_STD_SRC	=	$(SRC_NAME:.cpp=.d)
+DEPS_FT			=	$(patsubst %, $(OBJ_FT_DIR)%, $(DEPS_FT_SRC))
+DEPS_STD		=	$(patsubst %, $(OBJ_STD_DIR)%, $(DEPS_STD_SRC))
 
 all: $(NAME) doc
 
-$(OBJ_DIR)%.o:$(SRC_DIR)%.cpp
+$(OBJ_FT_DIR)%.o:$(SRC_DIR)%.cpp
 	@mkdir -p $(dir $@)
-	@$(CXX) $(CFLAGS) $< -c -o $@
+	@$(CXX) $(CFLAGS) -DTESTED_NAMESPACE=ft -DUSE_FT $< -c -o $@
 	@echo "\033[1;36m Compiled" $(*F) $(CLR)
 
-$(NAME): $(OBJ)
-	@$(CXX) $(CFLAGS) -o $(NAME) $(OBJ) $(GTEST_ALL_A) $(GTEST_MAIN_A)
-	@echo "\033[1;32m Executable" $(NAME) "created" $(CLR)
+$(OBJ_STD_DIR)%.o:$(SRC_DIR)%.cpp
+	@mkdir -p $(dir $@)
+	@$(CXX) $(CFLAGS) -DTESTED_NAMESPACE=std $< -c -o $@
+	@echo "\033[1;36m Compiled" $(*F) $(CLR)
+
+$(NAME): $(NAME_FT) $(NAME_STD)
+
+$(NAME_FT): $(OBJ_FT)
+	@$(CXX) $(CFLAGS) -o $(NAME_FT) $(OBJ_FT) $(GTEST_ALL_A)
+	@echo "\033[1;32m Executable" $(NAME_FT) "created" $(CLR)
+
+$(NAME_STD): $(OBJ_STD)
+	@$(CXX) $(CFLAGS) -o $(NAME_STD) $(OBJ_STD) $(GTEST_ALL_A)
+	@echo "\033[1;32m Executable" $(NAME_STD) "created" $(CLR)
 
 clean: dclean gclean
 	@rm -rf $(OBJ_DIR)
@@ -73,16 +88,24 @@ gclean:
 	@echo "\033[1;31m Deleted gtest tar" $(CLR)
 
 fclean: clean dclean gclean
-	@rm -f $(NAME)
-	@echo "\033[1;31m Deleted $(NAME)" $(CLR)
+	@rm -f $(NAME_FT)
+	@rm -f $(NAME_STD)
+	@echo "\033[1;31m Deleted $(NAME_FT)" $(CLR)
+	@echo "\033[1;31m Deleted $(NAME_STD)" $(CLR)
 
 re: fclean all
 
-run: $(NAME)
-	./$(NAME)
+ft: $(NAME_FT)
+	./$(NAME_FT)
 
-val: $(NAME)
-	valgrind --leak-check=full --show-leak-kinds=all -q ./$(NAME)
+std: $(NAME_STD)
+	./$(NAME_STD)
+
+valstd: $(NAME_STD)
+	valgrind --leak-check=full --show-leak-kinds=all -q ./$(NAME_STD)
+
+valft: $(NAME_FT)
+	valgrind --leak-check=full --show-leak-kinds=all -q ./$(NAME_FT)
 
 $(DOXYGEN_HTML): $(DOXYFILE) $(DOXYGEN_SRCS)
 	@echo "\033[0;35m Updated Doxygen documentation" $(CLR)
@@ -100,7 +123,7 @@ $(GTEST_DIR): $(GTEST_TAR)
 $(GTEST_ALL_A) $(GTEST_MAIN_A): $(GTEST_DIR)
 	@mkdir -p $(GTEST_BUILD)
 	@cd $(GTEST_BUILD)
-	@cmake -S $(GTEST_GTEST) -B $(GTEST_BUILD)
+	@cmake -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -S $(GTEST_GTEST) -B $(GTEST_BUILD)
 	@sed -i '1222s/int dummy;/int dummy = 0;/; 1223s/bool result;/bool result = false;/' $(GTEST_GTEST)src/gtest-death-test.cc
 	@make -j -C $(GTEST_BUILD)
 
@@ -109,4 +132,5 @@ gtest: $(GTEST_ALL_A)
 bear:
 	bear -- make
 
--include $(DEPS)
+-include $(DEPS_FT)
+-include $(DEPS_STD)

@@ -53,7 +53,7 @@ ft::vector<T, Allocator>::operator = (vector CREF rhs)
 				_allocator.destroy(_array + i);
 			_allocator.deallocate(_array, _size);
 		}
-		_assignHelper(rhs._array, rhs._array + _size, ft::false_type());
+		_assignHelper(rhs._array, rhs._end, ft::false_type());
 	}
 	return *this;
 }
@@ -64,7 +64,7 @@ ft::vector<T, Allocator>::~vector()
 {
 	if (!_array)
 		return ;
-	for (size_type i = 0; i < _size; ++i)
+	for (difference_type i = 0; i < _end - _array; ++i)
 		_allocator.destroy(_array + i);
 	_allocator.deallocate(_array, _size);
 }
@@ -91,7 +91,7 @@ template <typename T, typename Allocator>
 typename ft::vector<T, Allocator>::iterator
 ft::vector<T, Allocator>::end()
 {
-	return _array + _size;
+	return _end;
 }
 
 
@@ -99,7 +99,7 @@ template <typename T, typename Allocator>
 typename ft::vector<T, Allocator>::const_iterator
 ft::vector<T, Allocator>::end() const
 {
-	return _array + _size;
+	return _end;
 }
 
 
@@ -199,7 +199,7 @@ template <class T, class Allocator>
 typename ft::vector<T, Allocator>::reference
 ft::vector<T, Allocator>::operator [] (size_type n)
 {
-	return _array + n;
+	return *(_array + n);
 }
 
 
@@ -207,7 +207,7 @@ template <class T, class Allocator>
 typename ft::vector<T, Allocator>::const_reference
 ft::vector<T, Allocator>::operator [] (size_type n) const
 {
-	return _array + n;
+	return *(_array + n);
 }
 
 
@@ -243,7 +243,7 @@ template <class T, class Allocator>
 typename ft::vector<T, Allocator>::const_reference
 ft::vector<T, Allocator>::front() const
 {
-	return _array;
+	return *_array;
 }
 
 
@@ -395,8 +395,8 @@ ft::vector<T, Allocator>::_init(size_type n)
 	while (newSize < n)
 		newSize *= 2;
 	value_type *tmpArray = _allocator.allocate(newSize);
+	_array = NULL;
 	ft::swap(_array, tmpArray);
-	_allocator.deallocate(tmpArray, _size);
 	_end = _array;
 	_size = newSize;
 }
@@ -408,7 +408,8 @@ ft::vector<T, Allocator>::_assignHelper(size_type n, value_type CREF val, ft::tr
 {
 	_init(n);
 	_end = _array + n;
-	ft::fill(_array, _end, val);
+	for (value_type *it = _array; it != _end; ++it)
+		_allocator.construct(it, val);
 }
 
 
@@ -420,7 +421,8 @@ ft::vector<T, Allocator>::_assignHelper(InputIt first, InputIt last, ft::false_t
 	size_type const n = ft::distance(first, last);
 	_init(n);
 	_end = _array + n;
-	ft::copy(first, last, _array);
+	for (value_type *it = _array; it != _end; ++it)
+		_allocator.construct(it, *first++);
 }
 
 

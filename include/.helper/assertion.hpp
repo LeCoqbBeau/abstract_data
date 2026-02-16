@@ -38,6 +38,6 @@ struct is_not_equal<A, A> : ft::false_type{};
 
 }
 
-# define assert(check) ft::assertion<check>::test
+# define FT_ASSERT(check) ft::assertion<check>::test
 
 #endif //STATIC_ASSERT_HPP
