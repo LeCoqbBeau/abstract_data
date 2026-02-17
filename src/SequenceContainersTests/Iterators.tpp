@@ -12,7 +12,7 @@ class sctIteratorsTests : public ::testing::Test
 		// Helper Typedefs
 		typedef typename Container::value_type	value_type;
 
-		sctIteratorsTests() : container(arrayGenerator<value_type>()(), arrayGenerator<value_type>()() + ARRAY_SIZE) {}
+		sctIteratorsTests() : container(arrayGenerator<value_type>()(), arrayGenerator<value_type>()() + ARRAY_TINY) {}
 
 		// Attributes
 		Container container;
@@ -22,7 +22,7 @@ class sctIteratorsTests : public ::testing::Test
 template <typename T>
 struct wrapAround
 {
-	T operator() (T const* array, int const index, int const offset) { return array[static_cast<unsigned int>(index + offset) % ARRAY_SIZE]; }
+	T operator() (T const* array, int const index, int const offset) { return array[static_cast<unsigned int>(index + offset) % ARRAY_TINY]; }
 };
 
 
@@ -102,12 +102,12 @@ TYPED_TEST_P(sctIteratorsTests, ReverseLoopModification)
 	value_type const* array = arrayGenerator<value_type>()();
 
 	reverse_iterator it;
-	int i = ARRAY_SIZE;
+	int i = ARRAY_TINY;
 	for (it = this->container.rbegin(); it != this->container.rend(); ++it) {
 		*it = wrapAround<value_type>()(array, i, -3);
 		--i;
 	}
-	i = ARRAY_SIZE;
+	i = ARRAY_TINY;
 	for (it = this->container.rbegin(); it != this->container.rend(); ++it) {
 		EXPECT_EQ(*it, wrapAround<value_type>()(array, i, -3));
 		--i;

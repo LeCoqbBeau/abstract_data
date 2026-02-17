@@ -15,9 +15,9 @@ typedef std::string	str;
 int main(int argc, char *argv[]) {
 	(void)argc;
 	(void)argv;
-	// str CREF reference = arrayGenerator<str>()(5);
-	// strVector_t vector(5, reference);
-	// for (strVector_t::const_iterator it = vector.begin(); it != vector.end(); ++it)
+	// arrayGenerator<str> const array;
+	// strDeque_t deque(25, array[3]);
+	// for (strDeque_t::const_iterator it = deque.begin(); it != deque.end(); ++it)
 		// std::cout << *it << std::endl;
 	::testing::InitGoogleTest(&argc, argv);
 	return RUN_ALL_TESTS();

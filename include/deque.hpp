@@ -170,6 +170,7 @@ void swap(ft::deque<T, Allocator> x, ft::deque<T, Allocator> y) {
 	x.swap(y);
 }
 
+
 # define DEQUE_COMPARISON_OPERATOR(op)	template <class T, class Allocator> bool operator op						\
 										(ft::deque<T, Allocator> CREF lhs, ft::deque<T, Allocator> CREF rhs)
 

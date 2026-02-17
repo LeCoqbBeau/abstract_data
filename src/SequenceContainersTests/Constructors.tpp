@@ -27,7 +27,7 @@ TYPED_TEST_P(sctConstructorTests, Fill)
 	// Bounds check
 	size_type const	arrayIndex = 5;
 	ASSERT_GE(arrayIndex, static_cast<size_type>(0));
-	ASSERT_LT(arrayIndex, static_cast<size_type>(ARRAY_SIZE));
+	ASSERT_LT(arrayIndex, static_cast<size_type>(ARRAY_TINY));
 
 	value_type CREF	valueReference = arrayGenerator<value_type>()(arrayIndex);
 	TypeParam		container(arrayIndex, valueReference);
@@ -48,12 +48,12 @@ TYPED_TEST_P(sctConstructorTests, Range)
 
 	value_type const*	array = arrayGenerator<value_type>()();
 
-	TypeParam			container(array, array + ARRAY_SIZE);
+	TypeParam			container(array, array + ARRAY_TINY);
 	size_type	i = 0;
 	EXPECT_EQ(container.empty(), false);
-	EXPECT_EQ(container.size(), static_cast<size_type>(ARRAY_SIZE));
+	EXPECT_EQ(container.size(), static_cast<size_type>(ARRAY_TINY));
 	EXPECT_EQ(container.front(), array[0]);
-	EXPECT_EQ(container.back(), array[ARRAY_SIZE - 1]);
+	EXPECT_EQ(container.back(), array[ARRAY_TINY - 1]);
 	for (const_iterator it = container.begin(); it != container.end(); ++it) {
 		EXPECT_EQ(*it, array[i]);
 		++i;
@@ -66,7 +66,7 @@ TYPED_TEST_P(sctConstructorTests, Copy)
 	typedef typename TypeParam::value_type		value_type;
 	value_type const* CREF	array = arrayGenerator<value_type>()();
 
-	TypeParam	copy(array, array + ARRAY_SIZE);
+	TypeParam	copy(array, array + ARRAY_TINY);
 	TypeParam	dest(copy);
 	EXPECT_EQ(copy, dest);
 	{
@@ -83,7 +83,7 @@ TYPED_TEST_P(sctConstructorTests, AssignementOperator)
 	typedef typename TypeParam::size_type		size_type;
 	value_type const* CREF	array = arrayGenerator<value_type>()();
 
-	TypeParam const copy(array, array + ARRAY_SIZE);
+	TypeParam const copy(array, array + ARRAY_TINY);
 	TypeParam	dest = copy;
 	EXPECT_EQ(copy, dest);
 	{
@@ -102,7 +102,7 @@ TYPED_TEST_P(sctConstructorTests, AssignementOperator)
 	dudeSeriously = *iAmDoingShenanigans;
 	EXPECT_EQ(dudeSeriously.empty(), true);
 	// Return by value
-	TypeParam	partially(array, array + ARRAY_SIZE / 2);
+	TypeParam	partially(array, array + ARRAY_TINY / 2);
 	(dudeSeriously = partially) = copy;
 	EXPECT_NE(dudeSeriously, partially);
 	EXPECT_EQ(dudeSeriously, copy);

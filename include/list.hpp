@@ -177,9 +177,8 @@ LIST_COMPARISON_OPERATOR(>=) {
 	return !(lhs < rhs);
 }
 
-
-}
 # undef LIST_COMPARISON_OPERATOR
+}
 
 
 #include ".containers/list.tpp"

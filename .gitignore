@@ -3,6 +3,7 @@
 *_abstract_data
 obj/
 output.txt
+.output
 .cache/
 compile_commands.json
 *.diff

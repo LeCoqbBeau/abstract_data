@@ -133,7 +133,7 @@ class vector {
 		void									_assignHelper(size_type n, value_type CREF val, ft::true_type);
 		template <typename InputIt> void		_assignHelper(InputIt first, InputIt last, ft::false_type);
 		iterator								_insertHelper(iterator pos, size_type n, value_type CREF val, ft::true_type);
-		template <typename InputIt> iterator	_insertHelper(iterator pos, InputIt first, InputIt last, ft::false_type);
+		template <typename InputIt> void		_insertHelper(iterator pos, InputIt first, InputIt last, ft::false_type);
 		void									_reallocate(size_type n);
 
 		// Attributes
