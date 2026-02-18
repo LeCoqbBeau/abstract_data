@@ -4,6 +4,7 @@
 obj/
 output.txt
 .output
+.valgrind
 .cache/
 compile_commands.json
 *.diff

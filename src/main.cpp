@@ -12,6 +12,10 @@ typedef std::string	str;
 
 #include "SequenceContainersTests/Tests.hpp"
 
+#include "list.hpp"
+#include "deque.hpp"
+#include "vector.hpp"
+
 int main(int argc, char *argv[]) {
 	(void)argc;
 	(void)argv;

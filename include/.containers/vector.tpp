@@ -373,7 +373,7 @@ ft::vector<T, Allocator>::erase(iterator first, iterator last)
 
 template <typename T, typename Allocator>
 void
-ft::vector<T, Allocator>::swap(vector CREF other)
+ft::vector<T, Allocator>::swap(vector REF other)
 {
 	ft::swap(_array, other._array);
 	ft::swap(_end, other._end);

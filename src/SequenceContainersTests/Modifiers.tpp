@@ -156,33 +156,96 @@ TYPED_TEST_P(sctModifiersTests, PopFront)
 TYPED_TEST_P(sctModifiersTests, InsertSingle)
 {
 	typedef typename TypeParam::value_type	value_type;
+	typedef typename TypeParam::size_type	size_type;
 	typedef typename TypeParam::iterator	iterator;
 	arrayGenerator<value_type>				array;
+	TypeParam REF							c = this->container;
 
-	iterator inserted = this->container.insert(this->container.end(), array[ARRAY_TINY]);
+	// Insert at the back
+	iterator inserted = c.insert(c.end(), array[ARRAY_TINY]);
 	EXPECT_EQ(*inserted, array[ARRAY_TINY]);
-	EXPECT_EQ(this->container, TypeParam(array(), array() + ARRAY_TINY + 1));
-	this->container = TypeParam(array() + 1, array() + 1 + ARRAY_TINY);
-	inserted = this->container.insert(this->container.begin(), array[0]);
+	EXPECT_EQ(c, TypeParam(array(), array() + ARRAY_TINY + 1));
+	// Insert at the front
+	c = TypeParam(array() + 1, array() + 1 + ARRAY_TINY);
+	inserted = c.insert(c.begin(), array[0]);
 	EXPECT_EQ(*inserted, array[0]);
-	EXPECT_EQ(this->container, TypeParam(array(), array() + ARRAY_TINY + 1));
-	this->container = TypeParam(array(), array() + ARRAY_TINY);
-	iterator fifthElement = this->container.begin();
+	EXPECT_EQ(c, TypeParam(array(), array() + ARRAY_TINY + 1));
+	// Insert in the middle
+	c = TypeParam(array(), array() + ARRAY_TINY);
+	iterator fifthElement = c.begin();
 	std::advance(fifthElement, 5);
-	inserted = this->container.insert(fifthElement, array[5]);
+	inserted = c.insert(fifthElement, array[5]);
 	EXPECT_EQ(*inserted, array[5]);
-	iterator it = this->container.begin();
+	iterator it = c.begin();
 	int i;
-	for (i = 0; i < 5; ++i, ++it)
+	for (i = 0; i < 5; ++i, ++it) {
 		EXPECT_EQ(*it, array[i]);
+	}
 	EXPECT_EQ(*it++, array[i++]);
 	for (++it; i < ARRAY_TINY; ++i, ++it)
 		EXPECT_EQ(*it, array[i]);
+	// Insert at the back in empty container
+	c = TypeParam();
+	inserted = c.insert(c.end(), array[0]);
+	EXPECT_EQ(*inserted, array[0]);
+	EXPECT_EQ(c.size(), static_cast<size_type>(1));
+	// Insert at the front in empty container
+	c = TypeParam();
+	inserted = c.insert(c.begin(), array[ARRAY_TINY]);
+	EXPECT_EQ(*inserted, array[ARRAY_TINY]);
+	EXPECT_EQ(c.size(), static_cast<size_type>(1));
 }
 
 
 TYPED_TEST_P(sctModifiersTests, InsertFill)
 {
+	typedef typename TypeParam::value_type	value_type;
+	// typedef typename TypeParam::size_type	size_type;
+	typedef typename TypeParam::iterator	iterator;
+	arrayGenerator<value_type>				array;
+	TypeParam const							copy	= this->container;
+	TypeParam REF							c		= this->container;
+	TypeParam const							target(10, array[ARRAY_TINY]);
+
+	// Insert Single at the back
+	c.insert(c.end(), 1, array[ARRAY_TINY]);
+	EXPECT_EQ(c, TypeParam(array(), array() + ARRAY_TINY + 1));
+	// Insert Multiple at the back
+	c = copy;
+	c.insert(c.end(), 10, array[ARRAY_TINY]);
+	iterator tenth = c.begin();
+	std::advance(tenth, 10);
+	EXPECT_TRUE(std::equal(tenth, c.end(), target.begin()));
+	// Insert Single at the front
+	c = TypeParam(array() + 1, array() + 1 + ARRAY_TINY);
+	c.insert(c.begin(), 1, array[0]);
+	EXPECT_EQ(c, TypeParam(array(), array() + ARRAY_TINY + 1));
+	// Insert Multiple at the front
+	c = TypeParam(10, array[ARRAY_TINY]);
+	c.insert(c.begin(), 10, array[ARRAY_TINY]);
+	EXPECT_EQ(c, TypeParam(20, array[ARRAY_TINY]));
+	// Insert Single Multiple at the middle
+	iterator it = c.begin();
+	std::advance(it, 10);
+	c.insert(it, 1, array[1]); // this can cause it to be invalidated
+	tenth = c.begin();
+	std::advance(tenth, 10);
+	EXPECT_TRUE(std::equal(c.begin(), tenth, target.begin()));
+	EXPECT_EQ(*tenth, array[1]);
+	++tenth;
+	EXPECT_TRUE(std::equal(tenth, c.end(), target.begin()));
+	// Insert Multiple at the middle
+	c.insert(tenth, 9, array[1]);
+	tenth = c.begin();
+	std::advance(tenth, 10);
+	iterator twentieth = c.begin();
+	std::advance(twentieth, 20);
+	EXPECT_TRUE(std::equal(c.begin(), tenth, target.begin()));
+	for (iterator it = c.begin(); it != c.end(); ++it)
+		std::cout << *it << " ";
+	std::cout << std::endl;
+	EXPECT_TRUE(std::equal(tenth, twentieth, TypeParam(10, array[1]).begin()));
+	EXPECT_TRUE(std::equal(twentieth, c.end(), target.begin()));
 }
 
 

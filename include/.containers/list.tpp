@@ -2,6 +2,7 @@
 #ifndef LIST_TPP
 # define LIST_TPP
 
+#include "../.helper/type_traits.hpp"
 #include ".helper/algorithm.hpp"
 #include ".helper/doublyLinkedList.hpp"
 #include ".helper/functional.hpp"
@@ -236,7 +237,7 @@ template <class T, class Allocator>
 typename ft::list<T, Allocator>::iterator
 ft::list<T, Allocator>::insert(iterator position, size_type count, value_type CREF value) {
 	list tmp(_allocator);
-	tmp._assignHelper(count, value);
+	tmp._assignHelper(count, value, ft::true_type());
 	iterator ret = _insertHelper(position, tmp);
 	return ret;
 }

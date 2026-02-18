@@ -73,10 +73,12 @@ void hidden::sct_randomLookupTest(TypeParam CREF container)
 {
 	hidden::sct_randomAccessor<subscriptOperator> accessor;
 	arrayGenerator<typename TypeParam::value_type> array;
+
 	for (int i = 0; i < ARRAY_TINY; ++i)
 		EXPECT_EQ(accessor(container, i), array[i]);
-	if (subscriptOperator == false)
+	if (subscriptOperator == false) { // what da hell???
 		EXPECT_THROW(container.at(-1), ns::out_of_range);
+	}
 }
 
 

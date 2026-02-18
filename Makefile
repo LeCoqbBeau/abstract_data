@@ -1,7 +1,22 @@
+
+#-----------------------------------------------------------------------------------------------------------#
+#	Makefile Config																							#
+#-----------------------------------------------------------------------------------------------------------#
+
 MAKEFLAGS		=	--no-print-directory
 .DEFAULT_GOAL	:=	all
 
+
+#-----------------------------------------------------------------------------------------------------------#
+#	String Helpers																							#
+#-----------------------------------------------------------------------------------------------------------#
+
 CLR				=	"\033[1;0m"
+
+
+#-----------------------------------------------------------------------------------------------------------#
+#	Doxygen																									#
+#-----------------------------------------------------------------------------------------------------------#
 
 DOXYGEN_SRCS	=	$(INC)deque.hpp			\
 					$(INC)list.hpp			\
@@ -21,6 +36,11 @@ DOXYGEN_HTML	=	$(DOXYGEN_DOC)index.html
 DOXYGEN_LATEX	=	$(DOXYGEN_DIR)latex/
 DOXYGEN_SUBDIR	=	$(DOXYGEN_DOC) $(DOXYGEN_LATEX)
 
+
+#-----------------------------------------------------------------------------------------------------------#
+#	Googletest																								#
+#-----------------------------------------------------------------------------------------------------------#
+
 GTEST_LINK		=	https://github.com/google/googletest/archive/refs/tags/release-1.8.1.tar.gz
 GTEST_TAR		=	release-1.8.1.tar.gz
 GTEST_OLDDIR	=	googletest-release-1.8.1
@@ -30,6 +50,13 @@ GTEST_BUILD		=	$(GTEST_GTEST)build/
 GTEST_ALL_A		=	$(GTEST_BUILD)libgtest.a
 GTEST_MAIN_A	=	$(GTEST_BUILD)libgtest_main.a
 GTEST_INCLUDE	=	$(GTEST_GTEST)include/
+GTEST_FILTER	=	*ModifiersTests/*
+GTEST_FLAGS		=	--gtest_color=yes --gtest_filter=$(GTEST_FILTER)
+
+
+#-----------------------------------------------------------------------------------------------------------#
+#	Compilation																								#
+#-----------------------------------------------------------------------------------------------------------#
 
 NAME			=	abstract_data
 NAME_FT			=	ft_$(NAME)
@@ -48,10 +75,16 @@ OBJ_FT_DIR		=	$(OBJ_DIR)ft/
 OBJ_STD_DIR		=	$(OBJ_DIR)std/
 OBJ_FT			=	$(addprefix $(OBJ_FT_DIR), $(SRC_NAME:.cpp=.o))
 OBJ_STD			=	$(addprefix $(OBJ_STD_DIR), $(SRC_NAME:.cpp=.o))
+
 DEPS_FT_SRC		=	$(SRC_NAME:.cpp=.d)
 DEPS_STD_SRC	=	$(SRC_NAME:.cpp=.d)
 DEPS_FT			=	$(patsubst %, $(OBJ_FT_DIR)%, $(DEPS_FT_SRC))
 DEPS_STD		=	$(patsubst %, $(OBJ_STD_DIR)%, $(DEPS_STD_SRC))
+
+
+#-----------------------------------------------------------------------------------------------------------#
+#	Targets																									#
+#-----------------------------------------------------------------------------------------------------------#
 
 all: $(NAME) doc
 
@@ -96,16 +129,16 @@ fclean: clean dclean gclean
 re: fclean all
 
 ft: $(NAME_FT)
-	./$(NAME_FT)
+	./$(NAME_FT) $(GTEST_FLAGS)
 
 std: $(NAME_STD)
-	./$(NAME_STD)
+	./$(NAME_STD) $(GTEST_FLAGS)
 
 valstd: $(NAME_STD)
-	valgrind --leak-check=full --show-leak-kinds=all -q ./$(NAME_STD)
+	valgrind --leak-check=full --show-leak-kinds=all --log-file=.valgrind -q ./$(NAME_STD) $(GTEST_FLAGS)
 
 valft: $(NAME_FT)
-	valgrind --leak-check=full --show-leak-kinds=all -q ./$(NAME_FT)
+	valgrind --leak-check=full --show-leak-kinds=all --log-file=.valgrind -q ./$(NAME_FT) $(GTEST_FLAGS)
 
 $(DOXYGEN_HTML): $(DOXYFILE) $(DOXYGEN_SRCS)
 	@echo "\033[0;35m Updated Doxygen documentation" $(CLR)
@@ -131,6 +164,11 @@ gtest: $(GTEST_ALL_A)
 
 bear:
 	bear -- make
+
+
+#-----------------------------------------------------------------------------------------------------------#
+#	Dependency																								#
+#-----------------------------------------------------------------------------------------------------------#
 
 -include $(DEPS_FT)
 -include $(DEPS_STD)

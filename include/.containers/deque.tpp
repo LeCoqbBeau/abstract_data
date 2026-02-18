@@ -228,10 +228,10 @@ ft::deque<T, Allocator>::operator = (deque CREF rhs) {
 		_map = _allocateMap(_mapSize);
 		size_type const firstBuffer = rhs._start._mMap - rhs._map;
 		size_type const startOffset = rhs._start._mEnd - rhs._start._mCurrent;
-		_map[firstBuffer / DEQUE_ARRAY_SIZE] = _allocateBuffer();
+		_map[firstBuffer] = _allocateBuffer();
 		_start = iterator(
-			&_map[firstBuffer / DEQUE_ARRAY_SIZE],
-			&_map[firstBuffer / DEQUE_ARRAY_SIZE][startOffset % DEQUE_ARRAY_SIZE - 1]
+			&_map[firstBuffer],
+			&_map[firstBuffer][startOffset]
 		);
 		_end = _start;
 		// Copy content
@@ -614,7 +614,7 @@ void ft::deque<T, Allocator>::_assignHelper(InputIt first, InputIt last, ft::fal
 
 template <typename T, typename Allocator>
 void ft::deque<T, Allocator>::_expandBack() {
-	if (FT_UNLIKELY(_end._mMap == _map + _mapSize))
+	if (FT_UNLIKELY(_end._mMap == _map + _mapSize + 2))
 		_reallocateMap(_mapSize * 2);
 	_end._mMap[1] = _allocateBuffer();
 	++_end._mMap;
@@ -626,7 +626,7 @@ void ft::deque<T, Allocator>::_expandBack() {
 
 template <typename T, typename Allocator>
 void ft::deque<T, Allocator>::_expandFront() {
-	if (FT_UNLIKELY(_start._mMap == _map + 1))
+	if (FT_UNLIKELY(_start._mMap - 1 == _map))
 		_reallocateMap(_mapSize * 2);
 	_start._mMap[-1] = _allocateBuffer();
 	--_start._mMap;
@@ -685,9 +685,10 @@ ft::deque<T, Allocator>::_insertHelper(iterator pos, size_type n, value_type CRE
 	if (elemBefore < elemAfter) {
 		_reserveFront(n);
 		iterator it = begin();
-		for (size_type i = 0; i != posIndex; ++i, ++it)
+		for (size_type i = 0; i < posIndex; ++i, ++it)
 			_allocator.construct((it - n)._mCurrent, *it);
-		for (size_type i = 0; i != n; ++i, ++it) {
+		--it;
+		for (size_type i = 0; i < n; ++i, ++it) {
 			_allocator.destroy(it._mCurrent);
 			_allocator.construct(it._mCurrent, saveValue);
 		}
@@ -696,9 +697,10 @@ ft::deque<T, Allocator>::_insertHelper(iterator pos, size_type n, value_type CRE
 	}
 	_reserveBack(n);
 	iterator it = --end();
-	for (size_type i = 0; i != posIndex; ++i, --it)
+	for (size_type i = 0; i < posIndex; ++i, --it)
 		_allocator.construct((it + n)._mCurrent, *it);
-	for (size_type i = 0; i != n; ++i, --it) {
+	++it;
+	for (size_type i = 0; i < n; ++i, --it) {
 		_allocator.destroy(it._mCurrent);
 		_allocator.construct(it._mCurrent, saveValue);
 	}
@@ -782,8 +784,6 @@ ft::deque<T, Allocator>::_allocateBuffer() {
 
 template <typename T, typename Allocator>
 void ft::deque<T, Allocator>::_reallocateMap(size_type n) {
-	if (n < DEQUE_INIT_ARRAY_NUM || n < _mapSize)
-		throw ft::invalid_argument("ft::deque::_reallocateMap(): n parameter too small");
 	// Make sure _mapSize is still a multiple of itself
 	size_type newSize = _mapSize;
 	while (newSize < n)
@@ -793,8 +793,8 @@ void ft::deque<T, Allocator>::_reallocateMap(size_type n) {
 	value_type** oldMap = _map;
 	_map = _allocateMap(n);
 	// Move the data and update iterator position
-	size_type const copyStart = (n - _mapSize) / 2;
-	copy_n(oldMap, _mapSize, _map + copyStart);
+	size_type const copyStart = (n - _mapSize + 2) / 2;
+	ft::copy_n(oldMap + 1, _mapSize - 2, _map + copyStart);
 	size_type const startOffset = _start._mMap - oldMap;
 	size_type const endOffset = _end._mMap - oldMap;
 	_start._mMap = _map + copyStart + startOffset;
