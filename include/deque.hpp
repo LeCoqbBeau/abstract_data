@@ -139,27 +139,27 @@ class deque {
 		typedef typename allocator_type::template rebind<value_type*>::other _mapAllocator_type;
 
 		// Helper Functions
-		void									_init(size_type size);
-		void									_assignHelper(size_type n, value_type CREF val, ft::true_type);
-		template <typename InputIt> void		_assignHelper(InputIt first, InputIt last, ft::false_type);
-		void									_expandBack();
-		void									_expandFront();
-		void									_reserveBack(size_type n);
-		void									_reserveFront(size_type n);
-		iterator								_insertHelper(iterator pos, size_type n, value_type CREF val, ft::true_type);
-		template <typename InputIt> iterator	_insertHelper(iterator pos, InputIt first, InputIt last, ft::false_type);
-		void									_clearHelper(bool preserveMap = false);
-		value_type**							_allocateMap(size_type n);
-		value_type*								_allocateBuffer();
-		void									_reallocateMap(size_type n);
+		void								_init(size_type size);
+		void								_assignHelper(size_type n, value_type CREF val, ft::true_type);
+		template <typename InputIt> void	_assignHelper(InputIt first, InputIt last, ft::false_type);
+		void								_expandBack();
+		void								_expandFront();
+		void								_reserveBack(size_type n);
+		void								_reserveFront(size_type n);
+		iterator							_insertHelper(iterator pos, size_type n, value_type CREF val, ft::true_type);
+		template <typename InputIt> void	_insertHelper(iterator pos, InputIt first, InputIt last, ft::false_type);
+		void								_clearHelper(bool preserveMap = false);
+		value_type**						_allocateMap(size_type n);
+		value_type*							_allocateBuffer();
+		void								_reallocateMap(size_type n);
 
 		// Attributes
-		value_type**							_map;
-		size_type								_mapSize;
-		iterator								_start;
-		iterator								_end;
-		mutable allocator_type					_allocator;
-		_mapAllocator_type						_mapAllocator() { return _mapAllocator_type(_allocator); }
+		value_type**						_map;
+		size_type							_mapSize;
+		iterator							_start;
+		iterator							_end;
+		mutable allocator_type				_allocator;
+		_mapAllocator_type					_mapAllocator() { return _mapAllocator_type(_allocator); }
 
 
 };
@@ -204,6 +204,7 @@ DEQUE_COMPARISON_OPERATOR(>) {
 DEQUE_COMPARISON_OPERATOR(>=) {
 	return !(lhs < rhs);
 }
+
 }
 
 #undef DEQUE_COMPARISON_OPERATOR

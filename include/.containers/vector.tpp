@@ -12,7 +12,7 @@
 
 template <typename T, typename Allocator>
 ft::vector<T, Allocator>::vector(allocator_type CREF alloc)
-	: _array(NULL), _size(VECTOR_ARRAY_INIT_SIZE), _allocator(alloc)
+	: _array(NULL), _size(VECTOR_ARRAY_INIT_SIZE), _lastConstructedIndex(0), _allocator(alloc)
 {
 	_init(_size);
 }
@@ -20,7 +20,7 @@ ft::vector<T, Allocator>::vector(allocator_type CREF alloc)
 
 template <typename T, typename Allocator>
 ft::vector<T, Allocator>::vector(size_type n, value_type CREF val, allocator_type CREF alloc)
-	: _array(NULL), _size(VECTOR_ARRAY_INIT_SIZE), _allocator(alloc)
+	: _array(NULL), _size(VECTOR_ARRAY_INIT_SIZE), _lastConstructedIndex(0), _allocator(alloc)
 {
 	_assignHelper(n, val, ft::true_type());
 }
@@ -29,7 +29,7 @@ ft::vector<T, Allocator>::vector(size_type n, value_type CREF val, allocator_typ
 template <typename T, typename Allocator>
 template <typename InputIt>
 ft::vector<T, Allocator>::vector(InputIt first, InputIt last, allocator_type CREF alloc)
-	: _array(NULL), _size(VECTOR_ARRAY_INIT_SIZE), _allocator(alloc)
+	: _array(NULL), _size(VECTOR_ARRAY_INIT_SIZE), _lastConstructedIndex(0), _allocator(alloc)
 {
 	_assignHelper(first, last, ft::is_integral<InputIt>());
 }
@@ -37,7 +37,7 @@ ft::vector<T, Allocator>::vector(InputIt first, InputIt last, allocator_type CRE
 
 template <typename T, typename Allocator>
 ft::vector<T, Allocator>::vector(vector CREF rhs)
-	: _array(NULL), _size(rhs._size), _allocator(rhs._allocator)
+	: _array(NULL), _size(VECTOR_ARRAY_INIT_SIZE), _lastConstructedIndex(0), _allocator(rhs._allocator)
 {
 	*this = rhs;
 }
@@ -48,12 +48,9 @@ ft::vector<T, Allocator> REF
 ft::vector<T, Allocator>::operator = (vector CREF rhs)
 {
 	if (this != &rhs) {
-		if (_array) {
-			for (size_type i = 0; _array + i != _end; ++i)
-				_allocator.destroy(_array + i);
-			_allocator.deallocate(_array, _size);
-			_array = NULL;
-		}
+		if (!_array)
+			_init(rhs.size());
+		reserve(rhs.size());
 		_assignHelper(rhs.begin(), rhs.end(), ft::false_type());
 	}
 	return *this;
@@ -158,10 +155,8 @@ ft::vector<T, Allocator>::resize(size_type n, value_type CREF val)
 {
 	size_type const arraySize = size();
 	if (arraySize < n)
-		for (size_type i = arraySize; i != n; ++i) {
-			--_end;
-			_allocator.destroy(*_end);
-		}
+		for (size_type i = arraySize; i != n; ++i)
+			pop_back();
 	else
 		for (size_type i = arraySize; i != n; ++i)
 			push_back(val);
@@ -272,6 +267,7 @@ ft::vector<T, Allocator>::push_back(value_type CREF value)
 	if (FT_UNLIKELY(size() == capacity()))
 		_reallocate(_size * 2);
 	_allocator.construct(_end++, value);
+	++_lastConstructedIndex;
 }
 
 
@@ -280,6 +276,7 @@ void
 ft::vector<T, Allocator>::pop_back()
 {
 	_allocator.destroy(--_end);
+	--_lastConstructedIndex;
 }
 
 
@@ -287,12 +284,6 @@ template <typename T, typename Allocator>
 void
 ft::vector<T, Allocator>::assign(size_type n, value_type CREF value)
 {
-	if (_array) {
-		for (size_type i = 0; _array + i != _end; ++i)
-			_allocator.destroy(_array + i);
-		_allocator.deallocate(_array, _size);
-		_array = NULL;
-	}
 	_assignHelper(n, value, ft::true_type());
 }
 
@@ -302,12 +293,6 @@ template <typename InputIt>
 void
 ft::vector<T, Allocator>::assign(InputIt first, InputIt last)
 {
-	if (_array) {
-		for (size_type i = 0; _array + i != _end; ++i)
-			_allocator.destroy(_array + i);
-		_allocator.deallocate(_array, _size);
-		_array = NULL;
-	}
 	_assignHelper(first, last, ft::is_integral<InputIt>());
 }
 
@@ -341,16 +326,19 @@ template <typename T, typename Allocator>
 typename ft::vector<T, Allocator>::iterator
 ft::vector<T, Allocator>::erase(iterator position)
 {
-	size_type const posIndex	= position - _array;
+	size_type const posIndex	= position._curr - _array;
 	size_type const elemAfter	= size() - posIndex - 1;
 
-	if (position + 1 == _end)
+	if (position._curr == _end) {
 		pop_back();
-	try {
-		ft::rcopy(_end - elemAfter, _end, _end - 1);
-	} catch (...) { return _end; }
+		return _end;
+	}
+	TRY_RET(
+		ft::copy(_end - elemAfter, _end, _array + posIndex);,
+		_end;
+	)
 	pop_back();
-	return _array + posIndex;
+	return iterator(_array + posIndex);
 }
 
 
@@ -358,16 +346,17 @@ template <typename T, typename Allocator>
 typename ft::vector<T, Allocator>::iterator
 ft::vector<T, Allocator>::erase(iterator first, iterator last)
 {
-	size_type const posIndex	= first - _array;
+	size_type const posIndex	= first._curr - _array;
 	size_type const n			= ft::distance(first, last);
 	size_type const elemAfter	= size() - posIndex - n;
 
-	try {
-		ft::copy(_end - elemAfter, _end, _end - elemAfter - n);
-	} catch (...) { return _end; }
+	TRY_RET(
+		ft::copy(_end - elemAfter, _end, _array + posIndex);,
+		_end;
+	)
 	for (size_type i = 0; i < n; ++i)
 		pop_back();
-	return _array + posIndex;
+	return iterator(_array + posIndex);
 }
 
 
@@ -420,10 +409,24 @@ template <typename T, typename Allocator>
 void
 ft::vector<T, Allocator>::_assignHelper(size_type n, value_type CREF val, ft::true_type)
 {
-	_init(n);
+	if (!_array)
+		_init(n);
+	else
+		reserve(n);
+	if (_end > _array + n) {
+		for (value_type *it = _array + n; it < _end; ++it)
+			_allocator.destroy(it);
+		_lastConstructedIndex = n;
+	}
 	_end = _array + n;
-	for (value_type *it = _array; it != _end; ++it)
-		_allocator.construct(it, val);
+	for (value_type *it = _array; it < _end; ++it) {
+		if (static_cast<size_type>(it - _array) >= _lastConstructedIndex) {
+			_allocator.construct(it, val);
+			++_lastConstructedIndex;
+		}
+		else
+			*it = val;
+	}
 }
 
 
@@ -433,10 +436,25 @@ void
 ft::vector<T, Allocator>::_assignHelper(InputIt first, InputIt last, ft::false_type)
 {
 	size_type const n = ft::distance(first, last);
-	_init(n);
+	if (!_array)
+		_init(n);
+	else
+		reserve(n);
+	if (_end > _array + n) {
+		for (value_type *it = _array + n; it < _end; ++it)
+			_allocator.destroy(it);
+		_lastConstructedIndex = n;
+	}
 	_end = _array + n;
-	for (value_type *it = _array; it != _end; ++it)
-		_allocator.construct(it, *first++);
+	size_type i = 0;
+	while (first != last) {
+		if (i >= _lastConstructedIndex) {
+			_allocator.construct(_array + i++, *first++);
+			++_lastConstructedIndex;
+		}
+		else
+			_array[i++] = *first++;
+	}
 }
 
 
@@ -447,15 +465,26 @@ ft::vector<T, Allocator>::_insertHelper(iterator position, size_type n, value_ty
 	if (position._curr == _end) {
 		for (size_type i = 0; i < n; ++i)
 			push_back(val);
-		return _array + size() - 1;
+		return _end - 1;
 	}
 	value_type const	saveValue = val;
 	size_type const		posIndex = position._curr - _array;
+	size_type			constructCount = 0;
 	reserve(size() + n);
-	for (size_type i = size() - 1; i >= posIndex && i < size(); --i)
-		_allocator.construct(_array + n + i, _array[i]);
+	// Shift the back elements to the right to make a hole
+	for (size_type i = size() - 1; i >= posIndex && i < size(); --i) {
+		if (n + i >= _lastConstructedIndex) {
+			_allocator.construct(_array + n + i, _array[i]);
+			++constructCount;
+		}
+		else
+			_array[n + i] = _array[i];
+	}
+	// Fill the fresh hole with the correct values
 	for (size_type i = 0; i < n; ++i)
-		_allocator.construct(_array + posIndex + i, saveValue);
+		_array[posIndex + i] = saveValue;
+	// Adjust iterator position
+	_lastConstructedIndex += constructCount;
 	_end += n;
 	return _array + posIndex;
 }
@@ -469,15 +498,22 @@ ft::vector<T, Allocator>::_insertHelper(iterator position, InputIt first, InputI
 	if (position._curr == _end) {
 		while (first != last)
 			push_back(*first++);
-		return _array + size() - 1;
+		return ;
 	}
 	size_type const n = ft::distance(first, last);
 	size_type const posIndex = position._curr - _array;
 	reserve(size() + n);
-	for (size_type i = size() - 1; i >= posIndex && i < size(); --i)
-		_allocator.construct(_array + n + i, _array[i]);
+	// Shift the back elements to the right to make a hole
+	for (size_type i = size() - 1; i >= posIndex; --i) {
+		if (n + i >= _lastConstructedIndex) {
+			_allocator.construct(_array + n + i, _array[i]);
+			++_lastConstructedIndex;
+		}
+		else
+			_array[n + i] = _array[i];
+	}
 	for (size_type i = 0; i < n; ++i)
-		_allocator.construct(_array + posIndex + i, *first++);
+		_array[posIndex + i] = *first++;
 	_end += n;
 	return _array + posIndex + 1;
 }

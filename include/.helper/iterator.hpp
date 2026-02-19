@@ -201,7 +201,7 @@ distance_impl(InputIterator first, InputIterator last, ft::input_iterator_tag)
 {
 	typename ft::iterator_traits<InputIterator>::difference_type n = 0;
 
-	while(first != last)
+	while (first != last)
 	{
 		++first;
 		++n;
@@ -221,7 +221,7 @@ distance_impl(RandomAccessIterator first, RandomAccessIterator last, ft::random_
 template <typename InputIterator, typename Distance>
 void advance_impl(InputIterator REF i, Distance n, ft::input_iterator_tag)
 {
-	while(n--)
+	while (n--)
 		++i;
 }
 
@@ -232,7 +232,7 @@ struct advance_bi_impl
 	template <typename BidirectionalIterator, typename Distance>
 	static void advance_impl(BidirectionalIterator REF i, Distance n) // Specialization for unsigned distance type.
 	{
-		while(n--)
+		while (n--)
 			++i;
 	}
 };
@@ -244,14 +244,14 @@ struct advance_bi_impl<true>
 	template <typename BidirectionalIterator, typename Distance>
 	static void advance_impl(BidirectionalIterator REF i, Distance n) // Specialization for signed distance type.
 	{
-		if(n > 0)
+		if (n > 0)
 		{
-			while(n--)
+			while (n--)
 				++i;
 		}
 		else
 		{
-			while(n++)
+			while (n++)
 				--i;
 		}
 	}

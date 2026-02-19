@@ -140,8 +140,8 @@ class vector {
 		value_type*		_array;
 		value_type*		_end;
 		size_type		_size;
+		size_type		_lastConstructedIndex;
 		allocator_type	_allocator;
-
 };
 
 

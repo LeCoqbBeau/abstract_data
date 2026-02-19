@@ -36,6 +36,11 @@
 #endif
 
 
+#ifndef TRY_RET
+	#define	TRY_RET(stmt, ret) try { stmt; } catch (...) { return ret; }
+#endif
+
+
 # include <string> // for std::string :)
 
 

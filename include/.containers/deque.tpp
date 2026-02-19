@@ -161,7 +161,7 @@ TWO_DEQUEIT_COMPARISON(<=)	{ return !(b < a); }
 TWO_DEQUEIT_COMPARISON(>)	{ return (b < a); }
 TWO_DEQUEIT_COMPARISON(>=)	{ return !(a < b); }
 
-// Arithmetic Operators
+
 // to handle n + iterator
 template <typename T, typename Ref, typename Ptr>
 ft::_dequeIterator<T, Ref, Ptr>
@@ -415,7 +415,6 @@ void ft::deque<T, Allocator>::push_back(value_type CREF value) {
 	++_end._mCurrent;
 }
 
-#define SHOWL(var) std::cout << #var << " = " << var << std::endl;
 
 template <typename T, typename Allocator>
 void ft::deque<T, Allocator>::push_front(value_type CREF value) {
@@ -440,8 +439,10 @@ void ft::deque<T, Allocator>::pop_back() {
 
 template <typename T, typename Allocator>
 void ft::deque<T, Allocator>::pop_front() {
-	if (FT_LIKELY(!empty()))
-		_allocator.destroy((++_start)._mCurrent);
+	if (FT_LIKELY(!empty())) {
+		_allocator.destroy(_start._mCurrent);
+		++_start;
+	}
 }
 
 
@@ -483,16 +484,19 @@ ft::deque<T, Allocator>::erase(iterator position) {
 	}
 
 	if (elemBefore < elemAfter) {
-		try {
-			ft::copy(_start, _start + elemBefore, _start + 1);
-		} catch (...) { return _end; }
+		TRY_RET(
+			ft::rcopy(_start, _start + elemBefore, _start + 1),
+			_end
+		);
 		pop_front();
-		return _start + elemBefore - 1;
 	}
-	try {
-		ft::rcopy(_end - elemAfter, _end, _end - 1);
-	} catch (...) { return _end; }
-	pop_back();
+	else {
+		TRY_RET(
+			ft::copy(_end - elemAfter, _end, _start + posIndex),
+			_end;
+		);
+		pop_back();
+	}
 	return _start + posIndex;
 }
 
@@ -518,19 +522,22 @@ ft::deque<T, Allocator>::erase(iterator first, iterator last) {
 	}
 
 	if (elemBefore < elemAfter) {
-		try {
-			ft::copy(_start, _start + elemBefore, _start + n);
-		} catch (...) { return _end; }
+		TRY_RET(
+			ft::rcopy(_start, _start + elemBefore, _start + n),
+			_end
+		);
 		for (size_type i = 0; i < n; ++i)
 			pop_front();
-		return _start + elemBefore;
 	}
-	try {
-		ft::copy(_end - elemAfter, _end, _end - elemAfter - n);
-	} catch (...) { return _end; }
-	for (size_type i = 0; i < n; ++i)
-		pop_back();
-	return _start + posIndex;
+	else {
+		TRY_RET(
+			ft::copy(_end - elemAfter, _end, _start + posIndex),
+			_end
+		);
+		for (size_type i = 0; i < n; ++i)
+			pop_back();
+	}
+	return _start + posIndex + 1;
 }
 
 
@@ -669,7 +676,7 @@ typename ft::deque<T, Allocator>::iterator
 ft::deque<T, Allocator>::_insertHelper(iterator pos, size_type n, value_type CREF val, ft::true_type) {
 	size_type posIndex			= pos - _start;
 	size_type const elemBefore	= posIndex;
-	size_type const elemAfter	= size() - elemBefore - n;
+	size_type const elemAfter	= size() - elemBefore;
 	value_type const saveValue	= val;
 
 	if (FT_UNLIKELY(pos == _start)) {
@@ -680,38 +687,51 @@ ft::deque<T, Allocator>::_insertHelper(iterator pos, size_type n, value_type CRE
 	if (FT_UNLIKELY(pos == _end)) {
 		while (n--)
 			push_back(saveValue);
-		return --iterator(_end);
+		return _end - 1;
 	}
 	if (elemBefore < elemAfter) {
 		_reserveFront(n);
+		// Shift the front elements to the left to make a hole
 		iterator it = begin();
-		for (size_type i = 0; i < posIndex; ++i, ++it)
-			_allocator.construct((it - n)._mCurrent, *it);
-		--it;
-		for (size_type i = 0; i < n; ++i, ++it) {
-			_allocator.destroy(it._mCurrent);
-			_allocator.construct(it._mCurrent, saveValue);
+		for (size_type i = 0; i < posIndex; ++i, ++it) {
+			value_type *shifted = (it - n)._mCurrent;
+			if (i < n)
+				_allocator.construct(shifted, *it);
+			else
+				*shifted = *it;
 		}
+		// Fill the fresh hole with the correct values
+		ft::advance(it, -n);
+		for (size_type i = 0; i < n; ++i, ++it)
+			*it._mCurrent = saveValue;
+		// Adjust iterator position
 		_start -= n;
-		return _start + posIndex;
 	}
-	_reserveBack(n);
-	iterator it = --end();
-	for (size_type i = 0; i < posIndex; ++i, --it)
-		_allocator.construct((it + n)._mCurrent, *it);
-	++it;
-	for (size_type i = 0; i < n; ++i, --it) {
-		_allocator.destroy(it._mCurrent);
-		_allocator.construct(it._mCurrent, saveValue);
+	else {
+		_reserveBack(n);
+		// Shift the front elements to the left to make a hole
+		iterator it = end() - 1;
+		for (size_type i = 0; i < posIndex; ++i, --it) {
+			value_type *shifted = (it + n)._mCurrent;
+			if (i < n)
+				_allocator.construct(shifted, *it);
+			else
+				*shifted = *it;
+		}
+		// Fill the fresh hole with the correct values
+		ft::advance(it, n);
+		for (size_type i = 0; i < n; ++i, --it)
+			*it._mCurrent = saveValue;
+		// Adjust iterator position
+		_end += n;
 	}
-	_end += n;
 	return _start + posIndex;
 }
 
 
 template <typename T, typename Allocator>
 template <typename InputIt>
-typename ft::deque<T, Allocator>::iterator
+void
 ft::deque<T, Allocator>::_insertHelper(iterator pos, InputIt first, InputIt last, ft::false_type) {
 	size_type posIndex			= pos - _start;
 	size_type const n			= ft::distance(first, last);
@@ -721,44 +741,77 @@ ft::deque<T, Allocator>::_insertHelper(iterator pos, InputIt first, InputIt last
 	if (FT_UNLIKELY(pos == _start)) {
 		while (first != last)
 			push_front(*first++);
-		return _start;
+		return ;
 	}
 	if (FT_UNLIKELY(pos == _end)) {
 		while (first != last)
 			push_back(*first++);
-		return iterator(_end).operator--();
+		return ;
 	}
 	if (elemBefore < elemAfter) {
 		_reserveFront(n);
-		ft::copy(_start, _start + posIndex, _start - n);
-		ft::copy(first, last, _start - n + posIndex);
+		// Shift the front elements to the left to make a hole
+		iterator it = begin();
+		for (size_type i = 0; i < posIndex; ++i, ++it) {
+			value_type *shifted = (it - n)._mCurrent;
+			if (i < n)
+				_allocator.construct(shifted, *it);
+			else
+				*shifted = *it;
+		}
+		// Fill the fresh hole with the correct values
+		ft::advance(it, -n);
+		while (first != last) {
+			*it._mCurrent = *first;
+			++it;
+			++first;
+		}
+		// Adjust iterator position
 		_start -= n;
-		return _start + n + posIndex - 1;
 	}
-	_reserveBack(n);
-	ft::rcopy(_end - posIndex + 1, _end, _end + n);
-	ft::copy(first, last, _end - posIndex + 1);
-	_end += n;
-	return _end - n - 1;
+	else {
+		_reserveBack(n);
+		// Shift the back elements to the right to make a hole
+		iterator it = end() - 1;
+		for (size_type i = 0; i < posIndex; ++i, --it) {
+			value_type *shifted = (it + n)._mCurrent;
+			if (i < n)
+				_allocator.construct(shifted, *it);
+			else
+				*shifted = *it;
+		}
+		// Fill the fresh hole with the correct values
+		ft::advance(it, n);
+		while (first != last) {
+			*it._mCurrent = *first;
+			++it;
+			++first;
+		}
+		// Adjust iterator position
+		_end += n;
+	}
 }
 
 
 template <typename T, typename Allocator>
 void ft::deque<T, Allocator>::_clearHelper(bool preserveMap) {
+	if (!_map)
+		return;
 	for (iterator it = begin(); it != end(); ++it)
 		_allocator.destroy(it._mCurrent);
-	for (size_type i = 0; i < _mapSize + 2; ++i)
+	for (size_type i = 1; i < _mapSize + 1; ++i) {
 		if (FT_LIKELY(!preserveMap || i != (_mapSize + 2) / 2)) {
 			_allocator.deallocate(_map[i], DEQUE_ARRAY_SIZE);
 			_map[i] = NULL;
 		}
+	}
 	if (!preserveMap) {
 		_mapAllocator().deallocate(_map, _mapSize + 2);
 		_map = NULL;
 		_mapSize = 0;
 		return;
 	}
-	_start = iterator(&_map[_mapSize / 2], &_map[_mapSize / 2][DEQUE_ARRAY_SIZE / 2]);
+	_start = iterator(&_map[_mapSize + 2 / 2], &_map[_mapSize + 2 / 2][DEQUE_ARRAY_SIZE / 2]);
 	_end = _start;
 }
 

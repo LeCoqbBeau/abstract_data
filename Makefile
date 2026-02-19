@@ -50,7 +50,7 @@ GTEST_BUILD		=	$(GTEST_GTEST)build/
 GTEST_ALL_A		=	$(GTEST_BUILD)libgtest.a
 GTEST_MAIN_A	=	$(GTEST_BUILD)libgtest_main.a
 GTEST_INCLUDE	=	$(GTEST_GTEST)include/
-GTEST_FILTER	=	*ModifiersTests/*
+GTEST_FILTER	=	*Erase*
 GTEST_FLAGS		=	--gtest_color=yes --gtest_filter=$(GTEST_FILTER)
 
 
