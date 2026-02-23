@@ -5,4 +5,6 @@
 #ifndef SCT_DEQUE_TPP
 #define SCT_DEQUE_TPP
 
+
+
 #endif //SCT_DEQUE_TPP

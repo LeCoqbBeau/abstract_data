@@ -321,7 +321,7 @@ void ft::deque<T, Allocator>::resize(size_type n, value_type CREF val) {
 			for (size_type i = size(); i < n; ++i)
 				push_back(val); // this can throw :D
 	else
-		for (size_type i = size() - 1; i > n; --i)
+		for (size_type i = size() - 1; i >= n; --i)
 			pop_back(); // this never throws
 }
 
@@ -523,7 +523,7 @@ ft::deque<T, Allocator>::erase(iterator first, iterator last) {
 
 	if (elemBefore < elemAfter) {
 		TRY_RET(
-			ft::rcopy(_start, _start + elemBefore, _start + n),
+			ft::rcopy(_start, _start + elemBefore, _start + elemBefore + n),
 			_end
 		);
 		for (size_type i = 0; i < n; ++i)
@@ -537,13 +537,13 @@ ft::deque<T, Allocator>::erase(iterator first, iterator last) {
 		for (size_type i = 0; i < n; ++i)
 			pop_back();
 	}
-	return _start + posIndex + 1;
+	return _start + posIndex;
 }
 
 
 template <typename T, typename Allocator>
 void ft::deque<T, Allocator>::swap(deque REF other) {
-	if (this != &other)
+	if (this == &other)
 		return;
 	ft::swap(_map, other._map);
 	ft::swap(_mapSize, other._mapSize);

@@ -62,8 +62,8 @@ ft::vector<T, Allocator>::~vector()
 {
 	if (!_array)
 		return ;
-	for (difference_type i = 0; i < _end - _array; ++i)
-		_allocator.destroy(_array + i);
+	for (value_type* it = _array; it != _end; ++it)
+		_allocator.destroy(it);
 	_allocator.deallocate(_array, _size);
 }
 
@@ -153,14 +153,12 @@ template <typename T, typename Allocator>
 void
 ft::vector<T, Allocator>::resize(size_type n, value_type CREF val)
 {
-	size_type const arraySize = size();
-	if (arraySize < n)
-		for (size_type i = arraySize; i != n; ++i)
-			pop_back();
+	if (n > size())
+		for (size_type i = size(); i < n; ++i)
+			push_back(val); // this can throw :D
 	else
-		for (size_type i = arraySize; i != n; ++i)
-			push_back(val);
-
+		for (size_type i = size() - 1; i >= n; --i)
+			pop_back(); // this never throws
 }
 
 
@@ -532,6 +530,8 @@ ft::vector<T, Allocator>::_reallocate(size_type n)
 	for (value_type *it = _array; it != _end; ++it)
 		_allocator.construct(newArray + (it - _array), *it);
 	size_type const arraySize = _end - _array;
+	for (value_type* it = _array; it != _end; ++it)
+		_allocator.destroy(it);
 	_allocator.deallocate(_array, _size);
 	_size = newSize;
 	_array = newArray;

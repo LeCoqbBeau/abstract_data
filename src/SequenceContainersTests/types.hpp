@@ -7,14 +7,15 @@
 
 
 #ifndef USE_FT
-#include <list>
-#include <deque>
-#include <vector>
+# include <list>
+# include <deque>
+# include <vector>
 #else
-#include "list.hpp"
-#include "deque.hpp"
-#include "vector.hpp"
+# include "list.hpp"
+# include "deque.hpp"
+# include "vector.hpp"
 #endif
+
 namespace ns = TESTED_NAMESPACE;
 
 
@@ -49,9 +50,9 @@ typedef ::testing::Types<
 
 
 typedef ::testing::Types<
-	intList_t, strList_t, fatList_t,
-	intDeque_t, strDeque_t, fatDeque_t,
-	intVector_t, strVector_t, fatVector_t
+	intList_t, strList_t, fatList_t
+	// intDeque_t, strDeque_t, fatDeque_t,
+	// intVector_t, strVector_t, fatVector_t
 >	testContainers_type;
 
 

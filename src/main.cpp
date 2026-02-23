@@ -8,7 +8,18 @@
 typedef std::string	str;
 #include "Fat.hpp"
 
-#include "generator.hpp"
+
+#include "Generator.hpp"
+#include "HelperFunctors.hpp"
+
+
+template <typename TypeParam>
+void printContainer(TypeParam c)
+{
+	for (typename TypeParam::iterator it = c.begin(); it != c.end(); ++it)
+		std::cout << *it << " > ";
+	std::cout << std::endl;
+}
 
 #include "SequenceContainersTests/Tests.hpp"
 

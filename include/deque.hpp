@@ -166,7 +166,7 @@ class deque {
 
 
 template <typename T, typename Allocator>
-void swap(ft::deque<T, Allocator> x, ft::deque<T, Allocator> y) {
+void swap(ft::deque<T, Allocator> REF x, ft::deque<T, Allocator> REF y) {
 	x.swap(y);
 }
 
@@ -205,7 +205,9 @@ DEQUE_COMPARISON_OPERATOR(>=) {
 	return !(lhs < rhs);
 }
 
+
 }
+
 
 #undef DEQUE_COMPARISON_OPERATOR
 

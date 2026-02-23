@@ -337,6 +337,8 @@ void ft::list<T, Allocator>::clear() {
 // Operations
 template <class T, class Allocator>
 void ft::list<T, Allocator>::splice(iterator position, list REF other) {
+	if (other.empty())
+		return ;
 	_base_type* frontInserted = other._sentinel.next();
 	_base_type* backInserted = other._sentinel.prev();
 	frontInserted->prev() = position._currentNode->prev();
@@ -350,7 +352,8 @@ void ft::list<T, Allocator>::splice(iterator position, list REF other) {
 
 template <class T, class Allocator>
 void ft::list<T, Allocator>::splice(iterator position, list REF other, iterator it) {
-	(void)other;
+	if (other.empty())
+		return ;
 	it._currentNode->prev()->next() = it._currentNode->next();
 	it._currentNode->next()->prev() = it._currentNode->prev();
 	it._currentNode->next() = NULL;
@@ -364,7 +367,8 @@ void ft::list<T, Allocator>::splice(iterator position, list REF other, iterator 
 
 template <class T, class Allocator>
 void ft::list<T, Allocator>::splice(iterator position, list REF other, iterator first, iterator last) {
-	(void)other;
+	if (other.empty())
+		return ;
 	_base_type* firstInserted = first._currentNode;
 	_base_type* lastInserted = last._currentNode->prev();
 
@@ -516,12 +520,12 @@ void ft::list<T, Allocator>::_assignHelper(size_type n, value_type CREF val, ft:
 template <class T, class Allocator>
 template <class InputIt> void ft::list<T, Allocator>::_assignHelper(InputIt first, InputIt last, ft::false_type) {
 	_base_type* nodeIterator = &_sentinel;
-	do {
+	 while (first != last) {
 		nodeIterator->next() = _createNode(*first);
 		nodeIterator->next()->prev() = nodeIterator;
 		nodeIterator = nodeIterator->next();
 		++first;
-	} while (first != last);
+	}
 	nodeIterator->next() = &_sentinel;
 	_sentinel.prev() = nodeIterator;
 }

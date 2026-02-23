@@ -10,6 +10,7 @@
 #include "Iterators.tpp"
 #include "ElementAccess.tpp"
 #include "Modifiers.tpp"
+#include "OutOfClass.tpp"
 
 #include "Lists.tpp"
 #include "Deques.tpp"

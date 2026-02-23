@@ -129,18 +129,9 @@ void swap(list<T, Allocator> REF x, list<T, Allocator> REF y) {
 										(ft::list<T, Allocator> CREF lhs, ft::list<T, Allocator> CREF rhs)
 
 LIST_COMPARISON_OPERATOR(==) {
-	typedef typename ft::list<T, Allocator>::const_iterator const_iterator;
-	const_iterator	leftIt = lhs.begin();
-	const_iterator	rightIt = rhs.begin();
-	while (leftIt != lhs.end() && rightIt != rhs.end()) {
-		if (*leftIt != *rightIt)
-			return false;
-		++leftIt;
-		++rightIt;
-	}
-	if (leftIt != lhs.end() || rightIt != rhs.end())
+	if (lhs.size() != rhs.size())
 		return false;
-	return true;
+	return ft::equal(lhs.begin(), lhs.end(), rhs.begin());
 }
 
 
@@ -150,16 +141,7 @@ LIST_COMPARISON_OPERATOR(!=) {
 
 
 LIST_COMPARISON_OPERATOR(<) {
-	typedef typename ft::list<T, Allocator>::const_iterator const_iterator;
-	const_iterator	leftIt = lhs.begin();
-	const_iterator	rightIt = rhs.begin();
-	while (leftIt != lhs.end() && rightIt != rhs.end()) {
-		if (*rightIt < *leftIt)
-			return false;
-		++leftIt;
-		++rightIt;
-	}
-	return true;
+	return ft::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
 }
 
 

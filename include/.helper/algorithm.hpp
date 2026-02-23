@@ -134,8 +134,8 @@ ForwardIt remove_if(
 	ForwardIt last,
 	UnaryPred pred
 ) {
-	first = find_if(first, last, pred);
-	for (ForwardIt it = first; ++it != last;)
+	first = ft::find_if(first, last, pred);
+	for (ForwardIt it = first; it != last; ++it)
 		if (!pred(*it))
 			*first++ = *it;
 	return first;

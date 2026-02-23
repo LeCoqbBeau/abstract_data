@@ -6,7 +6,8 @@
 #define GENERATOR_HPP
 
 
-#define ARRAY	X(0), X(1), X(2), X(3), X(4), X(5), X(6), X(7), X(8), X(9),				\
+#define ARRAY	X(-1),																	\
+				X(0), X(1), X(2), X(3), X(4), X(5), X(6), X(7), X(8), X(9),				\
 				X(10), X(11), X(12), X(13), X(14), X(15), X(16), X(17), X(18), X(19),	\
 				X(20), X(21), X(22), X(23), X(24), X(25), X(26), X(27), X(28), X(29),	\
 				X(30), X(31), X(32), X(33), X(34), X(35), X(36), X(37), X(38), X(39),	\
@@ -41,28 +42,28 @@ struct arrayGenerator {};
 
 template <>
 struct arrayGenerator<int> {
-	operator int const*() const { return intArray; }
-	int const*	operator()() const { return intArray; }
-	int CREF	operator()(unsigned int const i) const { return intArray[i]; }
-	int CREF	operator[](unsigned int const i) const { return intArray[i]; }
+	operator int const*() const { return intArray + 1; }
+	int const*	operator()() const { return intArray + 1; }
+	int CREF	operator()(unsigned int const i) const { return intArray[i + 1]; }
+	int CREF	operator[](unsigned int const i) const { return intArray[i + 1]; }
 };
 
 
 template <>
 struct arrayGenerator<str> {
-	operator str const*() const { return strArray; }
-	str const*		operator()() const { return strArray; }
-	str CREF	operator()(unsigned int const i) const { return strArray[i]; }
-	str CREF	operator[](unsigned int const i) const { return strArray[i]; }
+	operator str const*() const { return strArray + 1; }
+	str const*		operator()() const { return strArray + 1; }
+	str CREF	operator()(unsigned int const i) const { return strArray[i + 1]; }
+	str CREF	operator[](unsigned int const i) const { return strArray[i + 1]; }
 };
 
 
 template <>
 struct arrayGenerator<Fat> {
-	operator Fat const*() const { return fatArray; }
-	Fat const*	operator()() const { return fatArray; }
-	Fat CREF	operator()(unsigned int const i) const { return fatArray[i]; }
-	Fat CREF	operator[](unsigned int const i) const { return fatArray[i]; }
+	operator Fat const*() const { return fatArray + 1; }
+	Fat const*	operator()() const { return fatArray + 1; }
+	Fat CREF	operator()(unsigned int const i) const { return fatArray[i + 1]; }
+	Fat CREF	operator[](unsigned int const i) const { return fatArray[i + 1]; }
 };
 
 
