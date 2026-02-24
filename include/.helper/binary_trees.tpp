@@ -288,7 +288,7 @@ template <typename T, typename Comp, typename Allocator, typename extractKey, bo
 typename ft::internal::rbt<T, Comp, Allocator, extractKey, mutableIterators>::const_iterator
 ft::internal::rbt<T, Comp, Allocator, extractKey, mutableIterators>::begin() const
 {
-	return const_iterator(&_sentinel,RBT_NODE(_sentinel.left()));
+	return const_iterator(&_sentinel, RBT_NODE(_sentinel.left()));
 }
 
 
@@ -417,6 +417,7 @@ ft::internal::rbt<T, Comp, Allocator, extractKey, mutableIterators>::clear()
 {
 	_clearTree(_root);
 	_root = NULL;
+	_size = 0;
 	_sentinel.left() = NULL;
 	_sentinel.right() = NULL;
 	_sentinel.parent = NULL;

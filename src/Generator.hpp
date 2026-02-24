@@ -35,15 +35,15 @@ Fat const fatArray[] = { ARRAY };
 #undef X
 
 #define X(e) ns::make_pair(e, e)
-ns::pair<int, int> const intPairArray[] = { ARRAY };
+ns::pair<int const, int> const intPairArray[] = { ARRAY };
 #undef X
 
 #define X(e) ns::make_pair(str(#e), str(#e))
-ns::pair<str, str> const strPairArray[] = { ARRAY };
+ns::pair<str const, str> const strPairArray[] = { ARRAY };
 #undef X
 
 #define X(e) ns::make_pair(Fat(e, #e), Fat(e, #e))
-ns::pair<Fat, Fat> const fatPairArray[] = { ARRAY };
+ns::pair<Fat const, Fat> const fatPairArray[] = { ARRAY };
 #undef X
 #undef ARRAY
 
@@ -80,29 +80,29 @@ struct arrayGenerator<Fat>
 
 
 template <>
-struct arrayGenerator<ns::pair<int, int> >
+struct arrayGenerator<ns::pair<int const, int> >
 {
-	ns::pair<int, int> const*	operator()() const { return intPairArray + 1; }
-	ns::pair<int, int> CREF	operator()(unsigned int const i) const { return intPairArray[i + 1]; }
-	ns::pair<int, int> CREF	operator[](unsigned int const i) const { return intPairArray[i + 1]; }
+	ns::pair<int const, int> const*	operator()() const { return intPairArray + 1; }
+	ns::pair<int const, int> CREF	operator()(unsigned int const i) const { return intPairArray[i + 1]; }
+	ns::pair<int const, int> CREF	operator[](unsigned int const i) const { return intPairArray[i + 1]; }
 };
 
 
 template <>
-struct arrayGenerator<ns::pair<str, str> >
+struct arrayGenerator<ns::pair<str const, str> >
 {
-	ns::pair<str, str> const*	operator()() const { return strPairArray + 1; }
-	ns::pair<str, str> CREF	operator()(unsigned int const i) const { return strPairArray[i + 1]; }
-	ns::pair<str, str> CREF	operator[](unsigned int const i) const { return strPairArray[i + 1]; }
+	ns::pair<str const, str> const*	operator()() const { return strPairArray + 1; }
+	ns::pair<str const, str> CREF	operator()(unsigned int const i) const { return strPairArray[i + 1]; }
+	ns::pair<str const, str> CREF	operator[](unsigned int const i) const { return strPairArray[i + 1]; }
 };
 
 
 template <>
-struct arrayGenerator<ns::pair<Fat, Fat> >
+struct arrayGenerator<ns::pair<Fat const, Fat> >
 {
-	ns::pair<Fat, Fat> const*	operator()() const { return fatPairArray + 1; }
-	ns::pair<Fat, Fat> CREF	operator()(unsigned int const i) const { return fatPairArray[i + 1]; }
-	ns::pair<Fat, Fat> CREF	operator[](unsigned int const i) const { return fatPairArray[i + 1]; }
+	ns::pair<Fat const, Fat> const*	operator()() const { return fatPairArray + 1; }
+	ns::pair<Fat const, Fat> CREF	operator()(unsigned int const i) const { return fatPairArray[i + 1]; }
+	ns::pair<Fat const, Fat> CREF	operator[](unsigned int const i) const { return fatPairArray[i + 1]; }
 };
 
 

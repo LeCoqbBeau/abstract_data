@@ -174,42 +174,17 @@ void swap(ft::deque<T, Allocator> REF x, ft::deque<T, Allocator> REF y) {
 # define DEQUE_COMPARISON_OPERATOR(op)	template <class T, class Allocator> bool operator op						\
 										(ft::deque<T, Allocator> CREF lhs, ft::deque<T, Allocator> CREF rhs)
 
-DEQUE_COMPARISON_OPERATOR(==) {
-	if (lhs.size() != rhs.size())
-		return false;
-	return ft::equal(lhs.begin(), lhs.end(), rhs.begin());
-}
-
-
-DEQUE_COMPARISON_OPERATOR(!=) {
-	return !(lhs == rhs);
-}
-
-
-DEQUE_COMPARISON_OPERATOR(<) {
-	return ft::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
-}
-
-
-DEQUE_COMPARISON_OPERATOR(<=) {
-	return !(rhs < lhs);
-}
-
-
-DEQUE_COMPARISON_OPERATOR(>) {
-	return (rhs < lhs);
-}
-
-
-DEQUE_COMPARISON_OPERATOR(>=) {
-	return !(lhs < rhs);
-}
-
-
-}
-
+DEQUE_COMPARISON_OPERATOR(==)	{ return lhs.size() == rhs.size() && ft::equal(lhs.begin(), lhs.end(), rhs.begin()); }
+DEQUE_COMPARISON_OPERATOR(!=)	{ return !(lhs == rhs); }
+DEQUE_COMPARISON_OPERATOR(<)	{ return ft::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end()); }
+DEQUE_COMPARISON_OPERATOR(<=)	{ return !(rhs < lhs); }
+DEQUE_COMPARISON_OPERATOR(>)	{ return (rhs < lhs); }
+DEQUE_COMPARISON_OPERATOR(>=)	{ return !(lhs < rhs); }
 
 #undef DEQUE_COMPARISON_OPERATOR
+
+
+}
 
 
 #include ".containers/deque.tpp"

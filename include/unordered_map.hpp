@@ -29,7 +29,7 @@ template <
 {
 	protected:
 		// Typedef
-		typedef ft::internal::hashmap<ft::utility<const Key, T>, Hash, KeyEqual, Allocator, ft::true_type, true>	hashmap_type;
+		typedef ft::internal::hashmap<ft::pair<const Key, T>, Hash, KeyEqual, Allocator, ft::true_type, true>	hashmap_type;
 
 	public:
 		// Typedefs

@@ -128,38 +128,16 @@ void swap(list<T, Allocator> REF x, list<T, Allocator> REF y) {
 # define LIST_COMPARISON_OPERATOR(op)	template <class T, class Allocator> bool operator op					\
 										(ft::list<T, Allocator> CREF lhs, ft::list<T, Allocator> CREF rhs)
 
-LIST_COMPARISON_OPERATOR(==) {
-	if (lhs.size() != rhs.size())
-		return false;
-	return ft::equal(lhs.begin(), lhs.end(), rhs.begin());
-}
-
-
-LIST_COMPARISON_OPERATOR(!=) {
-	return !(lhs == rhs);
-}
-
-
-LIST_COMPARISON_OPERATOR(<) {
-	return ft::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
-}
-
-
-LIST_COMPARISON_OPERATOR(<=) {
-	return !(rhs < lhs);
-}
-
-
-LIST_COMPARISON_OPERATOR(>) {
-	return (rhs < lhs);
-}
-
-
-LIST_COMPARISON_OPERATOR(>=) {
-	return !(lhs < rhs);
-}
+LIST_COMPARISON_OPERATOR(==)	{ return lhs.size() == rhs.size() && ft::equal(lhs.begin(), lhs.end(), rhs.begin()); }
+LIST_COMPARISON_OPERATOR(!=)	{ return !(lhs == rhs); }
+LIST_COMPARISON_OPERATOR(<)		{ return ft::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end()); }
+LIST_COMPARISON_OPERATOR(<=)	{ return !(rhs < lhs); }
+LIST_COMPARISON_OPERATOR(>)		{ return (rhs < lhs); }
+LIST_COMPARISON_OPERATOR(>=)	{ return !(lhs < rhs); }
 
 # undef LIST_COMPARISON_OPERATOR
+
+
 }
 
 

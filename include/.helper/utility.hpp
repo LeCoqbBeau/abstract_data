@@ -34,7 +34,21 @@ template <class T1, class T2>
 ft::pair<T1, T2> make_pair(T1 x, T2 y);
 
 
-}
+# define PAIR_RELATIONAL_PROTOTYPE(op)	template <class T1, class T2, class U1, class U2>						\
+bool operator op (ft::pair<T1, T2> CREF lhs, ft::pair<U1, U2> CREF rhs)
+
+PAIR_RELATIONAL_PROTOTYPE(==)	{ return lhs.first == rhs.first && lhs.second == rhs.second; }
+PAIR_RELATIONAL_PROTOTYPE(!=)	{ return !(lhs == rhs); }
+PAIR_RELATIONAL_PROTOTYPE(<)	{ return (lhs.first < rhs.first) || (!(rhs.first < lhs.first) && (lhs.second < rhs.second)); }
+PAIR_RELATIONAL_PROTOTYPE(<=)	{ return !(rhs < lhs); }
+PAIR_RELATIONAL_PROTOTYPE(>)	{ return (rhs < lhs); }
+PAIR_RELATIONAL_PROTOTYPE(>=)	{ return !(lhs < rhs); }
+
+
+#undef  PAIR_RELATIONAL_PROTOTYPE
+
+
+} // namespace ft
 
 
 // Member functions
@@ -89,45 +103,5 @@ ft::pair<T1, T2> ft::make_pair(T1 x, T2 y) {
 	return pair<T1, T2>(x, y);
 }
 
-# define PAIR_RELATIONAL_PROTOTYPE(op)	template <class T1, class T2, class U1, class U2>						\
-										bool operator op (ft::pair<T1, T2> CREF lhs, ft::pair<U1, U2> CREF rhs)
-
-PAIR_RELATIONAL_PROTOTYPE(==) {
-	return lhs.first() == rhs.first() && lhs.second() == rhs.second();
-}
-
-
-PAIR_RELATIONAL_PROTOTYPE(!=) {
-	return !(lhs == rhs);
-}
-
-
-PAIR_RELATIONAL_PROTOTYPE(<) {
-	if (lhs.first() < rhs.first())
-		return true;
-	if (rhs.first() < lhs.first())
-		return false;
-	if (lhs.second() < rhs.second())
-		return true;
-	return false;
-}
-
-
-PAIR_RELATIONAL_PROTOTYPE(<=) {
-	return !(rhs < lhs);
-}
-
-
-PAIR_RELATIONAL_PROTOTYPE(>) {
-	return (rhs < lhs);
-}
-
-
-PAIR_RELATIONAL_PROTOTYPE(>=) {
-	return !(lhs < rhs);
-}
-
-
-#undef  PAIR_RELATIONAL_PROTOTYPE
 
 #endif //PAIR_H

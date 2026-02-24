@@ -186,6 +186,26 @@ class multimap
 };
 
 
+# define MAP_COMPARISON_OPERATOR(op)	template <class T, class Container> bool operator op						\
+										(ft::map<T, Container> CREF lhs, ft::map<T, Container> CREF rhs)
+
+# define MMAP_COMPARISON_OPERATOR(op)	template <class T, class Container> bool operator op						\
+										(ft::multimap<T, Container> CREF lhs, ft::multimap<T, Container> CREF rhs)
+
+# define MAPS_COMPARISON_OPERATOR(op, stmt) MAP_COMPARISON_OPERATOR(op) {stmt;}; MMAP_COMPARISON_OPERATOR(op) {stmt;};
+
+MAPS_COMPARISON_OPERATOR(==, { return lhs.size() == rhs.size() && ft::equal(lhs.begin(), lhs.end(), rhs.begin()); });
+MAPS_COMPARISON_OPERATOR(!=, { return !(lhs == rhs); });
+MAPS_COMPARISON_OPERATOR(<,  { return ft::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end()); });
+MAPS_COMPARISON_OPERATOR(<=, { return !(rhs < lhs); });
+MAPS_COMPARISON_OPERATOR(>,  { return (rhs < lhs); });
+MAPS_COMPARISON_OPERATOR(>=, { return !(lhs < rhs); });
+
+#undef MAPS_COMPARISON_OPERATOR
+#undef MAP_COMPARISON_OPERATOR
+#undef MMAP_COMPARISON_OPERATOR
+
+
 }
 
 

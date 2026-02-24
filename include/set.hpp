@@ -172,6 +172,26 @@ class multiset
 };
 
 
+# define SET_COMPARISON_OPERATOR(op)	template <class T, class Container> bool operator op						\
+										(ft::set<T, Container> CREF lhs, ft::set<T, Container> CREF rhs)
+
+# define MSET_COMPARISON_OPERATOR(op)	template <class T, class Container> bool operator op						\
+										(ft::multiset<T, Container> CREF lhs, ft::multiset<T, Container> CREF rhs)
+
+# define SETS_COMPARISON_OPERATOR(op, stmt) SET_COMPARISON_OPERATOR(op) {stmt;}; MSET_COMPARISON_OPERATOR(op) {stmt;};
+
+SETS_COMPARISON_OPERATOR(==, { return lhs.size() == rhs.size() && ft::equal(lhs.begin(), lhs.end(), rhs.begin()); });
+SETS_COMPARISON_OPERATOR(!=, { return !(lhs == rhs); });
+SETS_COMPARISON_OPERATOR(<,  { return ft::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end()); });
+SETS_COMPARISON_OPERATOR(<=, { return !(rhs < lhs); });
+SETS_COMPARISON_OPERATOR(>,  { return (rhs < lhs); });
+SETS_COMPARISON_OPERATOR(>=, { return !(lhs < rhs); });
+
+#undef SETS_COMPARISON_OPERATOR
+#undef SET_COMPARISON_OPERATOR
+#undef MSET_COMPARISON_OPERATOR
+
+
 }
 
 

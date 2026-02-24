@@ -6,6 +6,14 @@
 #include "config.h"
 
 
+template <typename T, typename U>
+std::ostream REF operator << (std::ostream REF os, ns::pair<T, U> CREF pair)
+{
+	os << "< " << pair.first << " -=- " << pair.second << " >";
+	return os;
+}
+
+
 template <typename TypeParam>
 void printContainer(TypeParam c)
 {
@@ -14,9 +22,13 @@ void printContainer(TypeParam c)
 	std::cout << std::endl;
 }
 
+
+
 // #include "SequenceContainersTests/Tests.hpp"
 #include "AssociativeContainersTests/Tests.hpp"
 
+#include "set.hpp"
+#include "map.hpp"
 
 int main(int argc, char *argv[]) {
 	(void)argc;

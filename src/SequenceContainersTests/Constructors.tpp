@@ -64,7 +64,7 @@ TYPED_TEST_P(sctConstructorTests, Range)
 TYPED_TEST_P(sctConstructorTests, Copy)
 {
 	typedef typename TypeParam::value_type		value_type;
-	value_type const* CREF	array = arrayGenerator<value_type>()();
+	value_type const*	array = arrayGenerator<value_type>()();
 
 	TypeParam	copy(array, array + ARRAY_TINY);
 	TypeParam	dest(copy);
@@ -81,7 +81,7 @@ TYPED_TEST_P(sctConstructorTests, AssignementOperator)
 {
 	typedef typename TypeParam::value_type		value_type;
 	typedef typename TypeParam::size_type		size_type;
-	value_type const* CREF	array = arrayGenerator<value_type>()();
+	value_type const*	array = arrayGenerator<value_type>()();
 
 	TypeParam const copy(array, array + ARRAY_TINY);
 	TypeParam	dest = copy;
