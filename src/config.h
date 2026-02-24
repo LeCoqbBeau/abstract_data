@@ -11,21 +11,6 @@
 #endif
 
 
-#ifndef BENCHMARK
-# define BENCHMARK false
-#endif
-
-
-#include "Timer.hpp"
-
-
-#if BENCHMARK == true
-# define TIME(title) Timer(title)
-#else
-# define TIME(title)
-#endif
-
-
 #ifndef REF
 # define REF &
 #endif
@@ -59,12 +44,10 @@ ForwardIt next(ForwardIt it, typename std::iterator_traits<ForwardIt>::differenc
 // Okay look again :D
 
 
-typedef std::string	str;
-#include "Fat.hpp"
-
-
+#include "types.hpp"
 #include "Generator.hpp"
 #include "HelperFunctors.hpp"
+
 
 #include <fstream>
 

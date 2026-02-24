@@ -158,7 +158,7 @@ REGISTER_TYPED_TEST_CASE_P(
 INSTANTIATE_TYPED_TEST_CASE_P(
 	SequenceContainers,
 	sctElementAccess,
-	testContainers_type
+	sequenceContainers_type
 );
 
 

@@ -115,7 +115,7 @@ REGISTER_TYPED_TEST_CASE_P(
 INSTANTIATE_TYPED_TEST_CASE_P(
 	SequenceContainers,
 	sctOutOfClassTests,
-	testContainers_type
+	sequenceContainers_type
 );
 
 

@@ -62,7 +62,7 @@ class set
 		size_type							max_size() const;
 
 		// Modifiers
-		ft::utility<iterator, bool>			insert(value_type CREF val);
+		ft::pair<iterator, bool>			insert(value_type CREF val);
 		iterator							insert(iterator position, value_type CREF val);
 		template <typename InputIt> void	insert(InputIt first, InputIt last);
 		void								erase(iterator position);
@@ -80,7 +80,7 @@ class set
 		size_type							count(value_type CREF val) const;
 		iterator							lower_bound(value_type CREF val) const;
 		iterator							upper_bound(value_type CREF val) const;
-		ft::utility<iterator>					equal_range(value_type CREF val) const;
+		ft::pair<iterator>					equal_range(value_type CREF val) const;
 
 		// Allocator
 		allocator_type	get_allocator() const;
@@ -161,7 +161,7 @@ class multiset
 		size_type							count(value_type CREF val) const;
 		iterator							lower_bound(value_type CREF val) const;
 		iterator							upper_bound(value_type CREF val) const;
-		ft::utility<iterator>					equal_range(value_type CREF val) const;
+		ft::pair<iterator>					equal_range(value_type CREF val) const;
 
 		// Allocator
 		allocator_type						get_allocator() const;

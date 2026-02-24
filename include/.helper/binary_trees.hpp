@@ -73,13 +73,15 @@ struct rbt_node : rbt_node_base {
 
 	// Methods
 #define COMPARE_TEMPLATE template <typename Compare>
-	COMPARE_TEMPLATE 	this_type*										find(value_type CREF val, Compare comp) const;
-	template <typename Allocator, typename FreeFunc>	remove_result	erase(Allocator allocator, FreeFunc free);
-	COMPARE_TEMPLATE 	this_type*										insert(this_type* node, Compare comp);
-	COMPARE_TEMPLATE 	ft::size_t										count(value_type CREF val, Compare comp) const;
-	COMPARE_TEMPLATE	this_type const*								lower_bound(value_type CREF val, Compare comp) const;
-	COMPARE_TEMPLATE	this_type const*								upper_bound(value_type CREF val, Compare comp) const;
-	COMPARE_TEMPLATE	ft::utility<this_type const*, this_type const*>	equal_range(value_type CREF val, Compare comp) const;
+
+	COMPARE_TEMPLATE									this_type*			find(value_type CREF val, Compare comp) const;
+	template <typename Allocator, typename FreeFunc>	remove_result		erase(Allocator allocator, FreeFunc free);
+	COMPARE_TEMPLATE 									this_type*			insert(this_type* node, Compare comp);
+	COMPARE_TEMPLATE 									ft::size_t			count(value_type CREF val, Compare comp) const;
+	COMPARE_TEMPLATE									this_type const*	lower_bound(value_type CREF val, Compare comp) const;
+	COMPARE_TEMPLATE									this_type const*	upper_bound(value_type CREF val, Compare comp) const;
+	COMPARE_TEMPLATE	ft::pair<this_type const*, this_type const*>		equal_range(value_type CREF val, Compare comp) const;
+
 #undef COMPARE_TEMPLATE
 
 
@@ -103,7 +105,7 @@ struct rbt_iterator
 
 	// Constructors
 	explicit	rbt_iterator(base_type const* sentinel = NULL, node_type *node = NULL) : _current(node), _sentinel(sentinel) {}
-				rbt_iterator(iterator<T, T REF, T*> CREF rhs) : _current(rhs._current), _sentinel(rhs._sentinel) {}
+				rbt_iterator(rbt_iterator<T, T REF, T*> CREF rhs) : _current(rhs._current), _sentinel(rhs._sentinel) {}
 				~rbt_iterator() {}
 
 	// In/Equality Operator
@@ -217,7 +219,7 @@ struct rbt {
 		size_type				count(value_type CREF val) const;
 		iterator				lower_bound(value_type CREF val) const;
 		iterator				upper_bound(value_type CREF val) const;
-		ft::utility<iterator>		equal_range(value_type CREF val) const;
+		ft::pair<iterator>		equal_range(value_type CREF val) const;
 
 		// Allocator
 		allocator_type			get_allocator() const;

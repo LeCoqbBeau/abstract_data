@@ -33,6 +33,18 @@ str const strArray[] = { ARRAY };
 #define X(e) Fat(e, #e)
 Fat const fatArray[] = { ARRAY };
 #undef X
+
+#define X(e) ns::make_pair(e, e)
+ns::pair<int, int> const intPairArray[] = { ARRAY };
+#undef X
+
+#define X(e) ns::make_pair(str(#e), str(#e))
+ns::pair<str, str> const strPairArray[] = { ARRAY };
+#undef X
+
+#define X(e) ns::make_pair(Fat(e, #e), Fat(e, #e))
+ns::pair<Fat, Fat> const fatPairArray[] = { ARRAY };
+#undef X
 #undef ARRAY
 
 
@@ -52,7 +64,7 @@ struct arrayGenerator<int>
 template <>
 struct arrayGenerator<str>
 {
-	str const*		operator()() const { return strArray + 1; }
+	str const*	operator()() const { return strArray + 1; }
 	str CREF	operator()(unsigned int const i) const { return strArray[i + 1]; }
 	str CREF	operator[](unsigned int const i) const { return strArray[i + 1]; }
 };
@@ -64,6 +76,33 @@ struct arrayGenerator<Fat>
 	Fat const*	operator()() const { return fatArray + 1; }
 	Fat CREF	operator()(unsigned int const i) const { return fatArray[i + 1]; }
 	Fat CREF	operator[](unsigned int const i) const { return fatArray[i + 1]; }
+};
+
+
+template <>
+struct arrayGenerator<ns::pair<int, int> >
+{
+	ns::pair<int, int> const*	operator()() const { return intPairArray + 1; }
+	ns::pair<int, int> CREF	operator()(unsigned int const i) const { return intPairArray[i + 1]; }
+	ns::pair<int, int> CREF	operator[](unsigned int const i) const { return intPairArray[i + 1]; }
+};
+
+
+template <>
+struct arrayGenerator<ns::pair<str, str> >
+{
+	ns::pair<str, str> const*	operator()() const { return strPairArray + 1; }
+	ns::pair<str, str> CREF	operator()(unsigned int const i) const { return strPairArray[i + 1]; }
+	ns::pair<str, str> CREF	operator[](unsigned int const i) const { return strPairArray[i + 1]; }
+};
+
+
+template <>
+struct arrayGenerator<ns::pair<Fat, Fat> >
+{
+	ns::pair<Fat, Fat> const*	operator()() const { return fatPairArray + 1; }
+	ns::pair<Fat, Fat> CREF	operator()(unsigned int const i) const { return fatPairArray[i + 1]; }
+	ns::pair<Fat, Fat> CREF	operator[](unsigned int const i) const { return fatPairArray[i + 1]; }
 };
 
 

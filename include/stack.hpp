@@ -41,13 +41,9 @@ class stack {
 };
 
 
-}
-
-
-# define STACK_COMPARISON_OPERATOR(op)	template <class T, class Container> bool operator op						\
-											(ft::stack<T, Container> CREF lhs, ft::stack<T, Container> CREF rhs)	\
+# define STACK_COMPARISON_OPERATOR(op)	template <class T, class Container> bool operator op					\
+										(ft::stack<T, Container> CREF lhs, ft::stack<T, Container> CREF rhs)	\
 										{ return lhs.c op rhs.c; }
-
 
 STACK_COMPARISON_OPERATOR(==);
 STACK_COMPARISON_OPERATOR(!=);
@@ -56,7 +52,9 @@ STACK_COMPARISON_OPERATOR(<=);
 STACK_COMPARISON_OPERATOR(>);
 STACK_COMPARISON_OPERATOR(>=);
 
-
 #undef STACK_COMPARISON_OPERATOR
+
+
+}
 
 #endif //STACK_HPP

@@ -14,7 +14,8 @@ void printContainer(TypeParam c)
 	std::cout << std::endl;
 }
 
-#include "SequenceContainersTests/Tests.hpp"
+// #include "SequenceContainersTests/Tests.hpp"
+#include "AssociativeContainersTests/Tests.hpp"
 
 
 int main(int argc, char *argv[]) {

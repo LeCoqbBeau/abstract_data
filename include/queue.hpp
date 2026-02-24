@@ -81,17 +81,17 @@ class priority_queue {
 		value_compare	comp;
 };
 
-}
 
-
-# define QUEUE_COMPARISON_OPERATOR(op)	template <class T, class Container> bool operator op						\
-											(ft::queue<T, Container> CREF lhs, ft::queue<T, Container> CREF rhs)	\
+# define NPRIO_COMPARISON_OPERATOR(op)	template <class T, class Container> bool operator op									\
+										(ft::queue<T, Container> CREF lhs, ft::queue<T, Container> CREF rhs)					\
 										{ return lhs.c op rhs.c; }
 
-# define PRIO_QUEUE_COMPARISON_OPERATOR(op)	template <class T, class Container> bool operator op						\
-												(ft::queue<T, Container> CREF lhs, ft::queue<T, Container> CREF rhs)	\
-											{ return lhs.c op rhs.c; }
+# define PRIO_COMPARISON_OPERATOR(op)	template <class T, class Container> bool operator op									\
+										(ft::priority_queue<T, Container> CREF lhs, ft::priority_queue<T, Container> CREF rhs)	\
+										{ return lhs.c op rhs.c; }
 
+
+# define QUEUE_COMPARISON_OPERATOR(op) NPRIO_COMPARISON_OPERATOR(op); PRIO_COMPARISON_OPERATOR(op);
 
 QUEUE_COMPARISON_OPERATOR(==);
 QUEUE_COMPARISON_OPERATOR(!=);
@@ -102,5 +102,10 @@ QUEUE_COMPARISON_OPERATOR(>=);
 
 
 #undef QUEUE_COMPARISON_OPERATOR
+#undef NPRIO_COMPARISON_OPERATOR
+#undef PRIO_COMPARISON_OPERATOR
+
+
+}
 
 #endif //QUEUE_HPP
