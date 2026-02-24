@@ -41,8 +41,8 @@ struct arrayGenerator {};
 
 
 template <>
-struct arrayGenerator<int> {
-	operator int const*() const { return intArray + 1; }
+struct arrayGenerator<int>
+{
 	int const*	operator()() const { return intArray + 1; }
 	int CREF	operator()(unsigned int const i) const { return intArray[i + 1]; }
 	int CREF	operator[](unsigned int const i) const { return intArray[i + 1]; }
@@ -50,8 +50,8 @@ struct arrayGenerator<int> {
 
 
 template <>
-struct arrayGenerator<str> {
-	operator str const*() const { return strArray + 1; }
+struct arrayGenerator<str>
+{
 	str const*		operator()() const { return strArray + 1; }
 	str CREF	operator()(unsigned int const i) const { return strArray[i + 1]; }
 	str CREF	operator[](unsigned int const i) const { return strArray[i + 1]; }
@@ -59,11 +59,38 @@ struct arrayGenerator<str> {
 
 
 template <>
-struct arrayGenerator<Fat> {
-	operator Fat const*() const { return fatArray + 1; }
+struct arrayGenerator<Fat>
+{
 	Fat const*	operator()() const { return fatArray + 1; }
 	Fat CREF	operator()(unsigned int const i) const { return fatArray[i + 1]; }
 	Fat CREF	operator[](unsigned int const i) const { return fatArray[i + 1]; }
+};
+
+
+template <typename T>
+struct intConvertor {};
+
+
+template <>
+struct intConvertor<int>
+{
+	int operator()(int const i) const { return i; }
+};
+
+#define TOSTR( x )	static_cast< std::ostringstream REF>(				\
+					( std::ostringstream() << std::dec << x ) ).str()
+
+template <>
+struct intConvertor<str>
+{
+	str operator()(int const i) const { return TOSTR(i); }
+};
+
+
+template <>
+struct intConvertor<Fat>
+{
+	Fat operator()(int const i) const { return Fat(i, TOSTR(i)); }
 };
 
 

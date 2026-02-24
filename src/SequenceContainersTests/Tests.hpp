@@ -13,7 +13,5 @@
 #include "OutOfClass.tpp"
 
 #include "Lists.tpp"
-#include "Deques.tpp"
-#include "Vectors.tpp"
 
 #endif //SCT_TESTS_HPP

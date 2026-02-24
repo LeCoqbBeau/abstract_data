@@ -5,13 +5,6 @@
 #include "gtest/gtest.h"
 #include "config.h"
 
-typedef std::string	str;
-#include "Fat.hpp"
-
-
-#include "Generator.hpp"
-#include "HelperFunctors.hpp"
-
 
 template <typename TypeParam>
 void printContainer(TypeParam c)
@@ -23,9 +16,6 @@ void printContainer(TypeParam c)
 
 #include "SequenceContainersTests/Tests.hpp"
 
-#include "list.hpp"
-#include "deque.hpp"
-#include "vector.hpp"
 
 int main(int argc, char *argv[]) {
 	(void)argc;

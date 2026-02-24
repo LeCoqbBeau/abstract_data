@@ -59,4 +59,13 @@ ForwardIt next(ForwardIt it, typename std::iterator_traits<ForwardIt>::differenc
 // Okay look again :D
 
 
+typedef std::string	str;
+#include "Fat.hpp"
+
+
+#include "Generator.hpp"
+#include "HelperFunctors.hpp"
+
+#include <fstream>
+
 #endif //CONFIG_H

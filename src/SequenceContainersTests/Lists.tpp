@@ -4,7 +4,6 @@
 
 #ifndef SCT_LIST_TPP
 #define SCT_LIST_TPP
-#include "../Generator.hpp"
 
 
 template <typename Container>
@@ -20,6 +19,32 @@ class sctListsTests : public ::testing::Test
 		// Attributes
 		Container container;
 };
+
+
+// Why must you look inside me, don't
+namespace hidden {
+struct stableLess
+{
+	template <typename T>
+	bool operator() (std::pair<T, int> CREF lhs, std::pair<T, int> CREF rhs) const { return lhs.first < rhs.first; }
+};
+struct stableGreater
+{
+	template <typename T>
+	bool operator() (std::pair<T, int> CREF lhs, std::pair<T, int> CREF rhs) const { return lhs.first > rhs.first; }
+};
+struct stableCheck
+{
+	template <typename T>
+	bool operator() (std::pair<T, int> CREF lhs, std::pair<T, int> CREF rhs) const
+	{
+		if (lhs.first == rhs.first)
+			return lhs.second > rhs.second;
+		return false;
+	}
+};
+}
+// Look again pwease :3
 
 
 TYPED_TEST_CASE_P(sctListsTests);
@@ -45,7 +70,7 @@ TYPED_TEST_P(sctListsTests, SpliceEntire)
 
 TYPED_TEST_P(sctListsTests, SpliceOne)
 {
-	typedef typename TypeParam::iterator	iterator;
+	typedef typename TypeParam::iterator			iterator;
 
 	arrayGenerator<typename TypeParam::value_type>	array;
 	TypeParam REF									c = this->container;
@@ -101,7 +126,7 @@ TYPED_TEST_P(sctListsTests, SpliceRange)
 	// Single self splice
 	c = TypeParam(array(), array() + ARRAY_SMOL);
 	c.splice(c.end(), c, c.begin(), std::next(c.begin()));
-	EXPECT_TRUE(std::equal(array() + 1, array + ARRAY_SMOL, c.begin()));
+	EXPECT_TRUE(std::equal(array() + 1, array() + ARRAY_SMOL, c.begin()));
 	EXPECT_EQ(c.back(), array[0]);
 	// Whole range splice!
 	cCopy = c;
@@ -109,14 +134,14 @@ TYPED_TEST_P(sctListsTests, SpliceRange)
 	EXPECT_EQ(c, cCopy);
 	// Partial range splice finally!
 	c.splice(c.end(), c, c.begin(), std::next(c.begin(), 19));
-	EXPECT_TRUE(std::equal(array() + 20, array + ARRAY_SMOL, c.begin()));
-	EXPECT_TRUE(std::equal(array(), array + 20, std::next(c.end(), -20)));
+	EXPECT_TRUE(std::equal(array() + 20, array() + ARRAY_SMOL, c.begin()));
+	EXPECT_TRUE(std::equal(array(), array() + 20, std::next(c.end(), -20)));
 }
 
 
 TYPED_TEST_P(sctListsTests, RemoveIf)
 {
-	typedef typename TypeParam::size_type size_type;
+	typedef typename TypeParam::size_type			size_type;
 	arrayGenerator<typename TypeParam::value_type>	array;
 	arrayGenerator<int>								intGen;
 	arrayGenerator<str>								strGen;
@@ -145,13 +170,170 @@ TYPED_TEST_P(sctListsTests, RemoveIf)
 
 TYPED_TEST_P(sctListsTests, Unique)
 {
-	TypeParam REF c = this->container;
-	TypeParam cCopy = c;
+	typedef typename TypeParam::size_type			size_type;
 
-	c.unique();
+	arrayGenerator<typename TypeParam::value_type>	array;
+	TypeParam REF									c = this->container;
+	TypeParam										cCopy = c;
+
+	// Basic tests
+	c.unique(); // is always false
 	EXPECT_EQ(c, cCopy);
 	c.unique(alwaysTrue());
-	EXPECT_EQ(c.size(), false);
+	EXPECT_EQ(c.size(), size_type(1));
+	// Test without custom predicate
+	c.clear();
+	for (int i = 0; i < ARRAY_TINY * 2; ++i)
+		c.push_back(array[i / 2]); // this will push_back twice every numbers
+	ASSERT_EQ(c.size(), size_type(ARRAY_TINY * 2));
+	c.unique();
+	EXPECT_EQ(c, TypeParam(array(), array() + ARRAY_TINY));
+	// Test with custom predicate
+	c.clear();
+	for (int i = 0; i < ARRAY_TINY * 2; ++i)
+		c.push_back(array[i / 2]); // this will push_back twice every numbers
+	ASSERT_EQ(c.size(), size_type(ARRAY_TINY * 2));
+	c.unique(areThirdOrFourth());
+	// Ugly but I don't know how to code the pattern
+	typename TypeParam::iterator it = c.begin();
+	ASSERT_EQ(c.size(), size_type(12));
+	EXPECT_EQ(*it, array[0]);	// idx: 0
+	EXPECT_EQ(*++it, array[1]);	// idx: 1
+	EXPECT_EQ(*++it, array[1]);	// idx: 2
+	EXPECT_EQ(*++it, array[2]);	// idx: 3
+	EXPECT_EQ(*++it, array[2]);	// idx: 4
+	EXPECT_EQ(*++it, array[3]);	// idx: 5
+	EXPECT_EQ(*++it, array[5]);	// idx: 6
+	EXPECT_EQ(*++it, array[5]);	// idx: 7
+	EXPECT_EQ(*++it, array[6]);	// idx: 8
+	EXPECT_EQ(*++it, array[7]);	// idx: 9
+	EXPECT_EQ(*++it, array[7]);	// idx: 10
+	EXPECT_EQ(*++it, array[8]);	// idx: 11
+}
+
+
+TYPED_TEST_P(sctListsTests, Merge)
+{
+	arrayGenerator<typename TypeParam::value_type>	array;
+
+	TypeParam REF									c = this->container;
+	TypeParam										cCopy = c;
+	TypeParam										even;
+	TypeParam										odd;
+
+	// Merge from empty two empty
+	even.merge(odd);
+	EXPECT_TRUE(even.empty());
+	EXPECT_TRUE(odd.empty());
+	// Merge from empty
+	even.merge(c);
+	EXPECT_EQ(even, cCopy);
+	EXPECT_TRUE(c.empty());
+	// Merge with empty
+	even.merge(odd);
+	EXPECT_EQ(even, cCopy);
+	EXPECT_TRUE(odd.empty());
+	// Normal merge
+	even.clear();
+	for (int i = 0; i < ARRAY_TINY / 2; ++i) {
+		even.push_back(array[i * 2]);
+		odd.push_back(array[i * 2 + 1]);
+	}
+	even.merge(odd);
+	EXPECT_EQ(even, cCopy);
+	EXPECT_TRUE(odd.empty());
+}
+
+
+TYPED_TEST_P(sctListsTests, MergePredicate)
+{
+	std::greater<typename TypeParam::value_type>	greater;
+	TypeParam REF									c = this->container;
+	TypeParam										cCopy = c;
+	TypeParam										even;
+	TypeParam										odd;
+
+	// Merge from empty two empty
+	even.merge(odd, greater);
+	EXPECT_TRUE(even.empty());
+	EXPECT_TRUE(odd.empty());
+	// Merge from empty
+	even.merge(c, greater);
+	EXPECT_EQ(even, cCopy);
+	EXPECT_TRUE(c.empty());
+	// Merge with empty
+	even.merge(odd, greater);
+	EXPECT_EQ(even, cCopy);
+	EXPECT_TRUE(odd.empty());
+	// Normal merge
+	even.clear();
+	int i = 0;
+	for (typename TypeParam::reverse_iterator it = cCopy.rbegin(); it != cCopy.rend(); ++it) {
+		if (i % 2 == 0)
+			even.push_back(*it);
+		else
+			odd.push_back(*it);
+		++i;
+	}
+	even.merge(odd, greater);
+	EXPECT_TRUE(std::equal(cCopy.rbegin(), cCopy.rend(), even.begin()));
+	EXPECT_TRUE(odd.empty());
+}
+
+
+TYPED_TEST_P(sctListsTests, Sort)
+{
+	typedef typename TypeParam::value_type	value_type;
+	TypeParam								toSort;
+	intConvertor<value_type>				convert;
+
+	srand(69420);
+	for (int i = 0; i < 20000; ++i)
+		toSort.push_back(convert(rand()));
+	ASSERT_EQ(toSort.size(), typename TypeParam::size_type(20000));
+	EXPECT_FALSE(isSorted::check(toSort, std::greater<value_type>()));
+	toSort.sort();
+	EXPECT_TRUE(isSorted::check(toSort, std::greater<value_type>()));
+}
+
+
+TYPED_TEST_P(sctListsTests, SortStability)
+{
+	typedef typename TypeParam::value_type					value_type;
+	typedef std::pair<value_type, int>						stable_pair_type;
+	typedef typename ns::list<stable_pair_type>::iterator	iterator;
+
+	// Actual tests
+	ns::list<stable_pair_type>				toSort;
+	intConvertor<value_type>				convert;
+
+	srand(69420);
+	for (int i = 0; i < 20000; ++i)
+		toSort.push_back(std::make_pair(convert(rand() % 10000), i)); // so we have some duplicates
+	ASSERT_EQ(toSort.size(), typename TypeParam::size_type(20000));
+
+	EXPECT_FALSE(isSorted::check(toSort, hidden::stableGreater()));
+	toSort.sort(hidden::stableLess());
+	EXPECT_TRUE(isSorted::check(toSort, hidden::stableGreater()));
+	iterator	violation = std::adjacent_find(toSort.begin(), toSort.end(), hidden::stableCheck());
+	EXPECT_TRUE(violation == toSort.end()) << "Sort isn't stable";
+
+}
+
+
+TYPED_TEST_P(sctListsTests, Reverse)
+{
+	TypeParam REF	c = this->container;
+	TypeParam		cCopy = c;
+
+	// Normal reverse
+	c.reverse();
+	EXPECT_TRUE(std::equal(c.begin(), c.end(), cCopy.rbegin()));
+	// Reverse from empty
+	c.clear();
+	ASSERT_TRUE(c.empty());
+	c.reverse();
+	EXPECT_TRUE(c.empty());
 }
 
 
@@ -161,7 +343,12 @@ REGISTER_TYPED_TEST_CASE_P(
 	SpliceOne,
 	SpliceRange,
 	RemoveIf,
-	Unique
+	Unique,
+	Merge,
+	MergePredicate,
+	Sort,
+	SortStability, // Also test custom predicate :D
+	Reverse
 );
 
 
