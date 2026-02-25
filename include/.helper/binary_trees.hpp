@@ -80,7 +80,7 @@ struct rbt_node : rbt_node_base {
 	COMPARE_TEMPLATE 									ft::size_t			count(value_type CREF val, Compare comp) const;
 	COMPARE_TEMPLATE									this_type const*	lower_bound(value_type CREF val, Compare comp) const;
 	COMPARE_TEMPLATE									this_type const*	upper_bound(value_type CREF val, Compare comp) const;
-	COMPARE_TEMPLATE	ft::pair<this_type const*, this_type const*>		equal_range(value_type CREF val, Compare comp) const;
+	COMPARE_TEMPLATE							ft::pair<this_type const*>	equal_range(value_type CREF val, Compare comp) const;
 
 #undef COMPARE_TEMPLATE
 
@@ -104,7 +104,7 @@ struct rbt_iterator
 	typedef ft::internal::rbt_node_base	base_type;
 
 	// Constructors
-	explicit	rbt_iterator(base_type const* sentinel = NULL, node_type *node = NULL) : _current(node), _sentinel(sentinel) {}
+	explicit	rbt_iterator(base_type const* sentinel = NULL, node_type *node = NULL) : _current(node), _sentinel(sentinel) {if (!_current) _current = RBT_NODE(const_cast<base_type*>(_sentinel)); }
 				rbt_iterator(rbt_iterator<T, T REF, T*> CREF rhs) : _current(rhs._current), _sentinel(rhs._sentinel) {}
 				~rbt_iterator() {}
 
@@ -134,7 +134,7 @@ struct rbt_iterator
 		else
 			_current = RBT_NODE(_current->prevNode());
 		if (!_current)
-			_current = RBT_NODE(_sentinel);
+			_current = RBT_NODE(const_cast<base_type*>(_sentinel));
 		return *this;
 	}
 	this_type		operator -- (int) { this_type tmp = *this; operator--(); return tmp; }

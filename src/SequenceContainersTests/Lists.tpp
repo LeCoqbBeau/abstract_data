@@ -22,7 +22,7 @@ class sctListsTests : public ::testing::Test
 
 
 // Why must you look inside me, don't
-namespace hidden {
+namespace SCT {
 struct stableLess
 {
 	template <typename T>
@@ -312,10 +312,10 @@ TYPED_TEST_P(sctListsTests, SortStability)
 		toSort.push_back(std::make_pair(convert(rand() % 10000), i)); // so we have some duplicates
 	ASSERT_EQ(toSort.size(), typename TypeParam::size_type(20000));
 
-	EXPECT_FALSE(isSorted::check(toSort, hidden::stableGreater()));
-	toSort.sort(hidden::stableLess());
-	EXPECT_TRUE(isSorted::check(toSort, hidden::stableGreater()));
-	iterator	violation = std::adjacent_find(toSort.begin(), toSort.end(), hidden::stableCheck());
+	EXPECT_FALSE(isSorted::check(toSort, SCT::stableGreater()));
+	toSort.sort(SCT::stableLess());
+	EXPECT_TRUE(isSorted::check(toSort, SCT::stableGreater()));
+	iterator	violation = std::adjacent_find(toSort.begin(), toSort.end(), SCT::stableCheck());
 	EXPECT_TRUE(violation == toSort.end()) << "Sort isn't stable";
 
 }

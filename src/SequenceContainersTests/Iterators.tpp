@@ -2,8 +2,9 @@
 // Created by mscheman on 2/16/26.
 //
 
-#ifndef SEQUENCE_CONTAINERS_TESTS_ITERATORS_TPP
-#define SEQUENCE_CONTAINERS_TESTS_ITERATORS_TPP
+#ifndef SCT_ITERATORS_TPP
+#define SCT_ITERATORS_TPP
+
 
 template <typename Container>
 class sctIteratorsTests : public ::testing::Test
@@ -16,13 +17,6 @@ class sctIteratorsTests : public ::testing::Test
 
 		// Attributes
 		Container container;
-};
-
-
-template <typename T>
-struct wrapAround
-{
-	T operator() (T const* array, int const index, int const offset) { return array[static_cast<unsigned int>(index + offset) % ARRAY_TINY]; }
 };
 
 
@@ -171,4 +165,4 @@ INSTANTIATE_TYPED_TEST_CASE_P(
 );
 
 
-#endif //SEQUENCE_CONTAINERS_TESTS_ITERATORS_TPP
+#endif //SCT_ITERATORS_TPP

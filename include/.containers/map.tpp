@@ -146,10 +146,11 @@ template <typename Key, typename T, typename Comp, typename Allocator>
 typename ft::map<Key, T, Comp, Allocator>::mapped_type REF
 ft::map<Key, T, Comp, Allocator>::operator[](key_type CREF key)
 {
-	iterator elem = _tree.find(key);
+	value_type	pair(key, mapped_type());
+	iterator elem = _tree.find(pair);
 	if (elem == _tree.end())
-		elem = _tree.insert(ft::make_pair(key, mapped_type()));
-	return elem->second();
+		elem = _tree.insert(pair);
+	return elem->second;
 }
 
 
@@ -157,10 +158,10 @@ template <typename Key, typename T, typename Comp, typename Allocator>
 typename ft::map<Key, T, Comp, Allocator>::mapped_type REF
 ft::map<Key, T, Comp, Allocator>::at(key_type CREF key)
 {
-	iterator elem = _tree.find(key);
+	iterator elem = _tree.find(ft::make_pair(key, mapped_type()));
 	if (elem == _tree.end())
 		throw ft::out_of_range(MAP_AT_EXCEPTION_MSG);
-	return elem->second();
+	return elem->second;
 }
 
 
@@ -171,7 +172,7 @@ ft::map<Key, T, Comp, Allocator>::at(key_type CREF key) const
 	iterator elem = _tree.find(key);
 	if (elem == _tree.end())
 		throw ft::out_of_range(MAP_AT_EXCEPTION_MSG);
-	return elem->second();
+	return elem->second;
 }
 
 

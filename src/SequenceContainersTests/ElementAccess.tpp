@@ -21,15 +21,15 @@ class sctElementAccess : public ::testing::Test
 
 
 // Can you please not look at this thank you :3
-namespace hidden {
+namespace SCT {
 template <typename TypeParam, bool subscriptOperator>
-void sct_randomLookupTest(TypeParam CREF container);
+void randomLookupTest(TypeParam CREF container);
 template <typename TypeParam, bool subscriptOperator>
-void sct_randomModifyTest(TypeParam REF container);
+void randomModifyTest(TypeParam REF container);
 template <bool subscriptOperator>
-struct sct_randomAccessor {};
+struct randomAccessor {};
 template <>
-struct sct_randomAccessor<true>
+struct randomAccessor<true>
 {
 	template <typename TypeParam>
 	typename TypeParam::value_type REF	operator() (TypeParam REF container, unsigned int i) { return container[i]; }
@@ -37,7 +37,7 @@ struct sct_randomAccessor<true>
 	typename TypeParam::value_type CREF	operator() (TypeParam CREF container, unsigned int i) { return container[i]; }
 };
 template <>
-struct sct_randomAccessor<false>
+struct randomAccessor<false>
 {
 	template <typename TypeParam>
 	typename TypeParam::value_type REF	operator() (TypeParam REF container, unsigned int i) { return container.at(i); }
@@ -45,22 +45,22 @@ struct sct_randomAccessor<false>
 	typename TypeParam::value_type CREF	operator() (TypeParam CREF container, unsigned int i) { return container.at(i); }
 };
 template <typename T, bool subscriptOperator>
-struct sct_randomLookup
+struct randomLookup
 {
-	void operator()(T CREF container) const { hidden::sct_randomLookupTest<T, subscriptOperator>(container); }
+	void operator()(T CREF container) const { SCT::randomLookupTest<T, subscriptOperator>(container); }
 };
 template <typename T, bool subscriptOperator>
-struct sct_randomLookup<ns::list<T>, subscriptOperator>
+struct randomLookup<ns::list<T>, subscriptOperator>
 {
 	void operator()(ns::list<T> CREF) const { return SUCCEED(); }
 };
 template <typename T, bool subscriptOperator>
-struct sct_randomModify
+struct randomModify
 {
-	void operator()(T REF container) const { hidden::sct_randomModifyTest<T, subscriptOperator>(container); }
+	void operator()(T REF container) const { SCT::randomModifyTest<T, subscriptOperator>(container); }
 };
 template <typename T, bool subscriptOperator>
-struct sct_randomModify<ns::list<T>, subscriptOperator>
+struct randomModify<ns::list<T>, subscriptOperator>
 {
 	void operator()(ns::list<T> REF) const { return SUCCEED(); }
 };
@@ -69,9 +69,9 @@ struct sct_randomModify<ns::list<T>, subscriptOperator>
 
 
 template <typename TypeParam, bool subscriptOperator>
-void hidden::sct_randomLookupTest(TypeParam CREF container)
+void SCT::randomLookupTest(TypeParam CREF container)
 {
-	hidden::sct_randomAccessor<subscriptOperator> accessor;
+	SCT::randomAccessor<subscriptOperator> accessor;
 	arrayGenerator<typename TypeParam::value_type> array;
 
 	for (int i = 0; i < ARRAY_TINY; ++i)
@@ -83,11 +83,11 @@ void hidden::sct_randomLookupTest(TypeParam CREF container)
 
 
 template <typename TypeParam, bool subscriptOperator>
-void hidden::sct_randomModifyTest(TypeParam REF container)
+void SCT::randomModifyTest(TypeParam REF container)
 {
 	typedef typename TypeParam::value_type		value_type;
 	typedef typename TypeParam::const_iterator	const_iterator;
-	hidden::sct_randomAccessor<subscriptOperator>	accessor;
+	SCT::randomAccessor<subscriptOperator>	accessor;
 	arrayGenerator<value_type>				array;
 	wrapAround<value_type>					wrap;
 
@@ -106,8 +106,8 @@ TYPED_TEST_CASE_P(sctElementAccess);
 
 TYPED_TEST_P(sctElementAccess, SubscriptOperator)
 {
-	hidden::sct_randomLookup<TypeParam, true> testLookup;
-	hidden::sct_randomModify<TypeParam, true> testModification;
+	SCT::randomLookup<TypeParam, true> testLookup;
+	SCT::randomModify<TypeParam, true> testModification;
 
 	testLookup(this->container);
 	testModification(this->container);
@@ -116,8 +116,8 @@ TYPED_TEST_P(sctElementAccess, SubscriptOperator)
 
 TYPED_TEST_P(sctElementAccess, At)
 {
-	hidden::sct_randomLookup<TypeParam, false> testLookup;
-	hidden::sct_randomModify<TypeParam, false> testModification;
+	SCT::randomLookup<TypeParam, false> testLookup;
+	SCT::randomModify<TypeParam, false> testModification;
 
 	testLookup(this->container);
 	testModification(this->container);

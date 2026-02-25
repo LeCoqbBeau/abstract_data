@@ -9,7 +9,6 @@
 #include ".helper/binary_trees.hpp"
 
 # define MAP_AT_EXCEPTION_MSG ("map::at(): no such key")
-# define MULTIMAP_AT_EXCEPTION_MSG ("multimap::at(): no such key")
 
 namespace ft {
 
@@ -213,7 +212,6 @@ MAPS_COMPARISON_OPERATOR(>=, { return !(lhs < rhs); });
 
 
 #undef MAP_AT_EXCEPTION_MSG
-#undef MULTIMAP_AT_EXCEPTION_MSG
 
 
 #endif //MAP_HPP

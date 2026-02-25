@@ -20,30 +20,28 @@ class sctModifiersTests : public ::testing::Test
 };
 
 // Can you please not look at this thank you :3
-namespace hidden {
+namespace SCT {
 template <typename TypeParam>
-void sct_pushFrontTest(TypeParam REF container);
+void pushFrontTest(TypeParam REF container);
 template <typename TypeParam>
-void sct_popFrontTest(TypeParam REF container);
+void popFrontTest(TypeParam REF container);
 template <typename TypeParam>
-struct sct_hasPushFront
+struct hasPushFront
 {
-	void operator() (TypeParam REF container) { sct_pushFrontTest(container); }
+	void operator() (TypeParam REF container) { pushFrontTest(container); }
 };
 template <typename value_type>
-struct sct_hasPushFront<ns::vector<value_type> >
+struct hasPushFront<ns::vector<value_type> >
 {
 	void operator() (ns::vector<value_type> REF) { SUCCEED(); }
 };
 template <typename TypeParam>
-void sct_popFrontTest(TypeParam REF container);
-template <typename TypeParam>
-struct sct_hasPopFront
+struct hasPopFront
 {
-	void operator() (TypeParam REF container) { sct_popFrontTest(container); }
+	void operator() (TypeParam REF container) { popFrontTest(container); }
 };
 template <typename value_type>
-struct sct_hasPopFront<ns::vector<value_type> >
+struct hasPopFront<ns::vector<value_type> >
 {
 	void operator() (ns::vector<value_type> REF) { SUCCEED(); }
 };
@@ -53,7 +51,7 @@ struct sct_hasPopFront<ns::vector<value_type> >
 
 template <typename TypeParam>
 void
-hidden::sct_pushFrontTest(TypeParam REF container)
+SCT::pushFrontTest(TypeParam REF container)
 {
 	typedef typename TypeParam::value_type	value_type;
 	arrayGenerator<value_type>				array;
@@ -68,7 +66,7 @@ hidden::sct_pushFrontTest(TypeParam REF container)
 
 template <typename TypeParam>
 void
-hidden::sct_popFrontTest(TypeParam REF container)
+SCT::popFrontTest(TypeParam REF container)
 {
 	typedef typename TypeParam::value_type	value_type;
 	arrayGenerator<value_type>				array;
@@ -129,7 +127,7 @@ TYPED_TEST_P(sctModifiersTests, PushBack)
 
 TYPED_TEST_P(sctModifiersTests, PushFront)
 {
-	hidden::sct_hasPushFront<TypeParam>	tester;
+	SCT::hasPushFront<TypeParam>	tester;
 
 	tester(this->container);
 }
@@ -148,7 +146,7 @@ TYPED_TEST_P(sctModifiersTests, PopBack)
 
 TYPED_TEST_P(sctModifiersTests, PopFront)
 {
-	hidden::sct_hasPopFront<TypeParam>	tester;
+	SCT::hasPopFront<TypeParam>	tester;
 
 	tester(this->container);
 }

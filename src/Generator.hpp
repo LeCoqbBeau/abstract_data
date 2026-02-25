@@ -133,4 +133,12 @@ struct intConvertor<Fat>
 };
 
 
+template <typename T>
+struct wrapAround
+{
+	T operator() (T const* array, int const index, int const offset) { return array[static_cast<unsigned int>(index + offset) % ARRAY_TINY]; }
+};
+
+
+
 #endif //GENERATOR_HPP

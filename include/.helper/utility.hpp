@@ -9,7 +9,7 @@
 
 namespace ft {
 
-template <class T1, class T2 = T1>
+template <class T1, class T2 = typename ft::remove_cvref<T1>::type>
 struct pair {
 	// Typedefs
 	typedef T1	first_type;

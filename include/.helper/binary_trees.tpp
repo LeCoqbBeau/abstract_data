@@ -5,9 +5,6 @@
 #ifndef BINARY_TREES_TPP
 #define BINARY_TREES_TPP
 
-#ifndef BINARY_TREES_HPP
-# include "binary_trees.hpp"
-#endif
 
 #include "ftexcept.hpp"
 #include "new.hpp"
