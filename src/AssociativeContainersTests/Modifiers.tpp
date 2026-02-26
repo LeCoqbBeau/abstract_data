@@ -87,6 +87,7 @@ TYPED_TEST_CASE_P(actModifiersTests);
 
 TYPED_TEST_P(actModifiersTests, InsertSingle)
 {
+	typedef typename TypeParam::size_type		size_type;
 	typedef typename TypeParam::value_type		value_type;
 	typedef typename TypeParam::iterator		iterator;
 	typedef CONDITIONAL_TT(
@@ -95,36 +96,80 @@ TYPED_TEST_P(actModifiersTests, InsertSingle)
 		ns::pair<iterator FT_COMMA bool>
 	)											return_type;
 
-	arrayGenerator<value_type>			array;
-	ACT::insertReturnCheck<TypeParam>	checker;
-	ACT::getValue<value_type>			getter;
-	TypeParam	REF 					c = this->container;
-	return_type							ret;
+	arrayGenerator<value_type>					array;
+	ACT::insertReturnCheck<TypeParam>			checker = {};
+	ACT::getValue<value_type>					getter;
+	TypeParam	REF 							c = this->container;
+	return_type									ret;
 
 	// Successful insert (no duplicate)
 	ret = c.insert(array[ARRAY_TINY]);
 	checker.toComp = getter(array[ARRAY_TINY]);
 	checker.wasInserted = true;
 	checker(ret);
-
-	// if (allowsDuplicate)
-	// 	EXPECT_EQ(hidden::actGetValue<value_type>()(*ret), hidden::actGetValue<value_type>()(array[ARRAY_TINY - 1]));
-	// else {
-	// 	EXPECT_EQ(hidden::actGetValue<value_type>()(*ret.first), hidden::actGetValue<value_type>()(array[ARRAY_TINY - 1]));
-	// 	EXPECT_EQ(ret.second, true);
-	// }
+	EXPECT_EQ(c.size(), size_type(11));
+	EXPECT_TRUE(std::equal(array(), array() + ARRAY_TINY + 1, c.begin()));
+	// Failed insert (duplicate)
+	ret = c.insert(array[ARRAY_TINY]);
+	checker.toComp = getter(array[ARRAY_TINY]);
+	checker.wasInserted = false;
+	checker(ret);
+	EXPECT_TRUE(std::equal(array(), array() + ARRAY_TINY + 1, c.begin()));
+	if (ACT::allowsDuplicate<TypeParam>::value) {
+		EXPECT_EQ(*std::next(c.end(), -1), array[ARRAY_TINY]);
+		EXPECT_EQ(*std::next(c.end(), -2), array[ARRAY_TINY]);
+		EXPECT_EQ(c.size(), size_type(12));
+	}
+	else
+		EXPECT_EQ(c.size(), size_type(11));
 }
 
 
 TYPED_TEST_P(actModifiersTests, InsertHint)
 {
+	typedef typename TypeParam::size_type		size_type;
+	typedef typename TypeParam::value_type		value_type;
+	typedef typename TypeParam::iterator		iterator;
 
+	arrayGenerator<value_type>					array;
+	ACT::getValue<value_type>					getter;
+	TypeParam	REF 							c = this->container;
+	iterator									ret;
+
+	// Successful insert (no duplicate)
+	iterator hint = c.end();
+	ret = c.insert(hint, array[ARRAY_TINY]);
+	EXPECT_EQ(getter(*ret), getter(array[ARRAY_TINY]));
+	EXPECT_TRUE(std::equal(array(), array() + ARRAY_TINY + 1, c.begin()));
+	EXPECT_EQ(c.size(), size_type(11));
+	// Failure insert (no duplicate)
+	ret = c.insert(hint, array[ARRAY_TINY]);
+	EXPECT_EQ(getter(*ret), getter(array[ARRAY_TINY]));
+	EXPECT_TRUE(std::equal(array(), array() + ARRAY_TINY + 1, c.begin()));
+	if (ACT::allowsDuplicate<TypeParam>::value) {
+		EXPECT_EQ(*std::next(c.end(), -1), array[ARRAY_TINY]);
+		EXPECT_EQ(*std::next(c.end(), -2), array[ARRAY_TINY]);
+		EXPECT_EQ(c.size(), size_type(12));
+	}
+	else
+		EXPECT_EQ(c.size(), size_type(11));
 }
 
 
 TYPED_TEST_P(actModifiersTests, InsertRange)
 {
+	typedef typename TypeParam::size_type		size_type;
+	typedef typename TypeParam::value_type		value_type;
+	typedef typename TypeParam::iterator		iterator;
 
+	arrayGenerator<value_type>					array;
+	ACT::getValue<value_type>					getter;
+	TypeParam	REF 							c = this->container;
+	iterator									ret;
+
+	// Insert Range of duplicates
+	std::vector<value_type>						range(10, array[0]);
+	
 }
 
 

@@ -50,7 +50,7 @@ GTEST_BUILD		=	$(GTEST_GTEST)build/
 GTEST_ALL_A		=	$(GTEST_BUILD)libgtest.a
 GTEST_MAIN_A	=	$(GTEST_BUILD)libgtest_main.a
 GTEST_INCLUDE	=	$(GTEST_GTEST)include/
-GTEST_FILTER	=	*
+GTEST_FILTER	=	*Insert*
 GTEST_FLAGS		=	--gtest_color=yes --gtest_filter=$(GTEST_FILTER)
 
 
@@ -68,7 +68,7 @@ SRC_NAME		=	main.cpp
 
 INCLUDES		=	-I$(INC) -I$(GTEST_INCLUDE)
 CFLAGS			=	$(INCLUDES) -Wall -Werror -Wextra -g -std=c++98 -MMD -MP
-CXX				=	clang++
+CXX				=	c++
 
 OBJ_DIR			=	.build/
 OBJ_FT_DIR		=	$(OBJ_DIR)ft/

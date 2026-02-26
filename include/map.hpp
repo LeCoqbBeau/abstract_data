@@ -133,10 +133,10 @@ class multimap
 		typedef	typename rbt_type::size_type							size_type;
 
 		// Constructors
-		explicit					multimap(key_compare CREF comp = key_compare(), allocator_type CREF allocator = allocator_type());
-		template <typename InputIt>	multimap(InputIt first, InputIt last, key_compare CREF comp = key_compare(), allocator_type CREF allocator = allocator_type());
-									multimap(multimap CREF rhs);
-		multimap REF		operator=(multimap CREF rhs);
+		explicit							multimap(key_compare CREF comp = key_compare(), allocator_type CREF allocator = allocator_type());
+		template <typename InputIt>			multimap(InputIt first, InputIt last, key_compare CREF comp = key_compare(), allocator_type CREF allocator = allocator_type());
+											multimap(multimap CREF rhs);
+		multimap REF			operator	=(multimap CREF rhs);
 		~multimap();
 
 		// Iterators

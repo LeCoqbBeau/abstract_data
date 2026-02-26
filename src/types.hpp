@@ -6,7 +6,7 @@
 #define TYPES_HPP
 
 
-typedef std::string	str;
+#include "NumStrings.hpp"
 #include "Fat.hpp"
 
 

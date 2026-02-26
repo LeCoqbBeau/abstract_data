@@ -196,8 +196,9 @@ typename ft::map<Key, T, Comp, Allocator>::iterator
 ft::map<Key, T, Comp, Allocator>::insert(iterator position, value_type CREF val)
 {
 	(void)position;
-	if (_tree.find(val) == _tree.end())
-		return ;
+	iterator pos = _tree.find(val);
+	if (pos != _tree.end())
+		return pos;
 	return _tree.insert(val);
 }
 
@@ -240,7 +241,7 @@ void
 ft::map<Key, T, Comp, Allocator>::erase(iterator first, iterator last)
 {
 	while (first != last) {
-		iterator next = ++first;
+		iterator next = first + 1;
 		_tree._fastErase(*first);
 		first = next;
 	}

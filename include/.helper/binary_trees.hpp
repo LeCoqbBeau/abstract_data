@@ -155,33 +155,33 @@ template <
 struct rbt {
 	public:
 		// Base Typedefs
-		typedef T												key_type;
-		typedef T												value_type;
-		typedef Comp											key_compare;
-		typedef Comp											value_compare;
-		typedef Allocator										allocator_type;
-		typedef value_type REF									reference;
-		typedef value_type CREF									const_reference;
-		typedef typename allocator_type::pointer				pointer;
-		typedef typename allocator_type::const_pointer			const_pointer;
+		typedef T														key_type;
+		typedef T														value_type;
+		typedef Comp													key_compare;
+		typedef Comp													value_compare;
+		typedef Allocator												allocator_type;
+		typedef value_type REF											reference;
+		typedef value_type CREF											const_reference;
+		typedef typename allocator_type::pointer						pointer;
+		typedef typename allocator_type::const_pointer					const_pointer;
 
 		typedef rbt_iterator<T,
 			CONDITIONAL_TT(mutableIterators, T REF, T CREF),
 			CONDITIONAL_TT(mutableIterators, T *, T const*)
-		>														iterator;
-		typedef rbt_iterator<T, T CREF, T const*>				const_iterator;
-		typedef ft::reverse_iterator<iterator>					reverse_iterator;
-		typedef ft::reverse_iterator<const_iterator>			const_reverse_iterator;
-		typedef ft::ptrdiff_t									difference_type;
-		typedef ft::size_t										size_type;
+		>																iterator;
+		typedef rbt_iterator<T, T CREF, T const*>						const_iterator;
+		typedef ft::reverse_iterator<iterator>							reverse_iterator;
+		typedef ft::reverse_iterator<const_iterator>					const_reverse_iterator;
+		typedef ft::ptrdiff_t											difference_type;
+		typedef ft::size_t												size_type;
 
 		// Inherited typedefs wrapper
-		typedef rbt<T, Comp, Allocator>							this_type;
-		typedef rbt_node<T>										node_type;
-		typedef rbt_node_base									base_type;
-		typedef base_type::color_type							color_type;
-		typedef base_type::side_type							side_type;
-		typedef typename node_type::remove_result				remove_result;
+		typedef rbt<T, Comp, Allocator, extractKey, mutableIterators>	this_type;
+		typedef rbt_node<T>												node_type;
+		typedef rbt_node_base											base_type;
+		typedef base_type::color_type									color_type;
+		typedef base_type::side_type									side_type;
+		typedef typename node_type::remove_result						remove_result;
 
 		// Constructors
 		rbt(key_compare CREF comp = key_compare(), allocator_type CREF alloc = allocator_type())

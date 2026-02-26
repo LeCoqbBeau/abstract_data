@@ -405,6 +405,7 @@ ft::internal::rbt<T, Comp, Allocator, extractKey, mutableIterators>::swap(this_t
 {
 	ft::swap(this->_root, other._root);
 	ft::swap(this->_sentinel, other._sentinel);
+	ft::swap(this->_size, other._size);
 }
 
 
