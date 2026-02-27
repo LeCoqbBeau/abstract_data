@@ -75,7 +75,7 @@ class map
 		iterator							insert(iterator position, value_type CREF val);
 		template <typename InputIt> void	insert(InputIt first, InputIt last);
 		void								erase(iterator position);
-		size_type							erase(value_type CREF val);
+		size_type							erase(key_type CREF key);
 		void								erase(iterator first, iterator last);
 		void								swap(map REF other);
 		void								clear();
@@ -159,7 +159,7 @@ class multimap
 		iterator							insert(iterator position, value_type CREF val);
 		template <typename InputIt> void	insert(InputIt first, InputIt last);
 		void								erase(iterator position);
-		size_type							erase(value_type CREF val);
+		size_type							erase(key_type CREF key);
 		void								erase(iterator first, iterator last);
 		void								swap(multimap REF other);
 		void								clear();

@@ -225,11 +225,11 @@ ft::map<Key, T, Comp, Allocator>::erase(iterator position)
 
 template <typename Key, typename T, typename Comp, typename Allocator>
 typename ft::map<Key, T, Comp, Allocator>::size_type
-ft::map<Key, T, Comp, Allocator>::erase(value_type CREF val)
+ft::map<Key, T, Comp, Allocator>::erase(key_type CREF key)
 {
 	typedef typename rbt_type::remove_result	remove_result;
 
-	remove_result result = _tree.erase(val);
+	remove_result result = _tree.erase(ft::make_pair(key, mapped_type()));
 	if (result.parentNode == result.replacementNode && result.parentNode == &_tree._sentinel)
 		return 0;
 	return 1;
@@ -241,8 +241,9 @@ void
 ft::map<Key, T, Comp, Allocator>::erase(iterator first, iterator last)
 {
 	while (first != last) {
-		iterator next = first + 1;
-		_tree._fastErase(*first);
+		iterator next = first;
+		++next;
+		_tree._fastErase(first._current);
 		first = next;
 	}
 }
@@ -515,17 +516,18 @@ ft::multimap<Key, T, Comp, Allocator>::erase(iterator position)
 
 template <typename Key, typename T, typename Comp, typename Allocator>
 typename ft::multimap<Key, T, Comp, Allocator>::size_type
-ft::multimap<Key, T, Comp, Allocator>::erase(value_type CREF val)
+ft::multimap<Key, T, Comp, Allocator>::erase(key_type CREF key)
 {
 	typedef typename rbt_type::remove_result	remove_result;
 
-	size_type	count = -1;
-	remove_result result;
+	size_type		count = -1;
+	remove_result	result;
+	value_type		pair(key, mapped_type());
 	do {
-		result = _tree.erase(val);
+		result = _tree.erase(pair);
 		++count;
 	}
-	while (result.parentNode == result.replacementNode && result.parentNode == &_tree._sentinel);
+	while (!(result.parentNode == result.replacementNode && result.parentNode == &_tree._sentinel));
 	return count;
 }
 
@@ -535,8 +537,9 @@ void
 ft::multimap<Key, T, Comp, Allocator>::erase(iterator first, iterator last)
 {
 	while (first != last) {
-		iterator next = ++first;
-		_tree._fastErase(*first);
+		iterator next = first;
+		++next;
+		_tree._fastErase(first._current);
 		first = next;
 	}
 }

@@ -165,7 +165,7 @@ ft::internal::rbt_node<T>::erase(Allocator allocator, FreeFunc free)
 		result = noChildRemove(this);
 	else if (left() && right())
 		result = twoChildrenRemove(this);
-	else // if (left() || right())
+	else
 		result = oneChildRemove(this);
 	free(allocator, this);
 	return result;
@@ -392,7 +392,7 @@ template <typename T, typename Comp, typename Allocator, typename extractKey, bo
 typename ft::internal::rbt<T, Comp, Allocator, extractKey, mutableIterators>::remove_result
 ft::internal::rbt<T, Comp, Allocator, extractKey, mutableIterators>::erase(value_type CREF val)
 {
-	node_type	*toRemove = find(val);
+	node_type	*toRemove = find(val)._current;
 	if (toRemove == &_sentinel)
 		return remove_result(toRemove, toRemove, toRemove->color);
 	return _fastErase(toRemove);
@@ -574,9 +574,9 @@ ft::internal::rbt<T, Comp, Allocator, extractKey, mutableIterators>::_fastErase(
 
 	// Pre-fix the _sentinel
 	if (toRemove == _sentinel.left())
-		_sentinel.left() = _sentinel.left()->parent;
+		_sentinel.left() = _sentinel.left()->nextNode();
 	else if (toRemove == _sentinel.right())
-		_sentinel.right() = _sentinel.right()->parent;
+		_sentinel.right() = _sentinel.right()->prevNode();
 	if (toRemove == _root && !_root->left() && !_root->right())
 		_sentinel.left() = _sentinel.right() = NULL;
 	// Actually remove the node
@@ -704,7 +704,7 @@ static
 typename ft::internal::rbt_node<T>::remove_result
 oneChildRemove(ft::internal::rbt_node<T>* node)
 {
-	typedef ft::internal::rbt_node<T>		node_type;
+	typedef ft::internal::rbt_node<T>			node_type;
 	typedef typename node_type::remove_result	remove_result;
 
 	remove_result result(NULL, NULL, node->color);
@@ -723,7 +723,7 @@ static
 typename ft::internal::rbt_node<T>::remove_result
 twoChildrenRemove(ft::internal::rbt_node<T>* node)
 {
-	typedef ft::internal::rbt_node<T>		node_type;
+	typedef ft::internal::rbt_node<T>			node_type;
 	typedef typename node_type::side_type		side_type;
 	typedef typename node_type::remove_result	remove_result;
 

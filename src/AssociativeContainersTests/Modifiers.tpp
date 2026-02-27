@@ -168,25 +168,134 @@ TYPED_TEST_P(actModifiersTests, InsertRange)
 	iterator									ret;
 
 	// Insert Range of duplicates
-	std::vector<value_type>						range(10, array[0]);
-	
+	std::vector<value_type>						range(10, array[ARRAY_TINY]);
+	c.insert(range.begin(), range.end());
+	if (ACT::allowsDuplicate<TypeParam>::value)
+		EXPECT_EQ(c.size(), size_type(20));
+	else
+		EXPECT_EQ(c.size(), size_type(11));
+	// Insert nothing but duplicates
+	c.insert(range.begin(), range.end());
+	if (ACT::allowsDuplicate<TypeParam>::value)
+		EXPECT_EQ(c.size(), size_type(30));
+	else
+		EXPECT_EQ(c.size(), size_type(11));
+	// Insert valid range of numbers
+	std::vector<value_type> secondRange(array() + ARRAY_TINY + 1, array() + ARRAY_SMOL);
+	c.insert(secondRange.begin(), secondRange.end());
+	if (ACT::allowsDuplicate<TypeParam>::value) {
+		EXPECT_EQ(c.size(), size_type(69));
+		iterator it = c.begin();
+		for (int i = 0; i < ARRAY_TINY; ++i, ++it)
+			EXPECT_EQ(getter(*it), getter(array[i]));
+		for (int i = 0; i < 20; ++i, ++it)
+			EXPECT_EQ(getter(*it), getter(array[ARRAY_TINY]));
+		for (int i = ARRAY_TINY + 1; i < ARRAY_SMOL; ++i, ++it)
+			EXPECT_EQ(getter(*it), getter(array[i]));
+	}
+	else {
+		EXPECT_EQ(c.size(), size_type(50));
+		EXPECT_TRUE(std::equal(array(), array() + ARRAY_SMOL, c.begin()));
+	}
 }
 
 
 TYPED_TEST_P(actModifiersTests, ErasePos)
 {
+	typedef typename TypeParam::size_type		size_type;
+	typedef typename TypeParam::value_type		value_type;
 
+	arrayGenerator<value_type>					array;
+	TypeParam	REF 							c = this->container;
+
+	// Erase from begin
+	c.erase(c.begin());
+	EXPECT_EQ(c.size(), size_type(9));
+	EXPECT_EQ(c, TypeParam(array() + 1, array() + ARRAY_TINY));
+	// Erase from end
+	c.erase(std::next(c.end(), -1));
+	EXPECT_EQ(c.size(), size_type(8));
+	EXPECT_EQ(c, TypeParam(array() + 1, array() + ARRAY_TINY - 1));
+	// Erase from middle
+	c.erase(std::next(c.begin(), 4));
+	EXPECT_EQ(c.size(), size_type(7));
+	EXPECT_TRUE(std::equal(array() + 1, array() + 4, c.begin()));
+	EXPECT_TRUE(std::equal(array() + 6, array() + ARRAY_TINY - 1, std::next(c.begin(), 4)));
 }
 
 
 TYPED_TEST_P(actModifiersTests, EraseKey)
 {
+	typedef typename TypeParam::size_type		size_type;
+	typedef typename TypeParam::value_type		value_type;
+	typedef typename TypeParam::key_type		key_type;
 
+	arrayGenerator<value_type>					array;
+	arrayGenerator<key_type>					keyArray;
+	TypeParam	REF 							c = this->container;
+	size_type									ret;
+
+	// Erase valid key
+	ret = c.erase(keyArray[0]);
+	EXPECT_EQ(c.size(), size_type(9));
+	EXPECT_EQ(ret, size_type(1));
+	EXPECT_EQ(c, TypeParam(array() + 1, array() + ARRAY_TINY));
+	// Erase invalid key
+	ret = c.erase(keyArray[0]);
+	EXPECT_EQ(c.size(), size_type(9));
+	EXPECT_EQ(ret, size_type(0));
+	EXPECT_EQ(c, TypeParam(array() + 1, array() + ARRAY_TINY));
+	if (!ACT::allowsDuplicate<TypeParam>::value)
+		return ;
+	// Remove multiple key
+	for (int i = 0; i < 10; ++i)
+		c.insert(array[0]);
+	ret = c.erase(keyArray[0]);
+	EXPECT_EQ(ret, size_type(10));
+	EXPECT_EQ(c, TypeParam(array() + 1, array() + ARRAY_TINY));
 }
 
 
 TYPED_TEST_P(actModifiersTests, EraseRange)
 {
+	typedef typename TypeParam::size_type		size_type;
+	typedef typename TypeParam::value_type		value_type;
+
+	arrayGenerator<value_type>					array;
+	TypeParam	REF 							c = this->container;
+	TypeParam		 							cCopy = c;
+
+	// // Erase Single from begin
+	// c.erase(c.begin(), std::next(c.begin()));
+	// EXPECT_EQ(c.size(), size_type(9));
+	// EXPECT_EQ(c, TypeParam(array() + 1, array() + ARRAY_TINY));
+	// // Erase Single from end
+	// c.erase(std::next(c.end(), -1), c.end());
+	// EXPECT_EQ(c.size(), size_type(8));
+	// EXPECT_EQ(c, TypeParam(array() + 1, array() + ARRAY_TINY - 1));
+	// // Erase Single from middle
+	// c.erase(std::next(c.begin(), 4), std::next(c.begin(), 5));
+	// EXPECT_EQ(c.size(), size_type(7));
+	// EXPECT_TRUE(std::equal(array() + 1, array() + 4, c.begin()));
+	// EXPECT_TRUE(std::equal(array() + 6, array() + ARRAY_TINY - 1, std::next(c.begin(), 4)));
+
+	// Multiple erases
+	c = cCopy;
+
+	// Erase from begin
+	c.erase(c.begin(), std::next(c.begin(), 2));
+	EXPECT_EQ(c.size(), size_type(8));
+	EXPECT_EQ(c, TypeParam(array() + 2, array() + ARRAY_TINY));
+	// Erase from end
+	c.erase(std::next(c.end(), -2), c.end());
+	EXPECT_EQ(c.size(), size_type(6));
+	EXPECT_EQ(c, TypeParam(array() + 2, array() + ARRAY_TINY - 2));
+	// Erase from middle
+	c.erase(std::next(c.begin(), 2), std::next(c.begin(), 4));
+	EXPECT_EQ(c.size(), size_type(4));
+	EXPECT_TRUE(std::equal(array() + 2, array() + 4, c.begin()));
+	EXPECT_TRUE(std::equal(array() + 6, array() + ARRAY_TINY - 2, std::next(c.begin(), 2)));
+
 
 }
 

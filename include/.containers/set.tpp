@@ -206,8 +206,9 @@ void
 ft::set<T, Comp, Allocator>::erase(iterator first, iterator last)
 {
 	while (first != last) {
-		iterator next = ++first;
-		_tree._fastErase(*first);
+		iterator next = first;
+		++next;
+		_tree._fastErase(first._current);
 		first = next;
 	}
 }
@@ -482,7 +483,7 @@ ft::multiset<T, Comp, Allocator>::erase(value_type CREF val)
 		result = _tree.erase(val);
 		++count;
 	}
-	while (result.parentNode == result.replacementNode && result.parentNode == &_tree._sentinel);
+	while (!(result.parentNode == result.replacementNode && result.parentNode == &_tree._sentinel));
 	return count;
 }
 
@@ -492,8 +493,9 @@ void
 ft::multiset<T, Comp, Allocator>::erase(iterator first, iterator last)
 {
 	while (first != last) {
-		iterator next = ++first;
-		_tree._fastErase(*first);
+		iterator next = first;
+		++next;
+		_tree._fastErase(first._current);
 		first = next;
 	}
 }

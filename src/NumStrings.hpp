@@ -11,6 +11,7 @@ struct NumStrings : public std::string
 	NumStrings()					{}
 	NumStrings(char const* s)		: std::string(s) {}
 	NumStrings(std::string CREF s)	: std::string(s) {}
+	NumStrings REF operator = (NumStrings CREF s) { if (this != &s) this->std::string::operator=(s); return *this; }
 };
 
 

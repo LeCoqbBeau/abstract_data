@@ -44,6 +44,23 @@ ForwardIt next(ForwardIt it, typename std::iterator_traits<ForwardIt>::differenc
 // Okay look again :D
 
 
+template <typename T, typename U>
+std::ostream REF operator << (std::ostream REF os, std::pair<T, U> CREF pair)
+{
+	os << "< " << pair.first << " -=- " << pair.second << " >";
+	return os;
+}
+
+
+template <typename TypeParam>
+void printContainer(TypeParam c, std::ostream REF os)
+{
+	for (typename TypeParam::iterator it = c.begin(); it != c.end(); ++it)
+		os << *it << " > ";
+	os << std::endl;
+}
+
+
 #include "types.hpp"
 #include "Generator.hpp"
 #include "HelperFunctors.hpp"
