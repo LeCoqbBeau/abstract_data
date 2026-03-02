@@ -10,6 +10,18 @@
 namespace ft {
 
 
+template <class T, class Container>
+class stack;
+
+
+template <class T, class Container>	bool operator==(stack<T, Container> CREF lhs, stack<T, Container> CREF rhs);
+template <class T, class Container>	bool operator!=(stack<T, Container> CREF lhs, stack<T, Container> CREF rhs);
+template <class T, class Container>	bool operator< (stack<T, Container> CREF lhs, stack<T, Container> CREF rhs);
+template <class T, class Container>	bool operator<=(stack<T, Container> CREF lhs, stack<T, Container> CREF rhs);
+template <class T, class Container>	bool operator> (stack<T, Container> CREF lhs, stack<T, Container> CREF rhs);
+template <class T, class Container>	bool operator>=(stack<T, Container> CREF lhs, stack<T, Container> CREF rhs);
+
+
 template <class T, class Container = ft::deque<T> >
 class stack {
 	public:
@@ -25,16 +37,23 @@ class stack {
 		~stack() {}
 
 		// Element Access
-		reference		top()						{ return c.back(); }
 		const_reference	top() const					{ return c.back(); }
 
 		// Capacity
 		bool			empty() const				{ return c.empty(); }
-		bool			size() const				{ return c.size(); }
+		size_type		size() const				{ return c.size(); }
 
 		// Modifiers
 		void			push(value_type CREF value)	{ c.push_back(value); }
 		void			pop()						{ c.pop_back(); }
+
+		// Friends :D
+		friend bool operator== <>(stack<T, Container> CREF lhs, stack<T, Container> CREF rhs);
+		friend bool operator!= <>(stack<T, Container> CREF lhs, stack<T, Container> CREF rhs);
+		friend bool operator<  <>(stack<T, Container> CREF lhs, stack<T, Container> CREF rhs);
+		friend bool operator<= <>(stack<T, Container> CREF lhs, stack<T, Container> CREF rhs);
+		friend bool operator>  <>(stack<T, Container> CREF lhs, stack<T, Container> CREF rhs);
+		friend bool operator>= <>(stack<T, Container> CREF lhs, stack<T, Container> CREF rhs);
 
 	protected:
 		container_type	c;

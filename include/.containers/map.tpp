@@ -285,49 +285,79 @@ ft::map<Key, T, Comp, Allocator>::value_comp() const
 // Operations
 template <typename Key, typename T, typename Comp, typename Allocator>
 typename ft::map<Key, T, Comp, Allocator>::iterator
-ft::map<Key, T, Comp, Allocator>::find(value_type CREF val)
+ft::map<Key, T, Comp, Allocator>::find(key_type CREF key)
 {
-	return _tree.find(val);
+	return _tree.find(_toValue(key));
 }
 
 
 template <typename Key, typename T, typename Comp, typename Allocator>
 typename ft::map<Key, T, Comp, Allocator>::const_iterator
-ft::map<Key, T, Comp, Allocator>::find(value_type CREF val) const
+ft::map<Key, T, Comp, Allocator>::find(key_type CREF key) const
 {
-	return _tree.find(val);
+	return _tree.find(_toValue(key));
 }
 
 
 template <typename Key, typename T, typename Comp, typename Allocator>
 typename ft::map<Key, T, Comp, Allocator>::size_type
-ft::map<Key, T, Comp, Allocator>::count(value_type CREF val) const
+ft::map<Key, T, Comp, Allocator>::count(key_type CREF key) const
 {
-	return _tree.count(val);
+	return _tree.count(_toValue(key));
 }
 
 
 template <typename Key, typename T, typename Comp, typename Allocator>
 typename ft::map<Key, T, Comp, Allocator>::iterator
-ft::map<Key, T, Comp, Allocator>::lower_bound(value_type CREF val) const
+ft::map<Key, T, Comp, Allocator>::lower_bound(key_type CREF key)
 {
-	return _tree.lower_bound(val);
+	return _tree.lower_bound(_toValue(key));
+}
+
+
+template <typename Key, typename T, typename Comp, typename Allocator>
+typename ft::map<Key, T, Comp, Allocator>::const_iterator
+ft::map<Key, T, Comp, Allocator>::lower_bound(key_type CREF key) const
+{
+	return _tree.lower_bound(_toValue(key));
 }
 
 
 template <typename Key, typename T, typename Comp, typename Allocator>
 typename ft::map<Key, T, Comp, Allocator>::iterator
-ft::map<Key, T, Comp, Allocator>::upper_bound(value_type CREF val) const
+ft::map<Key, T, Comp, Allocator>::upper_bound(key_type CREF key)
 {
-	return _tree.upper_bound(val);
+	return _tree.upper_bound(_toValue(key));
+}
+
+
+template <typename Key, typename T, typename Comp, typename Allocator>
+typename ft::map<Key, T, Comp, Allocator>::const_iterator
+ft::map<Key, T, Comp, Allocator>::upper_bound(key_type CREF key) const
+{
+	return _tree.upper_bound(_toValue(key));
 }
 
 
 template <typename Key, typename T, typename Comp, typename Allocator>
 ft::pair<typename ft::map<Key, T, Comp, Allocator>::iterator>
-ft::map<Key, T, Comp, Allocator>::equal_range(value_type CREF val) const
+ft::map<Key, T, Comp, Allocator>::equal_range(key_type CREF key)
 {
-	return _tree.equal_range(val);
+	return _tree.equal_range(_toValue(key));
+}
+
+
+template <typename Key, typename T, typename Comp, typename Allocator>
+ft::pair<typename ft::map<Key, T, Comp, Allocator>::const_iterator>
+ft::map<Key, T, Comp, Allocator>::equal_range(key_type CREF key) const
+{
+	ft::pair<typename ft::map<Key, T, Comp, Allocator>::iterator>		range;
+	ft::pair<typename ft::map<Key, T, Comp, Allocator>::const_iterator>	ret;
+
+	range = _tree.equal_range(_toValue(key));
+	ret.first = const_iterator(range.first);
+	ret.second = const_iterator(range.second);
+	return ret;
 }
 
 
@@ -581,51 +611,80 @@ ft::multimap<Key, T, Comp, Allocator>::value_comp() const
 // Operations
 template <typename Key, typename T, typename Comp, typename Allocator>
 typename ft::multimap<Key, T, Comp, Allocator>::iterator
-ft::multimap<Key, T, Comp, Allocator>::find(value_type CREF val)
+ft::multimap<Key, T, Comp, Allocator>::find(key_type CREF key)
 {
-	return _tree.find(val);
+	return _tree.find(_toValue(key));
 }
 
 
 template <typename Key, typename T, typename Comp, typename Allocator>
 typename ft::multimap<Key, T, Comp, Allocator>::const_iterator
-ft::multimap<Key, T, Comp, Allocator>::find(value_type CREF val) const
+ft::multimap<Key, T, Comp, Allocator>::find(key_type CREF key) const
 {
-	return _tree.find(val);
+	return _tree.find(_toValue(key));
 }
 
 
 template <typename Key, typename T, typename Comp, typename Allocator>
 typename ft::multimap<Key, T, Comp, Allocator>::size_type
-ft::multimap<Key, T, Comp, Allocator>::count(value_type CREF val) const
+ft::multimap<Key, T, Comp, Allocator>::count(key_type CREF key) const
 {
-	return _tree.count(val);
+	return _tree.count(_toValue(key));
 }
 
 
 template <typename Key, typename T, typename Comp, typename Allocator>
 typename ft::multimap<Key, T, Comp, Allocator>::iterator
-ft::multimap<Key, T, Comp, Allocator>::lower_bound(value_type CREF val) const
+ft::multimap<Key, T, Comp, Allocator>::lower_bound(key_type CREF key)
 {
-	return _tree.lower_bound(val);
+	return _tree.lower_bound(_toValue(key));
+}
+
+
+template <typename Key, typename T, typename Comp, typename Allocator>
+typename ft::multimap<Key, T, Comp, Allocator>::const_iterator
+ft::multimap<Key, T, Comp, Allocator>::lower_bound(key_type CREF key) const
+{
+	return _tree.lower_bound(_toValue(key));
 }
 
 
 template <typename Key, typename T, typename Comp, typename Allocator>
 typename ft::multimap<Key, T, Comp, Allocator>::iterator
-ft::multimap<Key, T, Comp, Allocator>::upper_bound(value_type CREF val) const
+ft::multimap<Key, T, Comp, Allocator>::upper_bound(key_type CREF key)
 {
-	return _tree.upper_bound(val);
+	return _tree.upper_bound(_toValue(key));
+}
+
+
+template <typename Key, typename T, typename Comp, typename Allocator>
+typename ft::multimap<Key, T, Comp, Allocator>::const_iterator
+ft::multimap<Key, T, Comp, Allocator>::upper_bound(key_type CREF key) const
+{
+	return _tree.upper_bound(_toValue(key));
 }
 
 
 template <typename Key, typename T, typename Comp, typename Allocator>
 ft::pair<typename ft::multimap<Key, T, Comp, Allocator>::iterator>
-ft::multimap<Key, T, Comp, Allocator>::equal_range(value_type CREF val) const
+ft::multimap<Key, T, Comp, Allocator>::equal_range(key_type CREF key)
 {
-	return _tree.equal_range(val);
+	return _tree.equal_range(_toValue(key));
 }
 
+
+template <typename Key, typename T, typename Comp, typename Allocator>
+ft::pair<typename ft::multimap<Key, T, Comp, Allocator>::const_iterator>
+ft::multimap<Key, T, Comp, Allocator>::equal_range(key_type CREF key) const
+{
+	ft::pair<typename ft::map<Key, T, Comp, Allocator>::iterator>		range;
+	ft::pair<typename ft::map<Key, T, Comp, Allocator>::const_iterator>	ret;
+
+	range = _tree.equal_range(_toValue(key));
+	ret.first = const_iterator(range.first);
+	ret.second = const_iterator(range.second);
+	return ret;
+}
 
 // Allocator
 template <typename Key, typename T, typename Comp, typename Allocator>

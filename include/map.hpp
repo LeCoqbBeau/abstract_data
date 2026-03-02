@@ -85,12 +85,15 @@ class map
 		value_compare						value_comp() const;
 
 		// Operations
-		iterator							find(value_type CREF val);
-		const_iterator						find(value_type CREF val) const;
-		size_type							count(value_type CREF val) const;
-		iterator							lower_bound(value_type CREF val) const;
-		iterator							upper_bound(value_type CREF val) const;
-		ft::pair<iterator>					equal_range(value_type CREF val) const;
+		iterator							find(key_type CREF key);
+		const_iterator						find(key_type CREF key) const;
+		size_type							count(key_type CREF key) const;
+		iterator							lower_bound(key_type CREF key);
+		const_iterator						lower_bound(key_type CREF key) const;
+		iterator							upper_bound(key_type CREF key);
+		const_iterator						upper_bound(key_type CREF key) const;
+		ft::pair<iterator>					equal_range(key_type CREF key);
+		ft::pair<const_iterator>			equal_range(key_type CREF key) const;
 
 		// Allocator
 		allocator_type						get_allocator() const;
@@ -98,6 +101,9 @@ class map
 	protected:
 		// Attributes
 		rbt_type	_tree;
+
+		// Helper Functions
+		value_type							_toValue(key_type CREF key) const { return value_type(key, mapped_type()); }
 };
 
 
@@ -169,19 +175,25 @@ class multimap
 		value_compare						value_comp() const;
 
 		// Operations
-		iterator							find(value_type CREF val);
-		const_iterator						find(value_type CREF val) const;
-		size_type							count(value_type CREF val) const;
-		iterator							lower_bound(value_type CREF val) const;
-		iterator							upper_bound(value_type CREF val) const;
-		ft::pair<iterator>					equal_range(value_type CREF val) const;
+		iterator							find(key_type CREF key);
+		const_iterator						find(key_type CREF key) const;
+		size_type							count(key_type CREF key) const;
+		iterator							lower_bound(key_type CREF key);
+		const_iterator						lower_bound(key_type CREF key) const;
+		iterator							upper_bound(key_type CREF key);
+		const_iterator						upper_bound(key_type CREF key) const;
+		ft::pair<iterator>					equal_range(key_type CREF key);
+		ft::pair<const_iterator>			equal_range(key_type CREF key) const;
 
 		// Allocator
 		allocator_type						get_allocator() const;
 
 	protected:
 		// Attributes
-		rbt_type	_tree;
+		rbt_type							_tree;
+
+		// Helper Functions
+		value_type							_toValue(key_type CREF key) const { return value_type(key, mapped_type()); }
 };
 
 

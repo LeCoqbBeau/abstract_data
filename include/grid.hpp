@@ -5,215 +5,441 @@
 #ifndef GRID_HPP
 #define GRID_HPP
 
-#include ".helper/algorithm.hpp"
 #include ".helper/ftdef.hpp"
-#include ".helper/ftexcept.hpp"
 #include ".helper/iterator.hpp"
+#include ".helper/ftexcept.hpp"
 
-#define GRID_AT_EXCEPTION_MSG ("matrix::at(): index n out of bounds")
-#define GRID_ROW_AT_EXCEPTION_MSG ("matrix::row()::at(): index n out of bounds")
+
+#define GRID_AT_N_EXCEPTION_MSG ("matrix::at(): column n out of bounds")
+#define GRID_AT_M_EXCEPTION_MSG ("matrix::at(): row m out of bounds")
+
 
 namespace ft {
+namespace internal {
 
 
-template <typename T, class Ref, class Ptr, ft::size_t M, ft::size_t N>
-struct _gridIterator
-	: public ft::iterator<ft::random_access_iterator_tag, T, Ptr, Ref>
+template <typename T, typename Ref, typename Ptr, unsigned int M, unsigned int N>
+struct gridIterator
+	: ft::iterator<ft::random_access_iterator_tag, T, ft::ptrdiff_t, Ptr, Ref>
 {
 	// Typedefs
-	typedef _gridIterator<T, Ref, Ptr, M, N>	this_type;
-	typedef _gridIterator<T, T REF, T*, M, N>	iterator;
-	typedef ft::size_t							size_type;
-	typedef Ref									reference;
-	typedef Ptr									pointer;
-	typedef ft::ptrdiff_t						difference_type;
+	typedef gridIterator<T, Ref, Ptr, N, M>	this_type;
+	typedef T								value_type;
+	typedef Ref								reference;
+	typedef Ptr								pointer;
+	typedef ft::ptrdiff_t					difference_type;
+	typedef ft::size_t						size_type;
 
 	// Constructor
-	_gridIterator(T** matrix, size_type pos) : matrix(matrix), pos(pos) {}
-	_gridIterator(iterator it) : matrix(it.matrix), pos(it.pos) {}
+	explicit	gridIterator(pointer data, size_type pos);
+				gridIterator(gridIterator<T, T REF, T*, M, N> CREF iterator);
+	~gridIterator() {}
 
-	// Dereference operators
-	reference		operator	* () 					{ return matrix[pos / N][pos % N]; }
-	pointer			operator	->() 					{ return &operator*(); }
+	// In/Equality Operator
+	bool			operator	==	(this_type CREF rhs) const;
+	bool			operator	!=	(this_type CREF rhs) const;
 
-	// Shift operators
-	this_type REF	operator	++ ()					{ ++pos; return *this; };
-	this_type		operator	++ (int)				{ this_type tmp(*this); operator++(); return tmp; };
-	this_type REF	operator	+= (difference_type n)	{ pos += n; return *this; };
-	this_type		operator	+  (difference_type n)	{ return this_type(*this).operator+=(n); };
-	this_type REF	operator	-- ()					{ --pos; return *this; };
-	this_type		operator	-- (int)				{ this_type tmp(*this); operator--(); return tmp; };
-	this_type REF	operator	-= (difference_type n)	{ pos -= n; return *this; };
-	this_type		operator	-  (difference_type n)	{ return this_type(*this).operator-=(n); };
+	// Dereference Operator
+	reference		operator	*	();
+	pointer			operator	->	();
+
+	// Shift Operators
+	this_type REF	operator	++	();
+	this_type		operator	++	(int);
+	this_type REF	operator	+=	(difference_type n);
+	this_type		operator	+	(difference_type n);
+	this_type REF	operator	--	();
+	this_type		operator	--	(int);
+	this_type REF	operator	-=	(difference_type n);
+	this_type		operator	-	(difference_type n);
+	difference_type	operator	-	(this_type CREF rhs);
 
 	// Attributes
-	T**			matrix;
-	size_type	pos;
+	pointer		_data;
+	size_type	_pos;
 };
 
 
-/**
- * @brief ft::grid is a container that encapsulates fixed sized matrices.
- *
- * ft::grid has been designed with std::array as inspiration. However, unlike std::array which creates a fixed-sized
- * array on the stack and therefore doesn't have to handle memory, ft::array, allocates the matrices using the templated
- * allocator type.
- *
- * @tparam T			Type of the elements contained.
- * @tparam M			Number of rows, cannot be 0.
- * @tparam N			Number of columns, is also the length of each row, as in the number of elements.
- * @tparam Allocator	The allocator to use to allocate the matrix, and construct the elements.
- */
-template <typename T, ft::size_t M, ft::size_t N, typename Allocator = ft::allocator<T> >
-class grid {
-	protected:
-		// Proxy Structure to allow for the use of matrix[][] and matrix.at().at()
-		struct _row;
+}
 
+
+template <typename T, unsigned int M, unsigned int N>
+class grid
+{
 	public:
 		// Typedefs
-		typedef	T											value_type;
-		typedef _row										row_type;
-		typedef T**											grid_type;
-		typedef Allocator									allocator_type;
-		typedef	ft::size_t									size_type;
-		typedef ft::ptrdiff_t								difference_type;
-		typedef value_type REF								reference;
-		typedef value_type CREF								const_reference;
-		typedef typename Allocator::pointer					pointer;
-		typedef typename Allocator::const_pointer			const_pointer;
-		typedef _gridIterator<T, T REF, T*, M, N>			iterator;
-		typedef _gridIterator<T, T CREF, T const*, M, N>	const_iterator;
-		typedef ft::reverse_iterator<iterator>				reverse_iterator;
-		typedef ft::reverse_iterator<const_iterator>		const_reverse_iterator;
+		typedef T													value_type;
+		typedef T													row_type[N];
+		typedef T													grid_type[M][N];
+		typedef	ft::size_t											size_type;
+		typedef ft::ptrdiff_t										difference_type;
+		typedef value_type REF										reference;
+		typedef value_type CREF										const_reference;
+		typedef T*													pointer;
+		typedef T const*											const_pointer;
+		typedef internal::gridIterator<T, T REF, T*, M, N>			iterator;
+		typedef internal::gridIterator<T, T CREF, T const*, M, N>	const_iterator;
+		typedef ft::reverse_iterator<iterator>						reverse_iterator;
+		typedef ft::reverse_iterator<const_iterator>				const_reverse_iterator;
 
 		// Constructors
-									grid(allocator_type CREF alloc = allocator_type());
-									grid(size_type n, value_type CREF value = value_type(), allocator_type CREF alloc = allocator_type());
-		template<class InputIt>		grid(InputIt first, InputIt last, allocator_type CREF alloc = allocator_type(),
-											ENABLE_IF_TT(!IS_INTEGRAL_V(InputIt), InputIt)* = 0);
-									grid(grid CREF x);
-		grid REF		operator	=(grid CREF rhs);
+
+		/**
+		 * @brief The default constructor.
+		 * * Constructs a grid with M rows and N columns.
+		 * @throw Nothing unless T default constructor does.
+		 * @details Complexity: M * N calls to T default constructor.
+		 */
+		grid();
+
+		/**
+		 * @brief The fill constructor.
+		 * * Constructs a grid with copies of elements with value `value`.
+		 * @throw Nothing unless T copy assignment operator does.
+		 * @details Complexity: M * N calls to T's copy assignment operator.
+		 */
+		grid(const_reference value);
+
+
+		/**
+		 * @brief The range constructor.
+		 * * Constructs a grid with the contents of the range [first, last).
+		 * * Iterators in [first, last) is at most dereferenced exactly once.
+		 * @warning If the distance between first and last is bigger than M * N,
+		 then the constructor stop after initializing M * N elements.
+		 * @tparam InputIt A class that satisfies the requirements of LegacyInputIterator.
+		 * @param first, last the pair of iterators defining the source range of elements to copy
+		 * @throw Nothing unless T copy assignment operator does.
+		 * @details Complexity: max(M * N, ft::distance(first, last)) calls to T's copy assignment operator .
+		 */
+		template <typename InputIt> grid(InputIt first, InputIt last);
+
+		/**
+		 * @brief The copy constructor.
+		 * * Constructs a grid with the contents of other.
+		 * @param other another grid to be used as source to initialize the elements of the grid with
+		 * @throw Nothing unless T copy assignment operator does.
+		 * @details Complexity: M * N calls to T's copy assignment operator.
+		 */
+		grid(grid CREF other);
+
+		/**
+		 * @brief Replaces the contents of the container.
+		 * * Constructs a grid with the contents of other.
+		 * @param other another container to use as data source
+		 * @throw Nothing unless T copy assignment operator does.
+		 * @details Complexity: M * N calls to T's copy assignment operator.
+		 * @remark While this function does modify the container, it doesn't cause any reference/iterator invalidation.
+		 */
+		grid REF operator = (grid CREF other);
+
+		/**
+		 * @brief Destructs the grid. The destructors of the elements are called.
+		 * @throw Nothing this function never throws.
+		 * @details Complexity: M * N calls to T's destructor.
+		 * @note If the elements are pointers, the pointed-to objects are not destroyed.
+		 */
 		~grid();
 
 		// Iterators
+		/**
+		 * @brief Returns an iterator to the first element of *this.
+		 * * If *this is empty, the returned iterator will be equal to end().
+		 * @throw Nothing this function never throws.
+		 * @details Complexity: Constant.
+		 * @return Iterator to the first element.
+		 */
 		iterator					begin();
+
+		/**
+		 * @brief Returns an iterator to the first element of *this.
+		 * * If *this is empty, the returned iterator will be equal to end().
+		 * @throw Nothing this function never throws.
+		 * @details Complexity: Constant.
+		 * @return Iterator to the first element.
+		 */
 		const_iterator				begin() const;
+
+		/**
+		 * @brief Returns an iterator past the last element of *this.
+		 * * This returned iterator only acts as a sentinel. It is not guaranteed to be dereferenceable.
+		 * @throw Nothing this function never throws.
+		 * @details Complexity: Constant.
+		 * @return Iterator past the last element.
+		 */
 		iterator					end();
+
+		/**
+		 * @brief Returns an iterator past the last element of *this.
+		 * * This returned iterator only acts as a sentinel. It is not guaranteed to be dereferenceable.
+		 * @throw Nothing this function never throws.
+		 * @details Complexity: Constant.
+		 * @return Iterator past the last element.
+		 */
 		const_iterator				end() const;
+
+		/**
+		 * @brief Returns a reverse iterator to the first element of the reversed *this.
+		 * * It corresponds to the last element of the non-reversed *this.
+		 * * If *this is empty, the returned iterator is equal to rend().
+		 * @throw Nothing this function never throws.
+		 * @details Complexity: Constant.
+		 * @return Reverse iterator to the first element.
+		 */
 		reverse_iterator			rbegin();
+
+		/**
+		 * @brief Returns a reverse iterator to the first element of the reversed *this.
+		 * * It corresponds to the last element of the non-reversed *this.
+		 * * If *this is empty, the returned iterator is equal to rend().
+		 * @throw Nothing this function never throws.
+		 * @details Complexity: Constant.
+		 * @return Reverse iterator to the first element.
+		 */
 		const_reverse_iterator		rbegin() const;
+
+		/**
+		 * @brief Returns a reverse iterator past the last element of the reversed *this.
+		 * * It corresponds to the element preceding the first element of the non-reversed *this.
+		 * * This returned iterator only acts as a sentinel. It is not guaranteed to be dereferenceable.
+		 * @throw Nothing this function never throws.
+		 * @details Complexity: Constant.
+		 * @return Reverse iterator to the element following the last element.
+		 */
 		reverse_iterator			rend();
+
+		/**
+		 * @brief Returns a reverse iterator past the last element of the reversed *this.
+		 * * It corresponds to the element preceding the first element of the non-reversed *this.
+		 * * This returned iterator only acts as a sentinel. It is not guaranteed to be dereferenceable.
+		 * @throw Nothing this function never throws.
+		 * @details Complexity: Constant.
+		 * @return Reverse iterator to the element following the last element.
+		 */
 		const_reverse_iterator		rend() const;
 
 		// Capacity
-		size_type					size() const;
-		size_type					max_size() const;
-		bool						empty() const;
+
+		/**
+		 * @brief Returns the number of rows in the grid.
+		 * @throw Nothing this function never throws.
+		 * @details Complexity: Compile-time.
+		 * @return The template parameter M.
+		 */
+		size_type					rows() const		{ return M; };
+
+		/**
+		 * @brief Returns the number of column in the grid.
+		 * @throw Nothing this function never throws.
+		 * @details Complexity: Compile-time.
+		 * @return The template parameter N.
+		 */
+		size_type					cols() const		{ return N; };
+
+		/**
+		 * @brief Returns the number of elements in the container.
+		 * @throw Nothing this function never throws.
+		 * @details Complexity: Compile-time.
+		 * @return M * N
+		 */
+		size_type					size() const		{ return M * N; };
+
+		/**
+		 * @brief Checks if the container has no elements.
+		 * @throw Nothing this function never throws.
+		 * @details Complexity: Compile-time.
+		 * @return true if the container is empty, false otherwise.
+		 * @note The container is considered empty if it has 0 columns or rows.
+		 */
+		size_type					max_size() const	{ return M * N; };
+
+		/**
+		 * @brief Checks if the container has no elements.
+		 * @throw Nothing this function never throws.
+		 * @details Complexity: Compile-time.
+		 * @return true if the container is empty, false otherwise.
+		 * @note The container is considered empty if it has 0 columns or rows.
+		 */
+		bool						empty() const		{ return !M || !N; }
 
 		// Element Access
-		reference		operator	[](size_type n);
-		const_reference	operator	[](size_type n) const;
-		reference 					at(size_type n);
-		const_reference	 			at(size_type n) const;
-		row_type					row(size_type m);
-		row_type const				row(size_type m) const;
+
+		/**
+		 * @brief Returns the m-th row of the grid as an array of elements.
+		 * * This allows the use of the double subscript operator syntax.
+		 * @warning If m < M, the behavior is undefined.
+		 * @param m index of the row to return
+		 * @throw Nothing this function never throws.
+		 * @details Complexity: Constant.
+		 * @return Pointer of the requested row
+		 */
+		pointer			operator	[](size_type m);
+
+		/**
+		 * @brief Returns the m-th row of the grid as an array of elements.
+		 * * This allows the use of the double subscript operator syntax.
+		 * @warning If m < M, the behavior is undefined.
+		 * @param m index of the row to return
+		 * @throw Nothing this function never throws.
+		 * @details Complexity: Constant.
+		 * @return Pointer of the requested row.
+		 */
+		const_pointer	operator	[](size_type m) const;
+
+		/**
+		 * @brief Returns a reference to the element at the m-th row and the n-th column, with bounds checking.
+		 * * If m or n is not within the range of the container, an exception of type ft::out_of_range is thrown.
+		 * @param m index of the row of the element
+		 * @param n index of the column of the element
+		 * @throw ft::out_of_range if m >= M or n >= N
+		 * @details Complexity: Constant.
+		 * @return Reference of the requested element.
+		 */
+		reference					at(size_type m, size_type n);
+
+		/**
+		 * @brief Returns a reference to the element at the m-th row and the n-th column, with bounds checking.
+		 * * If m or n is not within the range of the container, an exception of type ft::out_of_range is thrown.
+		 * @param m index of the row of the element
+		 * @param n index of the column of the element
+		 * @throw ft::out_of_range if m >= M or n >= N
+		 * @details Complexity: Constant.
+		 * @return Reference of the requested element.
+		 */
+		const_reference				at(size_type m, size_type n) const;
+
+		/**
+		 * @brief Returns a reference to the first element in the container.
+		 * @throw Nothing this function never throws.
+		 * @details Complexity: Constant.
+		 * @return Reference to the first element.
+		 */
 		reference					front();
+
+		/**
+		 * @brief Returns a reference to the first element in the container.
+		 * @throw Nothing this function never throws.
+		 * @details Complexity: Constant.
+		 * @return Reference to the first element.
+		 */
 		const_reference				front() const;
+
+		/**
+		 * @brief Returns a reference to the first element of the m-th row.
+		 * @warning If m < M, the behavior is undefined.
+		 * @throw Nothing this function never throws.
+		 * @details Complexity: Constant.
+		 * @return Reference to the first element of the m-th row.
+		 */
+		reference					front(size_type m);
+
+		/**
+		 * @brief Returns a reference to the first element of the m-th row.
+		 * @warning If m < M, the behavior is undefined.
+		 * @param m index of the row
+		 * @throw Nothing this function never throws.
+		 * @details Complexity: Constant.
+		 * @return Reference to the first element of the m-th row.
+		 */
+		const_reference				front(size_type m) const;
+
+		/**
+		 * @brief Returns a reference to the last element in the container.
+		 * @throw Nothing this function never throws.
+		 * @details Complexity: Constant.
+		 * @return Reference to the last element.
+		 */
 		reference					back();
+
+		/**
+		 * @brief Returns a reference to the last element in the container.
+		 * @throw Nothing this function never throws.
+		 * @details Complexity: Constant.
+		 * @return Reference to the last element.
+		 */
 		const_reference				back() const;
-		grid_type					data();
-		grid_type const				data() const;
+
+		/**
+		 * @brief Returns a reference to the last element of the m-th row
+		 * @warning If m < M, the behavior is undefined.
+		 * @param m index of the row
+		 * @throw Nothing this function never throws.
+		 * @details Complexity: Constant.
+		 * @return Reference to the last element of the m-th row.
+		 */
+		reference					back(size_type m);
+
+		/**
+		 * @brief Returns a reference to the last element of the m-th row
+		 * @warning If m < M, the behavior is undefined.
+		 * @param m index of the row
+		 * @throw Nothing this function never throws.
+		 * @details Complexity: Constant.
+		 * @return Reference to the last element of the m-th row.
+		 */
+		const_reference				back(size_type m) const;
+
+		/**
+		 * @brief Returns a pointer to the flatten grid serving as element storage.
+		 * * The pointer is such that range [data(), data() + size()) is always a valid range.
+		 * * If *this is empty, data() is not dereferenceable.
+		 * @throw Nothing this function never throws.
+		 * @details Complexity: Constant.
+		 * @return Reference to the last element of the m-th row.
+		 * @note Note that the underlying data storage is in fact a grid,
+		 * * however since converting from an array to a pointer is impossible,
+		 * * returning a pointer is the most convenient solution.
+		 */
+		pointer						data();
+
+		/**
+		 * @brief Returns a pointer to the flatten grid serving as element storage.
+		 * * The pointer is such that range [data(), data() + size()) is always a valid range.
+		 * * If *this is empty, data() is not dereferenceable.
+		 * @throw Nothing this function never throws.
+		 * @details Complexity: Constant.
+		 * @return Reference to the last element of the m-th row.
+		 * @note Note that the underlying data storage is in fact a grid,
+		 * * however since converting from an array to a pointer is impossible,
+		 * * returning a pointer is the most convenient solution.
+		 */
+		const_pointer				data() const;
 
 		// Modifiers
-		void						fill(value_type CREF value);
-		void						swap(grid REF other);
+
+		/**
+		 * @brief Assigns the value to all elements in the container.
+		 * @param value the value to assign to the elements
+		 * @throw Nothing unless T copy assignment operator does.
+		 * @details Complexity: Linear in the size of the container.
+		 * @remark While this function does modify the container, it doesn't cause any reference/iterator invalidation.
+		 */
+		void						fill(const_reference value);
+
+		/**
+		 * @brief Exchanges the contents of the container with those of rhs.
+		 * * Does not cause iterators and references to associate with the other container.
+		 * @param rhs container to exchange the contents with
+		 * @throw Nothing unless T copy assignment operator does.
+		 * @details Complexity: Linear in the size of the container.
+		 * @remark While this function does modify the container, it doesn't cause any reference/iterator invalidation.
+		 */
+		void						swap(grid REF rhs);
+
 
 	protected:
-		// Proxy Structure
-		struct _row {
-			// Constructor
-			_row(pointer row) : row(row) {}
-
-			// Element Access
-			reference		operator	[](size_type n);
-			const_reference	operator	[](size_type n) const;
-			reference	 				at(size_type n);
-			const_reference	 			at(size_type n) const;
-			reference					col(size_type n);
-			const_reference				col(size_type n) const;
-			reference					front();
-			const_reference				front() const;
-			reference					back();
-			const_reference				back() const;
-			pointer						data();
-			pointer const				data() const;
-
-			// Attributes
-			pointer						row;
-		};
-
-	protected:
-		// Typedefs
-		typedef typename allocator_type::template rebind<pointer>::other _grid_allocator_type;
-
-		// Helper Functions
-		void					_init();
-		void					_init(value_type CREF value);
-		void					_clean();
-
 		// Attributes
-		grid_type				_grid;
-		size_type				_size;
-		mutable allocator_type	_allocator;
-		_grid_allocator_type	_gridAllocator() { return _grid_allocator_type(_allocator); }
-		void					_initUnleak(size_type lastM, size_type lastN);
+		grid_type					_grid;
 };
 
-
-}
-
-
-#define GRID_COMPARISON_OPERATOR(op)	\
-	template <typename T, ft::size_t M, ft::size_t N, typename Allocator>	\
-		bool operator op (ft::grid<T, M, N, Allocator> CREF lhs, ft::grid<T, M, N, Allocator> CREF rhs)
-
-
-GRID_COMPARISON_OPERATOR(==) {
-	if (lhs.size() != rhs.size())
-		return false;
-	return ft::equal(lhs.begin(), lhs.end(), rhs.begin());
-}
-
-
-GRID_COMPARISON_OPERATOR(!=) {
-	return !(lhs == rhs);
-}
-
-
-GRID_COMPARISON_OPERATOR(<) {
-	return ft::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
-}
-
-
-GRID_COMPARISON_OPERATOR(<=) {
-	return !(rhs < lhs);
-}
-
-
-GRID_COMPARISON_OPERATOR(>) {
-	return (rhs < lhs);
-}
-
-
-GRID_COMPARISON_OPERATOR(>=) {
-	return !(lhs < rhs);
 }
 
 
 #include ".containers/grid.tpp"
 
 
-#undef GRID_COMPARISON_OPERATOR
+#undef GRID_AT_N_EXCEPTION_MSG
+#undef GRID_AT_M_EXCEPTION_MSG
+
 
 #endif //GRID_HPP

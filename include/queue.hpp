@@ -12,6 +12,18 @@
 namespace ft {
 
 
+template <class T, class Container>
+class queue;
+
+
+template <class T, class Container>	bool operator==(queue<T, Container> CREF lhs, queue<T, Container> CREF rhs);
+template <class T, class Container>	bool operator!=(queue<T, Container> CREF lhs, queue<T, Container> CREF rhs);
+template <class T, class Container>	bool operator< (queue<T, Container> CREF lhs, queue<T, Container> CREF rhs);
+template <class T, class Container>	bool operator<=(queue<T, Container> CREF lhs, queue<T, Container> CREF rhs);
+template <class T, class Container>	bool operator> (queue<T, Container> CREF lhs, queue<T, Container> CREF rhs);
+template <class T, class Container>	bool operator>=(queue<T, Container> CREF lhs, queue<T, Container> CREF rhs);
+
+
 template <class T, class Container = deque<T> >
 class queue {
 	public:
@@ -23,25 +35,33 @@ class queue {
 		typedef typename container_type::const_reference	const_reference;
 
 		// Constructor
-		explicit queue(container_type CREF container = container_type()) : c(container) {}
+		explicit			queue(container_type CREF container = container_type()) : c(container) {}
 		~queue() {}
 
 		// Element Access
-		reference		front() { return c.front(); }
-		const_reference	front() const { return c.front(); }
-		reference		back() { return c.back(); }
-		const_reference	back() const { return c.back(); }
+		reference			front() { return c.front(); }
+		const_reference		front() const { return c.front(); }
+		reference			back() { return c.back(); }
+		const_reference		back() const { return c.back(); }
 
 		// Capacity
-		bool	empty() const { return c.empty(); }
-		bool	size() const { return c.size(); }
+		bool				empty() const { return c.empty(); }
+		size_type			size() const { return c.size(); }
 
 		// Modifiers
-		void	push(value_type CREF value) { c.push_back(value); }
-		void	pop() { c.pop_front(); }
+		void				push(value_type CREF value) { c.push_back(value); }
+		void				pop() { c.pop_front(); }
+
+		// Friends :D
+		friend bool operator== <>(queue<T, Container> CREF lhs, queue<T, Container> CREF rhs);
+		friend bool operator!= <>(queue<T, Container> CREF lhs, queue<T, Container> CREF rhs);
+		friend bool operator<  <>(queue<T, Container> CREF lhs, queue<T, Container> CREF rhs);
+		friend bool operator<= <>(queue<T, Container> CREF lhs, queue<T, Container> CREF rhs);
+		friend bool operator>  <>(queue<T, Container> CREF lhs, queue<T, Container> CREF rhs);
+		friend bool operator>= <>(queue<T, Container> CREF lhs, queue<T, Container> CREF rhs);
 
 	protected:
-		container_type	c;
+		container_type		c;
 };
 
 
@@ -57,41 +77,32 @@ class priority_queue {
 		typedef typename container_type::const_reference	const_reference;
 
 		// Constructor
-		explicit priority_queue(value_compare CREF comp = value_compare(), container_type CREF container = container_type())
+		explicit					priority_queue(value_compare CREF comp = value_compare(), container_type CREF container = container_type())
 			: c(container), comp(comp) {}
-		template <class InputIt> priority_queue(InputIt first, InputIt last, value_compare CREF comp = value_compare(), container_type CREF container = container_type())
+		template <class InputIt>	priority_queue(InputIt first, InputIt last, value_compare CREF comp = value_compare(), container_type CREF container = container_type())
 			: c(container), comp(comp) { c.insert(c.end(), first, last); ft::make_heap(c.begin(), c.end(), comp); }
 
 		// Element Access
-		reference		front()						{ return c.front(); }
-		const_reference	front() const				{ return c.front(); }
-		reference		back()						{ return c.back(); }
-		const_reference	back() const				{ return c.back(); }
+		const_reference				top() const					{ return c.front(); }
 
 		// Capacity
-		bool			empty() const				{ return c.empty(); }
-		bool			size() const				{ return c.size(); }
+		bool						empty() const				{ return c.empty(); }
+		size_type					size() const				{ return c.size(); }
 
 		// Modifiers
-		void			push(value_type CREF value)	{ c.push_back(value); ft::push_heap(c.begin(), c.end(), comp); }
-		void			pop()						{ ft::pop_heap(c.begin(), c.end(), comp); c.pop_front(); }
+		void						push(value_type CREF value)	{ c.push_back(value); ft::push_heap(c.begin(), c.end(), comp); }
+		void						pop()						{ ft::pop_heap(c.begin(), c.end(), comp); c.pop_back(); }
 
 	protected:
-		container_type	c;
-		value_compare	comp;
+		container_type				c;
+		value_compare				comp;
 };
 
 
-# define NPRIO_COMPARISON_OPERATOR(op)	template <class T, class Container> bool operator op									\
-										(ft::queue<T, Container> CREF lhs, ft::queue<T, Container> CREF rhs)					\
+# define QUEUE_COMPARISON_OPERATOR(op)	template <class T, class Container> bool operator op					\
+										(ft::queue<T, Container> CREF lhs, ft::queue<T, Container> CREF rhs)	\
 										{ return lhs.c op rhs.c; }
 
-# define PRIO_COMPARISON_OPERATOR(op)	template <class T, class Container> bool operator op									\
-										(ft::priority_queue<T, Container> CREF lhs, ft::priority_queue<T, Container> CREF rhs)	\
-										{ return lhs.c op rhs.c; }
-
-
-# define QUEUE_COMPARISON_OPERATOR(op) NPRIO_COMPARISON_OPERATOR(op); PRIO_COMPARISON_OPERATOR(op);
 
 QUEUE_COMPARISON_OPERATOR(==);
 QUEUE_COMPARISON_OPERATOR(!=);
@@ -102,8 +113,6 @@ QUEUE_COMPARISON_OPERATOR(>=);
 
 
 #undef QUEUE_COMPARISON_OPERATOR
-#undef NPRIO_COMPARISON_OPERATOR
-#undef PRIO_COMPARISON_OPERATOR
 
 
 }

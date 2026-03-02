@@ -265,19 +265,19 @@ TYPED_TEST_P(actModifiersTests, EraseRange)
 	TypeParam	REF 							c = this->container;
 	TypeParam		 							cCopy = c;
 
-	// // Erase Single from begin
-	// c.erase(c.begin(), std::next(c.begin()));
-	// EXPECT_EQ(c.size(), size_type(9));
-	// EXPECT_EQ(c, TypeParam(array() + 1, array() + ARRAY_TINY));
-	// // Erase Single from end
-	// c.erase(std::next(c.end(), -1), c.end());
-	// EXPECT_EQ(c.size(), size_type(8));
-	// EXPECT_EQ(c, TypeParam(array() + 1, array() + ARRAY_TINY - 1));
-	// // Erase Single from middle
-	// c.erase(std::next(c.begin(), 4), std::next(c.begin(), 5));
-	// EXPECT_EQ(c.size(), size_type(7));
-	// EXPECT_TRUE(std::equal(array() + 1, array() + 4, c.begin()));
-	// EXPECT_TRUE(std::equal(array() + 6, array() + ARRAY_TINY - 1, std::next(c.begin(), 4)));
+	// Erase Single from begin
+	c.erase(c.begin(), std::next(c.begin()));
+	EXPECT_EQ(c.size(), size_type(9));
+	EXPECT_EQ(c, TypeParam(array() + 1, array() + ARRAY_TINY));
+	// Erase Single from end
+	c.erase(std::next(c.end(), -1), c.end());
+	EXPECT_EQ(c.size(), size_type(8));
+	EXPECT_EQ(c, TypeParam(array() + 1, array() + ARRAY_TINY - 1));
+	// Erase Single from middle
+	c.erase(std::next(c.begin(), 4), std::next(c.begin(), 5));
+	EXPECT_EQ(c.size(), size_type(7));
+	EXPECT_TRUE(std::equal(array() + 1, array() + 4, c.begin()));
+	EXPECT_TRUE(std::equal(array() + 6, array() + ARRAY_TINY - 1, std::next(c.begin(), 4)));
 
 	// Multiple erases
 	c = cCopy;

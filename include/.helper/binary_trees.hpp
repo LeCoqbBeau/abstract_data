@@ -110,9 +110,9 @@ struct rbt_iterator
 
 	// In/Equality Operator
 	template <class U, class URef, class UPtr>
-	bool operator	== (rbt_iterator<U, URef, UPtr> CREF rhs) { return this->_current == rhs._current; }
+	bool operator	== (rbt_iterator<U, URef, UPtr> CREF rhs) const { return this->_current == rhs._current; }
 	template <class U, class URef, class UPtr>
-	bool operator	!= (rbt_iterator<U, URef, UPtr> CREF rhs) { return this->_current != rhs._current; }
+	bool operator	!= (rbt_iterator<U, URef, UPtr> CREF rhs) const { return this->_current != rhs._current; }
 
 	// Dereference Operator
 	reference	operator  * () { return _current->value; }

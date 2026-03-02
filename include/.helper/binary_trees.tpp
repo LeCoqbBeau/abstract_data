@@ -478,7 +478,7 @@ ft::internal::rbt<T, Comp, Allocator, extractKey, mutableIterators>::lower_bound
 {
 	node_type const* bound = _root->lower_bound(val, ft::internal::ValueComparator<extractKey, Comp>(_comp));
 	if (!bound)
-		return end();
+		return iterator(&_sentinel, RBT_NODE(const_cast<base_type *>(&_sentinel)));
 	return iterator(const_cast<base_type*>(&_sentinel), const_cast<node_type*>(bound));
 }
 
@@ -489,7 +489,7 @@ ft::internal::rbt<T, Comp, Allocator, extractKey, mutableIterators>::upper_bound
 {
 	node_type const* bound = _root->upper_bound(val, ft::internal::ValueComparator<extractKey, Comp>(_comp));
 	if (!bound)
-		return end();
+		return iterator(&_sentinel, RBT_NODE(const_cast<base_type *>(&_sentinel)));
 	return iterator(const_cast<base_type*>(&_sentinel), const_cast<node_type*>(bound));
 }
 
@@ -499,13 +499,13 @@ ft::pair<typename ft::internal::rbt<T, Comp, Allocator, extractKey, mutableItera
 ft::internal::rbt<T, Comp, Allocator, extractKey, mutableIterators>::equal_range(value_type CREF val) const
 {
 	ft::pair<node_type const*> nodeRange = _root->equal_range(val, ft::internal::ValueComparator<extractKey, Comp>(_comp));
-	if (!nodeRange.first())
-		nodeRange.first() = static_cast<node_type const*>(&_sentinel);
-	if (!nodeRange.second())
-		nodeRange.second() = static_cast<node_type const*>(&_sentinel);
+	if (!nodeRange.first)
+		nodeRange.first = static_cast<node_type const*>(&_sentinel);
+	if (!nodeRange.second)
+		nodeRange.second = static_cast<node_type const*>(&_sentinel);
 	return ft::make_pair(
-		iterator(const_cast<base_type*>(&_sentinel),  const_cast<node_type*>(nodeRange.first())),
-		iterator(const_cast<base_type*>(&_sentinel),  const_cast<node_type*>(nodeRange.second()))
+		iterator(const_cast<base_type*>(&_sentinel),  const_cast<node_type*>(nodeRange.first)),
+		iterator(const_cast<base_type*>(&_sentinel),  const_cast<node_type*>(nodeRange.second))
 	);
 }
 

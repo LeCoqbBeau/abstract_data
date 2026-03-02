@@ -151,16 +151,6 @@ ft::_dequeIterator<T, TRef, TPtr>::operator - (_dequeIterator<U, URef, UPtr> CRE
 	return bufferSize * nodeDiff + offset;
 }
 
-// Comparison Operators
-#define TWO_DEQUEIT_TEMPLATE template <typename U, typename RefA, typename PtrA, typename RefB, typename PtrB>
-#define TWO_DEQUEIT_PARAMETERS ft::_dequeIterator<U, RefA, PtrA> CREF a, ft::_dequeIterator<U, RefB, PtrB> CREF b
-#define TWO_DEQUEIT_COMPARISON(op) TWO_DEQUEIT_TEMPLATE inline bool operator op (TWO_DEQUEIT_PARAMETERS)
-
-TWO_DEQUEIT_COMPARISON(<)	{ return (a.map == b.map) ? (a._mCurrent < b._mCurrent) : (a.map < b.map); }
-TWO_DEQUEIT_COMPARISON(<=)	{ return !(b < a); }
-TWO_DEQUEIT_COMPARISON(>)	{ return (b < a); }
-TWO_DEQUEIT_COMPARISON(>=)	{ return !(a < b); }
-
 
 // to handle n + iterator
 template <typename T, typename Ref, typename Ptr>
@@ -169,6 +159,16 @@ operator + (ft::ptrdiff_t n, ft::_dequeIterator<T, Ref, Ptr> CREF iterator) {
 	return iterator + n;
 }
 
+
+// Comparison Operators
+#define TWO_DEQUEIT_TEMPLATE		template <typename U, typename RefA, typename PtrA, typename RefB, typename PtrB>
+#define TWO_DEQUEIT_PARAMETERS		ft::_dequeIterator<U, RefA, PtrA> CREF a, ft::_dequeIterator<U, RefB, PtrB> CREF b
+#define TWO_DEQUEIT_COMPARISON(op)	TWO_DEQUEIT_TEMPLATE inline bool operator op (TWO_DEQUEIT_PARAMETERS)
+
+TWO_DEQUEIT_COMPARISON(<)	{ return (a.map == b.map) ? (a._mCurrent < b._mCurrent) : (a.map < b.map); }
+TWO_DEQUEIT_COMPARISON(<=)	{ return !(b < a); }
+TWO_DEQUEIT_COMPARISON(>)	{ return (b < a); }
+TWO_DEQUEIT_COMPARISON(>=)	{ return !(a < b); }
 
 #undef TWO_DEQUEIT_TEMPLATE
 #undef TWO_DEQUEIT_PARAMETERS

@@ -11,6 +11,13 @@
 #endif
 
 
+#if TESTED_NAMESPACE == std
+# define UNTESTED_NAMESPACE ft
+# else
+# define UNTESTED_NAMESPACE std
+#endif
+
+
 #ifndef REF
 # define REF &
 #endif

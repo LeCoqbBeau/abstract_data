@@ -12,6 +12,8 @@
 #include "Constructors.tpp"
 #include "Iterators.tpp"
 #include "Modifiers.tpp"
+#include "Operations.tpp"
+#include "OutOfClass.tpp"
 
 #include "Maps.tpp"
 

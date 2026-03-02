@@ -10,22 +10,32 @@
 #include "Fat.hpp"
 
 
-#ifndef USE_FT
-# include <list>
+// ALWAYS NEEDED FOR STACK/QUEUE
 # include <deque>
 # include <vector>
-# include <set>
-# include <map>
-#else
-# include "list.hpp"
+
 # include "deque.hpp"
 # include "vector.hpp"
+// ALWAYS NEEDED FOR STACK/QUEUE
+
+
+#ifndef USE_FT
+# include <list>
+# include <set>
+# include <map>
+# include <queue>
+# include <stack>
+#else
+# include "list.hpp"
 # include "set.hpp"
 # include "map.hpp"
+# include "queue.hpp"
+# include "stack.hpp"
 #endif
 
 
-namespace ns = TESTED_NAMESPACE;
+namespace ns			= TESTED_NAMESPACE;
+namespace otherspace	= UNTESTED_NAMESPACE;
 
 
 // Sequence Containers
@@ -62,9 +72,9 @@ typedef ::testing::Types<
 
 
 typedef ::testing::Types<
-	intList_t, strList_t, fatList_t,
-	intDeque_t, strDeque_t, fatDeque_t,
-	intVector_t, strVector_t, fatVector_t
+	intList_t,		strList_t,		fatList_t,
+	intDeque_t,		strDeque_t,		fatDeque_t,
+	intVector_t,	strVector_t,	fatVector_t
 >	sequenceContainers_type;
 
 
@@ -112,11 +122,67 @@ typedef ::testing::Types<
 
 
 typedef ::testing::Types<
-	intSet_t, strSet_t, fatSet_t,
-	intMSet_t, strMSet_t, fatMSet_t,
-	intMap_t, strMap_t, fatMap_t,
-	intMMap_t, strMMap_t, fatMMap_t
+	intSet_t,	strSet_t,	fatSet_t,
+	intMSet_t,	strMSet_t,	fatMSet_t,
+	intMap_t,	strMap_t,	fatMap_t,
+	intMMap_t,	strMMap_t,	fatMMap_t
 >	associativeContainers_type;
+
+
+//	Adaptor Containers
+
+
+typedef ns::queue<int, ns::deque<int> >						intNQueue_t;
+typedef ns::queue<str, ns::deque<str> >						strNQueue_t;
+typedef ns::queue<Fat, ns::deque<Fat> >						fatNQueue_t;
+typedef ns::queue<int, otherspace::deque<int> >				intBQueue_t;
+typedef ns::queue<str, otherspace::deque<str> >				strBQueue_t;
+typedef ns::queue<Fat, otherspace::deque<Fat> >				fatBQueue_t;
+
+
+typedef ns::priority_queue<int, ns::vector<int> >			intNPQueue_t;
+typedef ns::priority_queue<str, ns::vector<str> >			strNPQueue_t;
+typedef ns::priority_queue<Fat, ns::vector<Fat> >			fatNPQueue_t;
+typedef ns::priority_queue<int, otherspace::vector<int> >	intBPQueue_t;
+typedef ns::priority_queue<str, otherspace::vector<str> >	strBPQueue_t;
+typedef ns::priority_queue<Fat, otherspace::vector<Fat> >	fatBPQueue_t;
+
+
+typedef ns::stack<int, ns::deque<int> >						intNStack_t;
+typedef ns::stack<str, ns::deque<str> >						strNStack_t;
+typedef ns::stack<Fat, ns::deque<Fat> >						fatNStack_t;
+typedef ns::stack<int, otherspace::deque<int> >				intBStack_t;
+typedef ns::stack<str, otherspace::deque<str> >				strBStack_t;
+typedef ns::stack<Fat, otherspace::deque<Fat> >				fatBStack_t;
+
+
+
+typedef ::testing::Types<
+	intNQueue_t, strNQueue_t, fatNQueue_t,
+	intBQueue_t, strBQueue_t, fatBQueue_t
+>	testQueue_type;
+
+
+typedef ::testing::Types<
+	intNPQueue_t, strNPQueue_t, fatNPQueue_t,
+	intBPQueue_t, strBPQueue_t, fatBPQueue_t
+>	testPQueue_type;
+
+
+typedef ::testing::Types<
+	intNStack_t, strNStack_t, fatNStack_t,
+	intBStack_t, strBStack_t, fatBStack_t
+>	testStack_type;
+
+
+typedef ::testing::Types<
+	intNQueue_t, strNQueue_t, fatNQueue_t,
+	intBQueue_t, strBQueue_t, fatBQueue_t,
+	intNPQueue_t, strNPQueue_t, fatNPQueue_t,
+	intBPQueue_t, strBPQueue_t, fatBPQueue_t,
+	intNStack_t, strNStack_t, fatNStack_t,
+	intBStack_t, strBStack_t, fatBStack_t
+>	adaptorContainers_type;
 
 
 #endif //TYPES_HPP

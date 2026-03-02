@@ -83,7 +83,7 @@ class set
 		ft::pair<iterator>					equal_range(value_type CREF val) const;
 
 		// Allocator
-		allocator_type	get_allocator() const;
+		allocator_type						get_allocator() const;
 
 	protected:
 		// Attributes
