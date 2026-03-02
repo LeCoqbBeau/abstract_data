@@ -67,7 +67,7 @@ SRC_DIR			=	src/
 SRC_NAME		=	main.cpp
 
 INCLUDES		=	-I$(INC) -I$(GTEST_INCLUDE)
-CFLAGS			=	$(INCLUDES) -Wall -Werror -Wextra -g -std=c++11 -MMD -MP
+CFLAGS			=	$(INCLUDES) -Wall -Werror -Wextra -g -std=c++98 -MMD -MP
 CXX				=	c++
 
 OBJ_DIR			=	.build/
@@ -145,6 +145,10 @@ $(DOXYGEN_HTML): $(DOXYFILE) $(DOXYGEN_SRCS)
 	@doxygen $(DOXYFILE)
 
 doc: $(DOXYGEN_HTML)
+
+bonus: doc
+	@open $(DOXYGEN_HTML)
+
 
 $(GTEST_TAR):
 	@wget $(GTEST_LINK)

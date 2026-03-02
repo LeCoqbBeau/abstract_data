@@ -207,7 +207,7 @@ template <typename T, unsigned int M, unsigned int N>
 typename ft::grid<T, M, N>::iterator
 ft::grid<T, M, N>::begin()
 {
-	return iterator(_grid, 0);
+	return iterator(data(), 0);
 }
 
 
@@ -215,7 +215,7 @@ template <typename T, unsigned int M, unsigned int N>
 typename ft::grid<T, M, N>::const_iterator
 ft::grid<T, M, N>::begin() const
 {
-	return const_iterator(_grid, 0);
+	return const_iterator(data(), 0);
 }
 
 
@@ -223,7 +223,7 @@ template <typename T, unsigned int M, unsigned int N>
 typename ft::grid<T, M, N>::iterator
 ft::grid<T, M, N>::end()
 {
-	return iterator(_grid, M * N);
+	return iterator(data(), M * N);
 }
 
 
@@ -231,7 +231,7 @@ template <typename T, unsigned int M, unsigned int N>
 typename ft::grid<T, M, N>::const_iterator
 ft::grid<T, M, N>::end() const
 {
-	return const_iterator(_grid, M * N);
+	return const_iterator(data(), M * N);
 }
 
 

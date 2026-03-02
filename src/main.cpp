@@ -3,23 +3,19 @@
 //
 
 
-// #include "gtest/gtest.h"
-// #include "config.h"
+#include "gtest/gtest.h"
+#include "config.h"
 
 
 // #include "SequenceContainersTests/Tests.hpp"
 // #include "AssociativeContainersTests/Tests.hpp"
 // #include "AdaptorContainersTests/Tests.hpp"
 
-#include <array>
-#include <iostream>
-
-#include "grid.hpp"
 
 int main(int argc, char *argv[]) {
 	(void)argc;
 	(void)argv;
 
-	// ::testing::InitGoogleTest(&argc, argv);
-	// return RUN_ALL_TESTS();
+	::testing::InitGoogleTest(&argc, argv);
+	return RUN_ALL_TESTS();
 }
