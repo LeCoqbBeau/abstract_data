@@ -234,22 +234,21 @@ ft::list<T, Allocator>::insert(iterator position, value_type CREF value) {
 
 
 template <class T, class Allocator>
-typename ft::list<T, Allocator>::iterator
+void
 ft::list<T, Allocator>::insert(iterator position, size_type count, value_type CREF value) {
 	list tmp(_allocator);
 	tmp._assignHelper(count, value, ft::true_type());
-	iterator ret = _insertHelper(position, tmp);
-	return ret;
+	_insertHelper(position, tmp);
 }
 
 
 template <class T, class Allocator>
-template<class InputIt> typename ft::list<T, Allocator>::iterator
+template<class InputIt>
+void
 ft::list<T, Allocator>::insert(iterator position, InputIt first, InputIt last) {
 	list tmp(_allocator);
 	tmp._assignHelper(first, last, ft::is_integral<InputIt>());
-	iterator ret = _insertHelper(position, tmp);
-	return ret;
+	_insertHelper(position, tmp);
 }
 
 

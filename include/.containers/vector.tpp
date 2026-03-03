@@ -513,7 +513,6 @@ ft::vector<T, Allocator>::_insertHelper(iterator position, InputIt first, InputI
 	for (size_type i = 0; i < n; ++i)
 		_array[posIndex + i] = *first++;
 	_end += n;
-	return _array + posIndex + 1;
 }
 
 

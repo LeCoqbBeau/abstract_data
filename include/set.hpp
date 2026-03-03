@@ -19,7 +19,7 @@ class set
 {
 	protected:
 		// Typedefs
-		typedef ft::internal::rbt<Key, Compare, Allocator, ft::false_type>	rbt_type;
+		typedef ft::internal::rbt<Key, Compare, Allocator, ft::false_type, true>	rbt_type;
 
 	public:
 		// Typedefs
@@ -76,11 +76,15 @@ class set
 		value_compare						value_comp() const;
 
 		// Operations
-		iterator							find(value_type CREF val) const;
+		iterator							find(value_type CREF val);
+		const_iterator						find(value_type CREF val) const;
 		size_type							count(value_type CREF val) const;
-		iterator							lower_bound(value_type CREF val) const;
-		iterator							upper_bound(value_type CREF val) const;
-		ft::pair<iterator>					equal_range(value_type CREF val) const;
+		iterator							lower_bound(value_type CREF val);
+		const_iterator						lower_bound(value_type CREF val) const;
+		iterator							upper_bound(value_type CREF val);
+		const_iterator						upper_bound(value_type CREF val) const;
+		ft::pair<iterator>					equal_range(value_type CREF val);
+		ft::pair<const_iterator>			equal_range(value_type CREF val) const;
 
 		// Allocator
 		allocator_type						get_allocator() const;
@@ -100,7 +104,7 @@ class multiset
 {
 	protected:
 		// Typedefs
-		typedef ft::internal::rbt<Key, Compare, Allocator, ft::false_type, false>	rbt_type;
+		typedef ft::internal::rbt<Key, Compare, Allocator, ft::false_type, true>	rbt_type;
 
 	public:
 		// Typedefs
@@ -157,11 +161,15 @@ class multiset
 		value_compare						value_comp() const;
 
 		// Operations
-		iterator							find(value_type CREF val) const;
+		iterator							find(value_type CREF val);
+		const_iterator						find(value_type CREF val) const;
 		size_type							count(value_type CREF val) const;
-		iterator							lower_bound(value_type CREF val) const;
-		iterator							upper_bound(value_type CREF val) const;
-		ft::pair<iterator>					equal_range(value_type CREF val) const;
+		iterator							lower_bound(value_type CREF val);
+		const_iterator						lower_bound(value_type CREF val) const;
+		iterator							upper_bound(value_type CREF val);
+		const_iterator						upper_bound(value_type CREF val) const;
+		ft::pair<iterator>					equal_range(value_type CREF val);
+		ft::pair<const_iterator>			equal_range(value_type CREF val) const;
 
 		// Allocator
 		allocator_type						get_allocator() const;

@@ -245,7 +245,7 @@ struct rbt {
 		key_compare				_comp;
 		size_type				_size;
 		mutable allocator_type	_allocator;
-		_node_allocator_type	_node_allocator() { return _node_allocator_type(_allocator); }
+		_node_allocator_type	_node_allocator() const { return _node_allocator_type(_allocator); }
 };
 
 

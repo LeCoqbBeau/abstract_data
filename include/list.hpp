@@ -58,14 +58,14 @@ class list {
 
 		// Modifiers
 		void									assign(size_type count, value_type CREF value);
-		template <class InputIt>	void		assign(InputIt first, InputIt last);
+		template <class InputIt> void			assign(InputIt first, InputIt last);
 		void									push_front(value_type CREF val);
 		void									pop_front();
 		void									push_back(value_type CREF val);
 		void									pop_back();
 		iterator								insert(iterator position, value_type CREF value);
-		iterator								insert(iterator position, size_type count, value_type CREF value);
-		template<class InputIt> iterator		insert(iterator position, InputIt first, InputIt last);
+		void									insert(iterator position, size_type count, value_type CREF value);
+		template<class InputIt> void			insert(iterator position, InputIt first, InputIt last);
 		iterator								erase(iterator position);
 		iterator								erase(iterator first, iterator last);
 		void									swap(list REF x);

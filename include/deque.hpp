@@ -42,18 +42,19 @@ struct _dequeIterator
 	bool operator	!= (_dequeIterator<U, URef, UPtr> CREF rhs) const;
 
 	// Dereference Operator
-	reference	operator		* () { return *_mCurrent; }
-	pointer		operator		->() { return _mCurrent; }
+	reference		operator	* () 					{ return *_mCurrent; }
+	pointer			operator	->() 					{ return _mCurrent; }
+	reference		operator	[](difference_type n)	{ return *ft::next(*this, n); }
 
 	// Shift Operators
 	this_type REF	operator	++ ();
 	this_type		operator	++ (int);
 	this_type REF	operator	+= (difference_type n);
-	this_type		operator	+  (difference_type n);
+	this_type		operator	+  (difference_type n) const;
 	this_type REF	operator	-- ();
 	this_type		operator	-- (int);
 	this_type REF	operator	-= (difference_type n);
-	this_type		operator	-  (difference_type n);
+	this_type		operator	-  (difference_type n) const;
 	template <class U, class URef, class UPtr>
 	difference_type	operator	- (_dequeIterator<U, URef, UPtr> CREF rhs) const;
 

@@ -2,14 +2,14 @@
 // Created by mscheman on 11/20/25.
 //
 
-#ifndef PAIR_H
-#define PAIR_H
+#ifndef UTILITY_H
+#define UTILITY_H
 
 #include "ftdef.hpp"
 
 namespace ft {
 
-template <class T1, class T2 = typename ft::remove_cvref<T1>::type>
+template <class T1, class T2 = T1>
 struct pair {
 	// Typedefs
 	typedef T1	first_type;
@@ -104,4 +104,4 @@ ft::pair<T1, T2> ft::make_pair(T1 x, T2 y) {
 }
 
 
-#endif //PAIR_H
+#endif //UTILITY_H

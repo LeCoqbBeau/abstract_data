@@ -11,3 +11,6 @@ compile_commands.json
 .doxygen/
 gtest/
 *.tar.gz
+*.tar
+static_tester/
+monkey_tester/

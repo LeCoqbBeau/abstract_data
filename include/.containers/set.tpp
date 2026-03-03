@@ -250,6 +250,14 @@ ft::set<T, Comp, Allocator>::value_comp() const
 // Operations
 template <typename T, typename Comp, typename Allocator>
 typename ft::set<T, Comp, Allocator>::iterator
+ft::set<T, Comp, Allocator>::find(value_type CREF val)
+{
+	return _tree.find(val);
+}
+
+
+template <typename T, typename Comp, typename Allocator>
+typename ft::set<T, Comp, Allocator>::const_iterator
 ft::set<T, Comp, Allocator>::find(value_type CREF val) const
 {
 	return _tree.find(val);
@@ -266,6 +274,14 @@ ft::set<T, Comp, Allocator>::count(value_type CREF val) const
 
 template <typename T, typename Comp, typename Allocator>
 typename ft::set<T, Comp, Allocator>::iterator
+ft::set<T, Comp, Allocator>::lower_bound(value_type CREF val)
+{
+	return _tree.lower_bound(val);
+}
+
+
+template <typename T, typename Comp, typename Allocator>
+typename ft::set<T, Comp, Allocator>::const_iterator
 ft::set<T, Comp, Allocator>::lower_bound(value_type CREF val) const
 {
 	return _tree.lower_bound(val);
@@ -274,6 +290,14 @@ ft::set<T, Comp, Allocator>::lower_bound(value_type CREF val) const
 
 template <typename T, typename Comp, typename Allocator>
 typename ft::set<T, Comp, Allocator>::iterator
+ft::set<T, Comp, Allocator>::upper_bound(value_type CREF val)
+{
+	return _tree.upper_bound(val);
+}
+
+
+template <typename T, typename Comp, typename Allocator>
+typename ft::set<T, Comp, Allocator>::const_iterator
 ft::set<T, Comp, Allocator>::upper_bound(value_type CREF val) const
 {
 	return _tree.upper_bound(val);
@@ -282,6 +306,14 @@ ft::set<T, Comp, Allocator>::upper_bound(value_type CREF val) const
 
 template <typename T, typename Comp, typename Allocator>
 ft::pair<typename ft::set<T, Comp, Allocator>::iterator>
+ft::set<T, Comp, Allocator>::equal_range(value_type CREF val)
+{
+	return _tree.equal_range(val);
+}
+
+
+template <typename T, typename Comp, typename Allocator>
+ft::pair<typename ft::set<T, Comp, Allocator>::const_iterator>
 ft::set<T, Comp, Allocator>::equal_range(value_type CREF val) const
 {
 	return _tree.equal_range(val);
@@ -537,6 +569,14 @@ ft::multiset<T, Comp, Allocator>::value_comp() const
 // Operations
 template <typename T, typename Comp, typename Allocator>
 typename ft::multiset<T, Comp, Allocator>::iterator
+ft::multiset<T, Comp, Allocator>::find(value_type CREF val)
+{
+	return _tree.find(val);
+}
+
+
+template <typename T, typename Comp, typename Allocator>
+typename ft::multiset<T, Comp, Allocator>::const_iterator
 ft::multiset<T, Comp, Allocator>::find(value_type CREF val) const
 {
 	return _tree.find(val);
@@ -553,6 +593,14 @@ ft::multiset<T, Comp, Allocator>::count(value_type CREF val) const
 
 template <typename T, typename Comp, typename Allocator>
 typename ft::multiset<T, Comp, Allocator>::iterator
+ft::multiset<T, Comp, Allocator>::lower_bound(value_type CREF val)
+{
+	return _tree.lower_bound(val);
+}
+
+
+template <typename T, typename Comp, typename Allocator>
+typename ft::multiset<T, Comp, Allocator>::const_iterator
 ft::multiset<T, Comp, Allocator>::lower_bound(value_type CREF val) const
 {
 	return _tree.lower_bound(val);
@@ -561,6 +609,14 @@ ft::multiset<T, Comp, Allocator>::lower_bound(value_type CREF val) const
 
 template <typename T, typename Comp, typename Allocator>
 typename ft::multiset<T, Comp, Allocator>::iterator
+ft::multiset<T, Comp, Allocator>::upper_bound(value_type CREF val)
+{
+	return _tree.upper_bound(val);
+}
+
+
+template <typename T, typename Comp, typename Allocator>
+typename ft::multiset<T, Comp, Allocator>::const_iterator
 ft::multiset<T, Comp, Allocator>::upper_bound(value_type CREF val) const
 {
 	return _tree.upper_bound(val);
@@ -569,6 +625,14 @@ ft::multiset<T, Comp, Allocator>::upper_bound(value_type CREF val) const
 
 template <typename T, typename Comp, typename Allocator>
 ft::pair<typename ft::multiset<T, Comp, Allocator>::iterator>
+ft::multiset<T, Comp, Allocator>::equal_range(value_type CREF val)
+{
+	return _tree.equal_range(val);
+}
+
+
+template <typename T, typename Comp, typename Allocator>
+ft::pair<typename ft::multiset<T, Comp, Allocator>::const_iterator>
 ft::multiset<T, Comp, Allocator>::equal_range(value_type CREF val) const
 {
 	return _tree.equal_range(val);

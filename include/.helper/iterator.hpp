@@ -132,42 +132,20 @@ class reverse_iterator {
 
 
 // Relational Operator Overload
-# define REVERSE_ITERATOR_RELATIONAL_PROTOTYPE(op)	template< class Iter1, class Iter2 >						\
-													bool operator op (	ft::reverse_iterator<Iter1> CREF lhs,	\
-													ft::reverse_iterator<Iter2> CREF rhs )
+# define REVERSE_ITERATOR_RELATIONAL_OPERATOR(op)	template<class Iter1, class Iter2>							\
+												bool operator op (	ft::reverse_iterator<Iter1> CREF lhs,	\
+																	ft::reverse_iterator<Iter2> CREF rhs )	\
+												{ return lhs.base() op rhs.base(); }
+
+REVERSE_ITERATOR_RELATIONAL_OPERATOR(==);
+REVERSE_ITERATOR_RELATIONAL_OPERATOR(!=);
+REVERSE_ITERATOR_RELATIONAL_OPERATOR(<);
+REVERSE_ITERATOR_RELATIONAL_OPERATOR(<=);
+REVERSE_ITERATOR_RELATIONAL_OPERATOR(>);
+REVERSE_ITERATOR_RELATIONAL_OPERATOR(>=);
 
 
-REVERSE_ITERATOR_RELATIONAL_PROTOTYPE(==) {
-	return lhs.base() == rhs.base();
-}
-
-
-REVERSE_ITERATOR_RELATIONAL_PROTOTYPE(!=) {
-	return lhs.base() != rhs.base();
-}
-
-
-REVERSE_ITERATOR_RELATIONAL_PROTOTYPE(<)  {
-	return lhs.base() > rhs.base();
-}
-
-
-REVERSE_ITERATOR_RELATIONAL_PROTOTYPE(<=) {
-	return lhs.base() >= rhs.base();
-}
-
-
-REVERSE_ITERATOR_RELATIONAL_PROTOTYPE(>)  {
-	return lhs.base() < rhs.base();
-}
-
-
-REVERSE_ITERATOR_RELATIONAL_PROTOTYPE(>=) {
-	return lhs.base() <= rhs.base();
-}
-
-
-# undef REVERSE_ITERATOR_RELATIONAL_PROTOTYPE
+# undef REVERSE_ITERATOR_RELATIONAL_OPERATOR
 
 
 // Non-member Operator overloads
@@ -286,7 +264,8 @@ distance(InputIterator first, InputIterator last)
 
 
 template <typename InputIterator, typename Distance>
-void advance(InputIterator REF i, Distance n)
+void
+advance(InputIterator REF i, Distance n)
 {
 	typedef typename ft::iterator_traits<InputIterator>::iterator_category IC;
 
@@ -295,7 +274,8 @@ void advance(InputIterator REF i, Distance n)
 
 
 template<class InputIt>
-InputIt next(InputIt it, typename ft::iterator_traits<InputIt>::difference_type n = 1)
+InputIt
+next(InputIt it, typename ft::iterator_traits<InputIt>::difference_type n = 1)
 {
 	ft::advance(it, n);
 	return it;

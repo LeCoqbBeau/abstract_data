@@ -37,6 +37,7 @@ class stack {
 		~stack() {}
 
 		// Element Access
+		reference		top()						{ return c.back(); }
 		const_reference	top() const					{ return c.back(); }
 
 		// Capacity

@@ -604,7 +604,7 @@ template <typename Key, typename T, typename Comp, typename Allocator>
 typename ft::multimap<Key, T, Comp, Allocator>::value_compare
 ft::multimap<Key, T, Comp, Allocator>::value_comp() const
 {
-	return value_compare();
+	return value_compare(_tree.key_comp());
 }
 
 

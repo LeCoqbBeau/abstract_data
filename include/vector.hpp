@@ -37,8 +37,9 @@ struct _vectorIterator : iterator<ft::random_access_iterator_tag, T, ft::ptrdiff
 	bool		operator	!= (_vectorIterator<U, URef, UPtr> CREF rhs) const { return _curr != rhs._curr; }
 
 	// Dereference Operator
-	reference	operator	* ()								{ return *_curr; }
-	pointer		operator	->()								{ return _curr; }
+	reference		operator	* ()							{ return *_curr; }
+	pointer			operator	->()							{ return _curr; }
+	reference		operator	[](difference_type n)			{ return _curr[n]; }
 
 	// Shift Operators
 	this_type REF	operator	++ ()							{ ++_curr; return *this; }
@@ -56,6 +57,31 @@ struct _vectorIterator : iterator<ft::random_access_iterator_tag, T, ft::ptrdiff
 	// Attributes
 	value_type	*_curr;
 };
+
+
+// Vector template out of class operator overloads
+template <typename T, typename Ref, typename Ptr>
+typename ft::_vectorIterator<T, Ref, Ptr>::this_type
+operator + (typename ft::_vectorIterator<T, Ref, Ptr>::difference_type n, ft::_vectorIterator<T, Ref, Ptr> it)
+{
+	return it + n;
+}
+
+// Comparison Operators
+#define TWO_VECTORIT_TEMPLATE			template <typename U, typename RefA, typename PtrA, typename RefB, typename PtrB>
+#define TWO_VECTORIT_PARAMETERS		ft::_vectorIterator<U, RefA, PtrA> CREF lhs, ft::_vectorIterator<U, RefB, PtrB> CREF rhs
+#define TWO_VECTORIT_COMPARISON(op)	TWO_VECTORIT_TEMPLATE inline bool operator op (TWO_VECTORIT_PARAMETERS)
+
+TWO_VECTORIT_COMPARISON(<) 	{ return (lhs._curr < rhs._curr); }
+TWO_VECTORIT_COMPARISON(<=)	{ return !(rhs < lhs); }
+TWO_VECTORIT_COMPARISON(>)	{ return (rhs < lhs); }
+TWO_VECTORIT_COMPARISON(>=)	{ return !(lhs < rhs); }
+
+#undef TWO_VECTORIT_TEMPLATE
+#undef TWO_VECTORIT_PARAMETERS
+#undef TWO_VECTORIT_COMPARISON
+//
+
 
 
 template <typename T, typename Allocator = ft::allocator<T> >
@@ -146,7 +172,8 @@ class vector {
 
 
 template <typename T, typename Allocator>
-void swap(ft::vector<T, Allocator> REF x, ft::vector<T, Allocator> REF y) {
+void swap(ft::vector<T, Allocator> REF x, ft::vector<T, Allocator> REF y)
+{
 	x.swap(y);
 }
 
@@ -154,36 +181,14 @@ void swap(ft::vector<T, Allocator> REF x, ft::vector<T, Allocator> REF y) {
 # define VECTOR_COMPARISON_OPERATOR(op)	template <class T, class Allocator> bool operator op						\
 										(ft::vector<T, Allocator> CREF lhs, ft::vector<T, Allocator> CREF rhs)
 
-VECTOR_COMPARISON_OPERATOR(==) {
-	if (lhs.size() != rhs.size())
-		return false;
-	return ft::equal(lhs.begin(), lhs.end(), rhs.begin());
-}
+VECTOR_COMPARISON_OPERATOR(==)	{ return lhs.size() == rhs.size() && ft::equal(lhs.begin(), lhs.end(), rhs.begin()); }
+VECTOR_COMPARISON_OPERATOR(<)	{ return ft::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end()); }
+VECTOR_COMPARISON_OPERATOR(!=)	{ return !(lhs == rhs); }
+VECTOR_COMPARISON_OPERATOR(<=)	{ return !(rhs < lhs); }
+VECTOR_COMPARISON_OPERATOR(>)	{ return (rhs < lhs); }
+VECTOR_COMPARISON_OPERATOR(>=)	{ return !(lhs < rhs); }
 
-
-VECTOR_COMPARISON_OPERATOR(!=) {
-	return !(lhs == rhs);
-}
-
-
-VECTOR_COMPARISON_OPERATOR(<) {
-	return ft::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
-}
-
-
-VECTOR_COMPARISON_OPERATOR(<=) {
-	return !(rhs < lhs);
-}
-
-
-VECTOR_COMPARISON_OPERATOR(>) {
-	return (rhs < lhs);
-}
-
-
-VECTOR_COMPARISON_OPERATOR(>=) {
-	return !(lhs < rhs);
-}
+#undef VECTOR_COMPARISON_OPERATOR
 
 
 }
@@ -194,6 +199,5 @@ VECTOR_COMPARISON_OPERATOR(>=) {
 
 #undef VECTOR_ARRAY_INIT_SIZE
 #undef VECTOR_AT_EXCEPTION_MSG
-#undef VECTOR_COMPARISON_OPERATOR
 
 #endif //VECTOR_HPP

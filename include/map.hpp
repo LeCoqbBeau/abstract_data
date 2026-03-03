@@ -197,11 +197,11 @@ class multimap
 };
 
 
-# define MAP_COMPARISON_OPERATOR(op)	template <class T, class Container> bool operator op						\
-										(ft::map<T, Container> CREF lhs, ft::map<T, Container> CREF rhs)
+# define MAP_COMPARISON_OPERATOR(op)	template <class Key, class T, class Compare, class Allocator> bool operator op						\
+										(ft::map<Key, T, Compare, Allocator> CREF lhs, ft::map<Key, T, Compare, Allocator> CREF rhs)
 
-# define MMAP_COMPARISON_OPERATOR(op)	template <class T, class Container> bool operator op						\
-										(ft::multimap<T, Container> CREF lhs, ft::multimap<T, Container> CREF rhs)
+# define MMAP_COMPARISON_OPERATOR(op)	template <class Key, class T, class Compare, class Allocator> bool operator op						\
+										(ft::multimap<Key, T, Compare, Allocator> CREF lhs, ft::multimap<Key, T, Compare, Allocator> CREF rhs)
 
 # define MAPS_COMPARISON_OPERATOR(op, stmt) MAP_COMPARISON_OPERATOR(op) {stmt;}; MMAP_COMPARISON_OPERATOR(op) {stmt;};
 

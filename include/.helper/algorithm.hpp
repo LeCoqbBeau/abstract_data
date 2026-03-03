@@ -120,7 +120,7 @@ ForwardIt remove(
 	ForwardIt last,
 	T CREF value
 ) {
-	first = find(first, last, value);
+	first = ft::find(first, last, value);
 	for (ForwardIt it = first; ++it != last;)
 		if (!(*it == value))
 			*first++ = *it;
