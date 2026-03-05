@@ -10,35 +10,57 @@
 #include "Fat.hpp"
 
 
-// ALWAYS NEEDED FOR STACK/QUEUE
-# include <deque>
-# include <vector>
-
-# include "deque.hpp"
-# include "vector.hpp"
-// ALWAYS NEEDED FOR STACK/QUEUE
+#define ENABLE_SEQUENCE		true
+#define ENABLE_ASSOCIATIVE	false
+#define ENABLE_ADAPTORS		false
 
 
 #ifndef USE_FT
-# include <list>
-# include <set>
-# include <map>
-# include <queue>
-# include <stack>
+
+# if ENABLE_SEQUENCE == true
+#  include <deque>
+#  include <vector>
+#  include <list>
+# endif
+
+# if ENABLE_SEQUENCE
+#  include <set>
+#  include <map>
+# endif
+
+# if ENABLE_ADAPTORS
+#  include <queue>
+#  include <stack>
+# endif
+
 #else
-# include "list.hpp"
-# include "set.hpp"
-# include "map.hpp"
-# include "queue.hpp"
-# include "stack.hpp"
+
+# if ENABLE_SEQUENCE == true
+#  include "deque.hpp"
+#  include "vector.hpp"
+#  include "list.hpp"
+# endif
+
+# if ENABLE_SEQUENCE
+#  include "set.hpp"
+#  include "map.hpp"
+# endif
+
+# if ENABLE_ADAPTORS
+#  include "queue.hpp"
+#  include "stack.hpp"
+# endif
+
 #endif
 
 
+namespace ft {}; // failsafe
 namespace ns			= TESTED_NAMESPACE;
 namespace otherspace	= UNTESTED_NAMESPACE;
 
 
 // Sequence Containers
+#if ENABLE_SEQUENCE == true
 
 
 typedef ns::list<int>	intList_t;
@@ -72,13 +94,17 @@ typedef ::testing::Types<
 
 
 typedef ::testing::Types<
-	intList_t,		strList_t,		fatList_t,
-	intDeque_t,		strDeque_t,		fatDeque_t,
-	intVector_t,	strVector_t,	fatVector_t
+	// intList_t,		strList_t,		fatList_t,
+	intDeque_t,		strDeque_t,		fatDeque_t
+	// intVector_t,	strVector_t,	fatVector_t
 >	sequenceContainers_type;
 
 
+#endif // ENABLE_SEQUENCE
+
+
 // Associative Containers
+#if ENABLE_ASSOCIATIVE == true
 
 
 typedef ns::set<int>			intSet_t;
@@ -129,7 +155,18 @@ typedef ::testing::Types<
 >	associativeContainers_type;
 
 
+#endif // ENABLE_ASSOCIATIVE
+
+
 //	Adaptor Containers
+#if ENABLE_ADAPTORS == true
+
+
+# include <deque>
+# include <vector>
+
+# include "deque.hpp"
+# include "vector.hpp"
 
 
 typedef ns::queue<int, ns::deque<int> >						intNQueue_t;
@@ -183,6 +220,9 @@ typedef ::testing::Types<
 	intNStack_t, strNStack_t, fatNStack_t,
 	intBStack_t, strBStack_t, fatBStack_t
 >	adaptorContainers_type;
+
+
+#endif // ENABLE_ADPATORS
 
 
 #endif //TYPES_HPP

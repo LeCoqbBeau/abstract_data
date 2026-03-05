@@ -6,8 +6,10 @@
 #include "gtest/gtest.h"
 #include "config.h"
 
+#include "vector.hpp"
+#include "deque.hpp"
 
-// #include "SequenceContainersTests/Tests.hpp"
+#include "SequenceContainersTests/Tests.hpp"
 // #include "AssociativeContainersTests/Tests.hpp"
 // #include "AdaptorContainersTests/Tests.hpp"
 

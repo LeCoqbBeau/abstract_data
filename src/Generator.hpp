@@ -140,5 +140,31 @@ struct wrapAround
 };
 
 
+template <typename T>
+struct array_iterator : std::iterator<std::input_iterator_tag, T, long, T*, T REF> {
+	explicit array_iterator(T *curr) : _curr(curr) {}
+	array_iterator(array_iterator CREF other) : _curr(other._curr) {}
+
+	array_iterator REF operator++() { ++_curr; return *this; }
+	array_iterator operator++(int) { array_iterator tmp(*this); operator++(); return tmp; }
+	T REF operator * () const { return *_curr; }
+	T* operator -> () const { return _curr; }
+	bool operator==(array_iterator CREF rhs) { return _curr == rhs._curr; }
+	bool operator!=(array_iterator CREF rhs) { return _curr != rhs._curr; }
+
+	T*	_curr;
+};
+
+
+template <typename T>
+struct rangeGenerator {
+	array_iterator<T>	 operator()(unsigned int i = 0) const
+	{
+		return array_iterator<T>(
+			const_cast<T*>(arrayGenerator<T>()() + i)
+		);
+	}
+};
+
 
 #endif //GENERATOR_HPP

@@ -65,6 +65,7 @@ typedef long int			ptrdiff_t;
 typedef std::string			string;
 typedef ft::string			str;
 
+
 template <typename T>
 struct allocator : public std::allocator<T> {};
 

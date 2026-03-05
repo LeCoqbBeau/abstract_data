@@ -295,8 +295,6 @@ TYPED_TEST_P(actModifiersTests, EraseRange)
 	EXPECT_EQ(c.size(), size_type(4));
 	EXPECT_TRUE(std::equal(array() + 2, array() + 4, c.begin()));
 	EXPECT_TRUE(std::equal(array() + 6, array() + ARRAY_TINY - 2, std::next(c.begin(), 2)));
-
-
 }
 
 

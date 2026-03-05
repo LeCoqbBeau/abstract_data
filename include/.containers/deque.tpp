@@ -5,6 +5,7 @@
 #ifndef DEQUE_TPP
 #define DEQUE_TPP
 
+#include "iostream"
 #include ".helper/ftexcept.hpp"
 #include ".helper/new.hpp"
 
@@ -15,7 +16,8 @@
 // Constructor
 template <typename T, typename TRef, typename TPtr>
 ft::_dequeIterator<T, TRef, TPtr>::_dequeIterator(value_type** map, value_type *curr)
-	: _mCurrent(curr), _mMap(map) {
+	: _mCurrent(curr), _mMap(map)
+{
 	if (!map) {
 		_mBegin = NULL;
 		_mEnd = NULL;
@@ -169,21 +171,6 @@ operator + (ft::ptrdiff_t n, ft::_dequeIterator<T, Ref, Ptr> CREF iterator)
 }
 
 
-// Comparison Operators
-#define TWO_DEQUEIT_TEMPLATE		template <typename U, typename RefA, typename PtrA, typename RefB, typename PtrB>
-#define TWO_DEQUEIT_PARAMETERS		ft::_dequeIterator<U, RefA, PtrA> CREF a, ft::_dequeIterator<U, RefB, PtrB> CREF b
-#define TWO_DEQUEIT_COMPARISON(op)	TWO_DEQUEIT_TEMPLATE inline bool operator op (TWO_DEQUEIT_PARAMETERS)
-
-TWO_DEQUEIT_COMPARISON(<) 	{ return (a._mMap == b._mMap) ? (a._mCurrent < b._mCurrent) : (a._mMap < b._mMap); }
-TWO_DEQUEIT_COMPARISON(<=)	{ return !(b < a); }
-TWO_DEQUEIT_COMPARISON(>)		{ return (b < a); }
-TWO_DEQUEIT_COMPARISON(>=)	{ return !(a < b); }
-
-#undef TWO_DEQUEIT_TEMPLATE
-#undef TWO_DEQUEIT_PARAMETERS
-#undef TWO_DEQUEIT_COMPARISON
-
-
 //	//
 //	//	ft::_deque<T, Allocator>
 //	//
@@ -202,16 +189,18 @@ template <typename T, typename Allocator>
 ft::deque<T, Allocator>::deque(size_type n, value_type CREF val, allocator_type CREF allocator)
 	: _map(NULL), _mapSize(DEQUE_INIT_ARRAY_NUM), _allocator(allocator)
 {
-	_assignHelper(n, val, ft::true_type());
+	_init(DEQUE_INIT_ARRAY_NUM);
+	_assignFill(n, val);
 }
 
 
 template <typename T, typename Allocator>
-template <typename InputIt>
-ft::deque<T, Allocator>::deque(InputIt first, InputIt last, allocator_type CREF allocator)
+template <typename Iterator>
+ft::deque<T, Allocator>::deque(Iterator first, Iterator last, allocator_type CREF allocator)
 	: _map(NULL), _mapSize(DEQUE_INIT_ARRAY_NUM), _allocator(allocator)
 {
-	_assignHelper(first, last, ft::is_integral<InputIt>());
+	_init(DEQUE_INIT_ARRAY_NUM);
+	_assignHelper(first, last, ft::dispatch<Iterator>::identify());
 }
 
 
@@ -219,6 +208,7 @@ template <typename T, typename Allocator>
 ft::deque<T, Allocator>::deque(deque CREF rhs)
 	: _map(NULL), _mapSize(0)
 {
+	_init(DEQUE_INIT_ARRAY_NUM);
 	*this = rhs;
 }
 
@@ -227,32 +217,8 @@ template <typename T, typename Allocator>
 ft::deque<T, Allocator> REF
 ft::deque<T, Allocator>::operator = (deque CREF rhs)
 {
-	if (this != &rhs) {
-		// Cleanups before allocating
-		if (_map)
-			_clearHelper();
-		_map = NULL;
-		// Copy basic attributes
-		_allocator = rhs._allocator;
-		_mapSize = rhs._mapSize;
-		_map = _allocateMap(_mapSize);
-		size_type const firstBuffer = rhs._start._mMap - rhs._map;
-		size_type const startOffset = rhs._start._mEnd - rhs._start._mCurrent;
-		_map[firstBuffer] = _allocateBuffer();
-		_start = iterator(
-			&_map[firstBuffer],
-			&_map[firstBuffer][startOffset]
-		);
-		_end = _start;
-		// Copy content
-		try {
-			for (const_iterator it = rhs.begin(); it != rhs.end(); ++it)
-				push_back(*it);
-		} catch (...) {
-			while (_start != _end)
-				pop_back();
-		}
-	}
+	if (this != &rhs)
+		_assignHelper(rhs.begin(), rhs.end(), ft::dispatch_forward());
 	return *this;
 }
 
@@ -350,7 +316,9 @@ template <typename T, typename Allocator>
 void
 ft::deque<T, Allocator>::resize(size_type n, value_type CREF val)
 {
-	if (n > size())
+	if (n == 0)
+		clear();
+	else if (n > size())
 			for (size_type i = size(); i < n; ++i)
 				push_back(val); // this can throw :D
 	else
@@ -441,16 +409,16 @@ template <typename T, typename Allocator>
 void
 ft::deque<T, Allocator>::assign(size_type n, value_type CREF value)
 {
-	_assignHelper(n, value, ft::true_type());
+	_assignFill(n, value);
 }
 
 
 template <typename T, typename Allocator>
-template <typename InputIt>
+template <typename Iterator>
 void
-ft::deque<T, Allocator>::assign(InputIt first, InputIt last)
+ft::deque<T, Allocator>::assign(Iterator first, Iterator last)
 {
-	_assignHelper(first, last, ft::is_integral<InputIt>());
+	_assignHelper(first, last, ft::dispatch<Iterator>::identify());
 }
 
 
@@ -505,7 +473,11 @@ template <typename T, typename Allocator>
 typename ft::deque<T, Allocator>::iterator
 ft::deque<T, Allocator>::insert(iterator position, value_type CREF value)
 {
-	return _insertHelper(position, 1, value, ft::true_type());
+	if (empty()) {
+		_assignFill(1, value);
+		return _start;
+	}
+	return _insertFill(position, 1, value);
 }
 
 
@@ -513,16 +485,20 @@ template <class T, class Allocator>
 void
 ft::deque<T, Allocator>::insert(iterator position, size_type count, value_type CREF value)
 {
-	_insertHelper(position, count, value, ft::true_type());
+	if (empty())
+		return _assignFill(count, value);
+	_insertFill(position, count, value);
 }
 
 
 template <class T, class Allocator>
-template<class InputIt>
+template<class Iterator>
 void
-ft::deque<T, Allocator>::insert(iterator position, InputIt first, InputIt last)
+ft::deque<T, Allocator>::insert(iterator position, Iterator first, Iterator last)
 {
-	_insertHelper(position, first, last, ft::is_integral<InputIt>());
+	if (empty())
+		return _assignHelper(first, last, ft::dispatch<Iterator>::identify());
+	_insertHelper(position, first, last, ft::dispatch<Iterator>::identify());
 }
 
 
@@ -545,17 +521,11 @@ ft::deque<T, Allocator>::erase(iterator position)
 	}
 
 	if (elemBefore < elemAfter) {
-		TRY_RET(
-			ft::rcopy(_start, _start + elemBefore, _start + 1),
-			_end
-		);
+		ft::rcopy(_start, position, position + 1); // this causes conditional jump?
 		pop_front();
 	}
 	else {
-		TRY_RET(
-			ft::copy(_end - elemAfter, _end, _start + posIndex),
-			_end;
-		);
+		ft::copy(position + 1, end(), position);
 		pop_back();
 	}
 	return _start + posIndex;
@@ -620,7 +590,6 @@ template <typename T, typename Allocator>
 void ft::deque<T, Allocator>::clear()
 {
 	_clearHelper(true);
-	// _init(DEQUE_INIT_ARRAY_NUM);
 }
 
 
@@ -652,16 +621,10 @@ ft::deque<T, Allocator>::_init(size_type size)
 
 template <typename T, typename Allocator>
 void
-ft::deque<T, Allocator>::_assignHelper(size_type n, value_type CREF val, ft::true_type)
+ft::deque<T, Allocator>::_assignFill(size_type n, value_type CREF val)
 {
-	if (_map)
-		_clearHelper();
-	size_type	newSize = _mapSize;
-	if (!newSize)
-		newSize = DEQUE_INIT_ARRAY_NUM;
-	while (newSize * DEQUE_ARRAY_SIZE < n)
-		newSize *= 2;
-	_init(newSize);
+	clear();
+	_reserveBack(n);
 	while (n) {
 		push_back(val);
 		--n;
@@ -670,14 +633,36 @@ ft::deque<T, Allocator>::_assignHelper(size_type n, value_type CREF val, ft::tru
 
 
 template <typename T, typename Allocator>
+template <typename Integer>
+void
+ft::deque<T, Allocator>::_assignHelper(Integer first, Integer last, ft::dispatch_int)
+{
+	_assignFill(static_cast<size_type>(first), static_cast<value_type>(last));
+}
+
+
+template <typename T, typename Allocator>
 template <typename InputIt>
 void
-ft::deque<T, Allocator>::_assignHelper(InputIt first, InputIt last, ft::false_type)
+ft::deque<T, Allocator>::_assignHelper(InputIt first, InputIt last, ft::dispatch_input)
+{
+	clear();
+	while (first != last) {
+		push_back(*first);
+		++first;
+	}
+}
+
+
+template <typename T, typename Allocator>
+template <typename ForwardIt>
+void
+ft::deque<T, Allocator>::_assignHelper(ForwardIt first, ForwardIt last, ft::dispatch_forward)
 {
 	if (_map)
 		_clearHelper();
-	size_type const elemNum = static_cast<size_type>(ft::distance(first, last));
-	size_type	newSize = _mapSize;
+	size_type const	elemNum = static_cast<size_type>(ft::distance(first, last));
+	size_type		newSize = _mapSize;
 	if (!newSize)
 		newSize = DEQUE_INIT_ARRAY_NUM;
 	while (newSize * DEQUE_ARRAY_SIZE < elemNum)
@@ -752,7 +737,7 @@ ft::deque<T, Allocator>::_reserveFront(size_type n)
 
 template <typename T, typename Allocator>
 typename ft::deque<T, Allocator>::iterator
-ft::deque<T, Allocator>::_insertHelper(iterator pos, size_type n, value_type CREF val, ft::true_type)
+ft::deque<T, Allocator>::_insertFill(iterator pos, size_type n, value_type CREF val)
 {
 	size_type posIndex			= pos - _start;
 	size_type const elemBefore	= posIndex;
@@ -783,7 +768,10 @@ ft::deque<T, Allocator>::_insertHelper(iterator pos, size_type n, value_type CRE
 		// Fill the fresh hole with the correct values
 		ft::advance(it, -n);
 		for (size_type i = 0; i < n; ++i, ++it)
-			*it._mCurrent = saveValue;
+			if (_start >= it)
+				_allocator.construct(it._mCurrent, saveValue);
+			else
+				*it._mCurrent = saveValue;
 		// Adjust iterator position
 		_start -= n;
 	}
@@ -801,7 +789,10 @@ ft::deque<T, Allocator>::_insertHelper(iterator pos, size_type n, value_type CRE
 		// Fill the fresh hole with the correct values
 		ft::advance(it, n);
 		for (size_type i = 0; i < n; ++i, --it)
-			*it._mCurrent = saveValue;
+			if (it >= _end)
+				_allocator.construct(it._mCurrent, saveValue);
+			else
+				*it._mCurrent = saveValue;
 		// Adjust iterator position
 		_end += n;
 	}
@@ -810,23 +801,83 @@ ft::deque<T, Allocator>::_insertHelper(iterator pos, size_type n, value_type CRE
 
 
 template <typename T, typename Allocator>
+template <typename Integer>
+typename ft::deque<T, Allocator>::iterator
+ft::deque<T, Allocator>::_insertHelper(iterator position, Integer first, Integer last, ft::dispatch_int)
+{
+	return _insertFill(position, first, last);
+}
+
+
+template <typename T, typename Allocator>
 template <typename InputIt>
 void
-ft::deque<T, Allocator>::_insertHelper(iterator pos, InputIt first, InputIt last, ft::false_type)
+ft::deque<T, Allocator>::_insertHelper(iterator position, InputIt first, InputIt last, ft::dispatch_input)
 {
-	size_type posIndex			= pos - _start;
-	size_type const n			= ft::distance(first, last);
-	size_type const elemBefore	= posIndex;
-	size_type const elemAfter	= size() - elemBefore - n;
+	size_type	posIndex	= position - _start;
 
-	if (FT_UNLIKELY(pos == _start)) {
-		while (first != last)
-			push_front(*first++);
+	if (FT_UNLIKELY(position == _start)) {
+		ft::deque<T, Allocator>	range(first, last, get_allocator());
+		insert(position, range.begin(), range.end());
 		return ;
 	}
-	if (FT_UNLIKELY(pos == _end)) {
-		while (first != last)
-			push_back(*first++);
+	if (FT_UNLIKELY(position == _end)) {
+		while (first != last) {
+			push_back(*first);
+			++first;
+		}
+		return ;
+	}
+	ft::deque<T, Allocator>	save(get_allocator());
+	if (posIndex < size() / 2) {
+		ft::deque<T, Allocator>	range(first, last, get_allocator());
+		// Front insert
+		save.assign(_start, position);
+		_reserveFront(save.size());
+		erase(_start, position);
+		for (reverse_iterator it = range.rbegin(); it != range.rend(); ++it)
+			push_front(*it);
+		for (reverse_iterator it = save.rbegin(); it != save.rend(); ++it)
+			push_front(*it);
+	}
+	else {
+		// Back insert
+		save.assign(position, _end);
+		_reserveBack(save.size());
+		erase(position, _end);
+		while (first != last) {
+			push_back(*first);
+			++first;
+		}
+		for (iterator it = save.begin(); it != save.end(); ++it)
+			push_back(*it);
+	}
+}
+
+
+template <typename T, typename Allocator>
+template <typename ForwardIt>
+void
+ft::deque<T, Allocator>::_insertHelper(iterator position, ForwardIt first, ForwardIt last, ft::dispatch_forward)
+{
+	size_type	posIndex			= position - _start;
+	size_type	const n				= ft::distance(first, last);
+	size_type	const elemBefore	= posIndex;
+	size_type	const elemAfter		= size() - elemBefore - n;
+
+	if (FT_UNLIKELY(position == _start)) {
+		_reserveFront(n);
+		_start -= n;
+		for (iterator it = _start; first != last; ++it, ++first)
+			_allocator.construct(it._mCurrent, *first);
+		return ;
+	}
+	if (FT_UNLIKELY(position == _end)) {
+		_reserveBack(n);
+		while (first != last) {
+			push_back(*first);
+			++first;
+		}
 		return ;
 	}
 	if (elemBefore < elemAfter) {
@@ -843,7 +894,10 @@ ft::deque<T, Allocator>::_insertHelper(iterator pos, InputIt first, InputIt last
 		// Fill the fresh hole with the correct values
 		ft::advance(it, -n);
 		while (first != last) {
-			*it._mCurrent = *first;
+			if (_start >= it)
+				_allocator.construct(it._mCurrent, *first);
+			else
+				*it._mCurrent = *first;
 			++it;
 			++first;
 		}
@@ -864,7 +918,10 @@ ft::deque<T, Allocator>::_insertHelper(iterator pos, InputIt first, InputIt last
 		// Fill the fresh hole with the correct values
 		ft::advance(it, n);
 		while (first != last) {
-			*it._mCurrent = *first;
+			if (it >= _end)
+				_allocator.construct(it._mCurrent, *first);
+			else
+				*it._mCurrent = *first;
 			++it;
 			++first;
 		}
@@ -877,8 +934,17 @@ ft::deque<T, Allocator>::_insertHelper(iterator pos, InputIt first, InputIt last
 template <typename T, typename Allocator>
 void ft::deque<T, Allocator>::_clearHelper(bool preserveMap)
 {
-	if (!_map)
+	if (!_map || empty())
 		return;
+	std::cout << "begin()._mCurrent: " << begin()._mCurrent << std::endl;
+	std::cout << "begin()._mMap: " << begin()._mMap << std::endl;
+	std::cout << "begin()._mBegin: " << begin()._mBegin << std::endl;
+	std::cout << "begin()._mEnd: " << begin()._mEnd << std::endl;
+	std::cout << "end()._mCurrent: " << end()._mCurrent << std::endl;
+	std::cout << "end()._mMap: " << end()._mMap << std::endl;
+	std::cout << "end()._mBegin: " << end()._mBegin << std::endl;
+	std::cout << "end()._mEnd: " << end()._mEnd << std::endl;
+	std::cout << "size: " << size() << std::endl;
 	for (iterator it = begin(); it != end(); ++it)
 		_allocator.destroy(it._mCurrent);
 	for (size_type i = 1; i < _mapSize + 1; ++i) {
@@ -893,7 +959,7 @@ void ft::deque<T, Allocator>::_clearHelper(bool preserveMap)
 		_mapSize = 0;
 		return;
 	}
-	_start = iterator(&_map[_mapSize + 2 / 2], &_map[_mapSize + 2 / 2][DEQUE_ARRAY_SIZE / 2]);
+	_start = iterator(&_map[(_mapSize + 2) / 2], &_map[(_mapSize + 2) / 2][DEQUE_ARRAY_SIZE / 2]);
 	_end = _start;
 }
 

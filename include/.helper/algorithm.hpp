@@ -178,7 +178,7 @@ OutputIt copy(
 	InputIt last,
 	OutputIt d_first
 ) {
-	for (; first != last; (void)++first, (void)++d_first)
+	for (; first != last; ++first, ++d_first)
 		*d_first = *first;
 	return d_first;
 }
@@ -328,6 +328,7 @@ void promote_heap_impl(
 	*(first + position) = value;
 }
 
+
 template <typename RandomAccessIterator, typename Distance, typename T, typename Compare, typename ValueType>
 void promote_heap_impl(
 	RandomAccessIterator first,
@@ -436,10 +437,11 @@ void adjust_heap_impl(
 		*(first + position) = *(first + (childPosition - 1));
 		position = childPosition - 1;
 	}
-	ft::promote_heap<RandomAccessIterator, Distance, T, Compare>(first, topPosition, position, value, compare);
+	ft::promote_heap(first, topPosition, position, value, compare);
 }
 
-}
+
+} // namespace internal
 
 
 template <typename RandomAccessIterator, typename Distance, typename T>

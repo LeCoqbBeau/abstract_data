@@ -60,9 +60,9 @@ std::ostream REF operator << (std::ostream REF os, std::pair<T, U> CREF pair)
 
 
 template <typename TypeParam>
-void printContainer(TypeParam c, std::ostream REF os)
+void printContainer(TypeParam CREF c, std::ostream REF os = std::cout)
 {
-	for (typename TypeParam::iterator it = c.begin(); it != c.end(); ++it)
+	for (typename TypeParam::const_iterator it = c.begin(); it != c.end(); ++it)
 		os << *it << " > ";
 	os << std::endl;
 }
@@ -74,5 +74,6 @@ void printContainer(TypeParam c, std::ostream REF os)
 
 
 #include <fstream>
+
 
 #endif //CONFIG_H

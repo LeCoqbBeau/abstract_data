@@ -8,6 +8,7 @@
 #include ".helper/algorithm.hpp"
 #include ".helper/ftdef.hpp"
 #include ".helper/iterator.hpp"
+#include ".helper/dispatch.hpp"
 
 #define VECTOR_ARRAY_INIT_SIZE 16
 #define VECTOR_AT_EXCEPTION_MSG ("vector::at(): index n out of bounds")
@@ -104,8 +105,8 @@ class vector {
 		// Constructors
 		explicit 								vector(allocator_type CREF alloc = allocator_type());
 		explicit 								vector(size_type n, value_type CREF val = value_type(), allocator_type CREF alloc = allocator_type());
-		template <class InputIterator>			vector(InputIterator first, InputIterator last, allocator_type CREF alloc = allocator_type());
-		vector(vector CREF rhs);
+		template <class Iterator>				vector(Iterator first, Iterator last, allocator_type CREF alloc = allocator_type());
+												vector(vector CREF rhs);
 		vector REF					operator	= (vector CREF rhs);
 		~vector();
 
@@ -128,8 +129,8 @@ class vector {
 		void									reserve(size_type n);
 
 		// Element Access
-		reference		operator				[] (size_type n);
-		const_reference operator				[] (size_type n) const;
+		reference					operator	[] (size_type n);
+		const_reference 			operator	[] (size_type n) const;
 		reference 								at(size_type n);
 		const_reference 						at(size_type n) const;
 		reference								front();
@@ -139,12 +140,12 @@ class vector {
 
 		// Modifiers
 		void									assign(size_type n, value_type CREF value);
-		template <typename InputIt> void		assign(InputIt first, InputIt last);
+		template <typename Iterator> void		assign(Iterator first, Iterator last);
 		void									push_back(value_type CREF value);
 		void									pop_back();
 		iterator								insert(iterator position, value_type CREF val);
 		void									insert(iterator position, size_type count, value_type CREF val);
-		template <typename InputIt> void		insert(iterator position, InputIt first, InputIt last);
+		template <typename Iterator> void		insert(iterator position, Iterator first, Iterator last);
 		iterator								erase(iterator position);
 		iterator								erase(iterator first, iterator last);
 		void									swap(vector REF other);
@@ -156,17 +157,20 @@ class vector {
 	protected:
 		// Helper Functions
 		void									_init(size_type n);
-		void									_assignHelper(size_type n, value_type CREF val, ft::true_type);
-		template <typename InputIt> void		_assignHelper(InputIt first, InputIt last, ft::false_type);
-		iterator								_insertHelper(iterator pos, size_type n, value_type CREF val, ft::true_type);
-		template <typename InputIt> void		_insertHelper(iterator pos, InputIt first, InputIt last, ft::false_type);
+		void									_assignFill(size_type n, value_type CREF val);
+		template <typename Integer>		void	_assignHelper(Integer first, Integer last, ft::dispatch_int);
+		template <typename InputIt>		void	_assignHelper(InputIt first, InputIt last, ft::dispatch_input);
+		template <typename ForwardIt>	void	_assignHelper(ForwardIt first, ForwardIt last, ft::dispatch_forward);
+		iterator								_insertFill(iterator position, size_type n, value_type CREF val);
+		template <typename Integer>	iterator	_insertHelper(iterator position, Integer first, Integer last, ft::dispatch_int);
+		template <typename InputIt>		void	_insertHelper(iterator position, InputIt first, InputIt last, ft::dispatch_input);
+		template <typename ForwardIt>	void	_insertHelper(iterator position, ForwardIt first, ForwardIt last, ft::dispatch_forward);
 		void									_reallocate(size_type n);
 
 		// Attributes
 		value_type*		_array;
 		value_type*		_end;
-		size_type		_size;
-		size_type		_lastConstructedIndex;
+		size_type		_capacity;
 		allocator_type	_allocator;
 };
 

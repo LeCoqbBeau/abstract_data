@@ -46,15 +46,27 @@ TYPED_TEST_P(sctConstructorTests, Range)
 	typedef typename TypeParam::size_type		size_type;
 	typedef typename TypeParam::const_iterator	const_iterator;
 
-	value_type const*	array = arrayGenerator<value_type>()();
+	value_type const*			array = arrayGenerator<value_type>()();
+	rangeGenerator<value_type>	range;
 
-	TypeParam			container(array, array + ARRAY_TINY);
+	TypeParam			c1(array, array + ARRAY_TINY);
 	size_type	i = 0;
-	EXPECT_EQ(container.empty(), false);
-	EXPECT_EQ(container.size(), static_cast<size_type>(ARRAY_TINY));
-	EXPECT_EQ(container.front(), array[0]);
-	EXPECT_EQ(container.back(), array[ARRAY_TINY - 1]);
-	for (const_iterator it = container.begin(); it != container.end(); ++it) {
+	EXPECT_EQ(c1.empty(), false);
+	EXPECT_EQ(c1.size(), static_cast<size_type>(ARRAY_TINY));
+	EXPECT_EQ(c1.front(), array[0]);
+	EXPECT_EQ(c1.back(), array[ARRAY_TINY - 1]);
+	for (const_iterator it = c1.begin(); it != c1.end(); ++it) {
+		EXPECT_EQ(*it, array[i]);
+		++i;
+	}
+
+	TypeParam			c2(range(0), range(ARRAY_TINY));
+	i = 0;
+	EXPECT_EQ(c2.empty(), false);
+	EXPECT_EQ(c2.size(), static_cast<size_type>(ARRAY_TINY));
+	EXPECT_EQ(c2.front(), array[0]);
+	EXPECT_EQ(c2.back(), array[ARRAY_TINY - 1]);
+	for (const_iterator it = c2.begin(); it != c2.end(); ++it) {
 		EXPECT_EQ(*it, array[i]);
 		++i;
 	}

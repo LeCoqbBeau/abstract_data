@@ -102,13 +102,24 @@ TYPED_TEST_P(sctModifiersTests, AssignRange)
 	typedef typename TypeParam::value_type	value_type;
 	value_type const*			first = arrayGenerator<value_type>()();
 	value_type const*			last = first + ARRAY_SMOL;
+	rangeGenerator<value_type>	range;
 
+	// Other Iterators
 	TypeParam	target(first, last);
 	TypeParam	victim;
 	EXPECT_NE(victim, target);
 	victim.assign(first, last);
 	EXPECT_NE(this->container, target);
 	this->container.assign(first, last);
+	EXPECT_EQ(this->container, target);
+
+	// Input Iterators
+	victim.clear();
+	this->container.clear();
+	EXPECT_NE(victim, target);
+	victim.assign(range(0), range(ARRAY_SMOL));
+	EXPECT_NE(this->container, target);
+	this->container.assign(range(0), range(ARRAY_SMOL));
 	EXPECT_EQ(this->container, target);
 }
 
@@ -205,6 +216,13 @@ TYPED_TEST_P(sctModifiersTests, InsertFill)
 	TypeParam REF							c		= this->container;
 	TypeParam const							target(10, array[ARRAY_TINY]);
 
+	// Insert nothing haha :D
+	c.insert(c.end(), 0, array[0]);
+	EXPECT_EQ(c, copy);
+	c.insert(c.begin(), 0, array[0]);
+	EXPECT_EQ(c, copy);
+	c.insert(std::next(c.begin(), 3), 0, array[0]);
+	EXPECT_EQ(c, copy);
 	// Insert Single at the back
 	c.insert(c.end(), 1, array[ARRAY_TINY]);
 	EXPECT_EQ(c, TypeParam(array(), array() + ARRAY_TINY + 1));
@@ -242,6 +260,102 @@ TYPED_TEST_P(sctModifiersTests, InsertFill)
 }
 
 
+TYPED_TEST_P(sctModifiersTests, InsertRange)
+{
+	typedef typename TypeParam::value_type	value_type;
+	typedef typename TypeParam::size_type	size_type;
+	typedef typename TypeParam::iterator	iterator;
+	arrayGenerator<value_type>				array;
+	rangeGenerator<value_type>				range;
+	TypeParam const							copy	= this->container;
+	TypeParam REF							c		= this->container;
+	TypeParam const							target(array(), array() + ARRAY_SMOL);
+
+	// FORWARD ITERATORS
+	// Empty range :D
+	c.insert(c.begin(), array(), array());
+	EXPECT_EQ(c, copy);
+	c.insert(c.end(), array(), array());
+	EXPECT_EQ(c, copy);
+	c.insert(std::next(c.begin(), 3), array(), array());
+	EXPECT_EQ(c, copy);
+	// Insert Single at back
+	c.insert(c.end(), array() + ARRAY_TINY, array() + ARRAY_TINY + 1);
+	EXPECT_EQ(c.size(), size_type(ARRAY_TINY + 1));
+	EXPECT_TRUE(std::equal(array(), array() + ARRAY_TINY + 1, c.begin()));
+	// Insert Range at back
+	c.insert(c.end(), array() + ARRAY_TINY + 1, array() + ARRAY_SMOL);
+	EXPECT_EQ(c, target);
+	// Insert Single at front
+	c = TypeParam(array() + ARRAY_TINY, array() + ARRAY_SMOL);
+	c.insert(c.begin(), array() + ARRAY_TINY - 1, array() + ARRAY_TINY);
+	EXPECT_EQ(c.size(), size_type(ARRAY_SMOL - ARRAY_TINY + 1));
+	EXPECT_TRUE(std::equal(array() + ARRAY_TINY - 1, array() + ARRAY_SMOL, c.begin()));
+	// Insert Range at front
+	c = TypeParam(array() + ARRAY_TINY, array() + ARRAY_SMOL);
+	c.insert(c.begin(), array(), array() + ARRAY_TINY);
+	EXPECT_EQ(c, target);
+	// Insert Single at middle
+	c = TypeParam(array(), array() + ARRAY_TINY);
+	iterator pos = std::next(c.begin(), 3);
+	c.insert(pos, array() + ARRAY_TINY + 3, array() + ARRAY_TINY + 4);
+	EXPECT_EQ(c.size(), size_type(ARRAY_TINY + 1));
+	EXPECT_TRUE(std::equal(array(), array() + 3, c.begin()));
+	EXPECT_EQ(*std::next(c.begin(), 3), array[ARRAY_TINY + 3]);
+	EXPECT_TRUE(std::equal(array() + 3, array() + ARRAY_TINY, std::next(c.begin(), 4)));
+	// Insert Range at middle
+	c = TypeParam(array(), array() + ARRAY_TINY);
+	pos = std::next(c.begin(), 6);
+	c.insert(pos, array() + ARRAY_TINY + 6, array() + ARRAY_SMOL + 6);
+	EXPECT_EQ(c.size(), size_type(ARRAY_SMOL)); // is ARRAY_TINY + 1 + (ARRAY_SMOL + 6) - (ARRAY_TINY + 6)
+	EXPECT_TRUE(std::equal(array(), array() + 6, c.begin()));
+	EXPECT_TRUE(std::equal(array() + ARRAY_TINY + 6, array() + ARRAY_SMOL + 6, std::next(c.begin(), 6)));
+	EXPECT_TRUE(std::equal(array() + 6, array() + ARRAY_TINY, std::next(c.begin(), 6 + (ARRAY_SMOL - ARRAY_TINY))));
+
+	// INPUT ITERATORS
+	c = TypeParam(array(), array() + ARRAY_TINY);
+	// Empty range :D
+	c.insert(c.begin(), range(), range());
+	EXPECT_EQ(c, copy);
+	c.insert(c.end(), range(), range());
+	EXPECT_EQ(c, copy);
+	c.insert(std::next(c.begin(), 3), range(), range());
+	EXPECT_EQ(c, copy);
+	// Insert Single at back
+	c.insert(c.end(), range(ARRAY_TINY), range(ARRAY_TINY + 1));
+	EXPECT_EQ(c.size(), size_type(ARRAY_TINY + 1));
+	EXPECT_TRUE(std::equal(range(), range(ARRAY_TINY + 1), c.begin()));
+	// Insert Range at back
+	c.insert(c.end(), range(ARRAY_TINY + 1), range(ARRAY_SMOL));
+	EXPECT_EQ(c, target);
+	// Insert Single at front
+	c = TypeParam(range(ARRAY_TINY), range(ARRAY_SMOL));
+	c.insert(c.begin(), range(ARRAY_TINY - 1), range(ARRAY_TINY));
+	EXPECT_EQ(c.size(), size_type(ARRAY_SMOL - ARRAY_TINY + 1));
+	EXPECT_TRUE(std::equal(range(ARRAY_TINY - 1), range(ARRAY_SMOL), c.begin()));
+	// Insert Range at front
+	c = TypeParam(range(ARRAY_TINY), range(ARRAY_SMOL));
+	c.insert(c.begin(), range(), range(ARRAY_TINY));
+	EXPECT_EQ(c, target);
+	// Insert Single at middle
+	c = TypeParam(range(), range(ARRAY_TINY));
+	pos = std::next(c.begin(), 3);
+	c.insert(pos, range(ARRAY_TINY + 3), range(ARRAY_TINY + 4));
+	EXPECT_EQ(c.size(), size_type(ARRAY_TINY + 1));
+	EXPECT_TRUE(std::equal(range(), range(3), c.begin()));
+	EXPECT_EQ(*std::next(c.begin(), 3), array[ARRAY_TINY + 3]);
+	EXPECT_TRUE(std::equal(range(3), range(ARRAY_TINY), std::next(c.begin(), 4)));
+	// Insert Range at middle
+	c = TypeParam(range(), range(ARRAY_TINY));
+	pos = std::next(c.begin(), 6);
+	c.insert(pos, range(ARRAY_TINY + 6), range(ARRAY_SMOL + 6));
+	EXPECT_EQ(c.size(), size_type(ARRAY_SMOL)); // is ARRAY_TINY + 1 + (ARRAY_SMOL + 6) - (ARRAY_TINY + 6)
+	EXPECT_TRUE(std::equal(range(), range(6), c.begin()));
+	EXPECT_TRUE(std::equal(range(ARRAY_TINY + 6), range(ARRAY_SMOL + 6), std::next(c.begin(), 6)));
+	EXPECT_TRUE(std::equal(range(6), range(ARRAY_TINY), std::next(c.begin(), 6 + (ARRAY_SMOL - ARRAY_TINY))));
+}
+
+
 TYPED_TEST_P(sctModifiersTests, EraseSingle)
 {
 	typedef typename TypeParam::value_type	value_type;
@@ -268,7 +382,8 @@ TYPED_TEST_P(sctModifiersTests, EraseSingle)
 }
 
 
-TYPED_TEST_P(sctModifiersTests, EraseRange) {
+TYPED_TEST_P(sctModifiersTests, EraseRange)
+{
 	typedef typename TypeParam::value_type	value_type;
 	typedef typename TypeParam::size_type	size_type;
 	typedef typename TypeParam::iterator	iterator;
@@ -314,6 +429,7 @@ TYPED_TEST_P(sctModifiersTests, EraseRange) {
 	EXPECT_TRUE(std::equal(follower, c.end(), TypeParam(array() + 6, array() + ARRAY_TINY).begin()));
 	EXPECT_EQ(c.size(), size_type(6));
 }
+
 
 
 TYPED_TEST_P(sctModifiersTests, Swap)
@@ -408,6 +524,7 @@ REGISTER_TYPED_TEST_CASE_P(
 	PopFront,
 	InsertSingle,
 	InsertFill,
+	InsertRange,
 	EraseSingle,
 	EraseRange,
 	Swap,

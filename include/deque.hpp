@@ -8,15 +8,13 @@
 #include ".helper/ftdef.hpp"
 #include ".helper/algorithm.hpp"
 #include ".helper/iterator.hpp"
-#include ".helper/type_traits.hpp"
+#include ".helper/dispatch.hpp"
 
 # define DEQUE_ARRAY_SIZE 16
 # define DEQUE_INIT_ARRAY_NUM 8
 # define DEQUE_AT_EXCEPTION_MSG ("deque::at(): index n out of bounds")
 
 namespace ft {
-template <typename T, typename Allocator = ft::allocator<T> >
-class deque;
 
 
 template <typename T, typename TRef, typename TPtr>
@@ -66,7 +64,22 @@ struct _dequeIterator
 };
 
 
-template <typename T, typename Allocator>
+// DequeIterators Comparison Operators
+#define TWO_DEQUEIT_TEMPLATE		template <typename U, typename RefA, typename PtrA, typename RefB, typename PtrB>
+#define TWO_DEQUEIT_PARAMETERS		ft::_dequeIterator<U, RefA, PtrA> CREF a, ft::_dequeIterator<U, RefB, PtrB> CREF b
+#define TWO_DEQUEIT_COMPARISON(op)	TWO_DEQUEIT_TEMPLATE inline bool operator op (TWO_DEQUEIT_PARAMETERS)
+
+TWO_DEQUEIT_COMPARISON(<) 	{ return (a._mMap == b._mMap) ? (a._mCurrent < b._mCurrent) : (a._mMap < b._mMap); }
+TWO_DEQUEIT_COMPARISON(<=)	{ return !(b < a); }
+TWO_DEQUEIT_COMPARISON(>)	{ return (b < a); }
+TWO_DEQUEIT_COMPARISON(>=)	{ return !(a < b); }
+
+#undef TWO_DEQUEIT_TEMPLATE
+#undef TWO_DEQUEIT_PARAMETERS
+#undef TWO_DEQUEIT_COMPARISON
+
+
+template <typename T, typename Allocator = ft::allocator<T> >
 class deque {
 	public:
 		// Typedefs
@@ -86,7 +99,7 @@ class deque {
 		// Constructor
 		explicit							deque(allocator_type CREF allocator = allocator_type());
 		explicit							deque(size_type n, value_type CREF val = value_type(), allocator_type CREF allocator = allocator_type());
-		template <typename InputIt>			deque(InputIt first, InputIt last, allocator_type CREF allocator = allocator_type());
+		template <typename Iterator>		deque(Iterator first, Iterator last, allocator_type CREF allocator = allocator_type());
 		deque(deque CREF rhs);
 		deque REF				operator	= (deque CREF rhs);
 		~deque();
@@ -119,14 +132,14 @@ class deque {
 
 		// Modifiers
 		void								assign(size_type n, value_type CREF value);
-		template <typename InputIt> void	assign(InputIt first, InputIt last);
+		template <typename Iterator> void	assign(Iterator first, Iterator last);
 		void								push_back(value_type CREF value);
 		void								push_front(value_type CREF value);
 		void								pop_back();
 		void								pop_front();
 		iterator							insert(iterator position, value_type CREF value);
 		void								insert(iterator position, size_type count, value_type CREF value);
-		template <typename InputIt> void	insert(iterator position, InputIt first, InputIt last);
+		template <typename Iterator> void	insert(iterator position, Iterator first, Iterator last);
 		iterator							erase(iterator position);
 		iterator							erase(iterator first, iterator last);
 		void								swap(deque REF other);
@@ -140,27 +153,31 @@ class deque {
 		typedef typename allocator_type::template rebind<value_type*>::other _mapAllocator_type;
 
 		// Helper Functions
-		void								_init(size_type size);
-		void								_assignHelper(size_type n, value_type CREF val, ft::true_type);
-		template <typename InputIt> void	_assignHelper(InputIt first, InputIt last, ft::false_type);
-		void								_expandBack();
-		void								_expandFront();
-		void								_reserveBack(size_type n);
-		void								_reserveFront(size_type n);
-		iterator							_insertHelper(iterator pos, size_type n, value_type CREF val, ft::true_type);
-		template <typename InputIt> void	_insertHelper(iterator pos, InputIt first, InputIt last, ft::false_type);
-		void								_clearHelper(bool preserveMap = false);
-		value_type**						_allocateMap(size_type n);
-		value_type*							_allocateBuffer();
-		void								_reallocateMap(size_type n);
+		void									_init(size_type size);
+		void									_assignFill(size_type n, value_type CREF val);
+		template <typename Integer>		void	_assignHelper(Integer first, Integer last, ft::dispatch_int);
+		template <typename InputIt>		void	_assignHelper(InputIt first, InputIt last, ft::dispatch_input);
+		template <typename ForwardIt>	void	_assignHelper(ForwardIt first, ForwardIt last, ft::dispatch_forward);
+		void									_expandBack();
+		void									_expandFront();
+		void									_reserveBack(size_type n);
+		void									_reserveFront(size_type n);
+		iterator								_insertFill(iterator position, size_type n, value_type CREF val);
+		template <typename Integer>	iterator	_insertHelper(iterator position, Integer first, Integer last, ft::dispatch_int);
+		template <typename InputIt>		void	_insertHelper(iterator position, InputIt first, InputIt last, ft::dispatch_input);
+		template <typename ForwardIt>	void	_insertHelper(iterator position, ForwardIt first, ForwardIt last, ft::dispatch_forward);
+		void									_clearHelper(bool preserveMap = false);
+		value_type**							_allocateMap(size_type n);
+		value_type*								_allocateBuffer();
+		void									_reallocateMap(size_type n);
 
 		// Attributes
-		value_type**						_map;
-		size_type							_mapSize;
-		iterator							_start;
-		iterator							_end;
-		mutable allocator_type				_allocator;
-		_mapAllocator_type					_mapAllocator() { return _mapAllocator_type(_allocator); }
+		value_type**							_map;
+		size_type								_mapSize;
+		iterator								_start;
+		iterator								_end;
+		mutable allocator_type					_allocator;
+		_mapAllocator_type						_mapAllocator() const { return _mapAllocator_type(_allocator); }
 
 
 };

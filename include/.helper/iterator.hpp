@@ -11,11 +11,11 @@
 namespace ft {
 
 // Iterator tags
-typedef std::input_iterator_tag input_iterator_tag;
-typedef std::output_iterator_tag output_iterator_tag;
-typedef std::forward_iterator_tag forward_iterator_tag;
-typedef std::bidirectional_iterator_tag bidirectional_iterator_tag;
-typedef std::random_access_iterator_tag random_access_iterator_tag;
+typedef std::input_iterator_tag			input_iterator_tag;
+typedef std::output_iterator_tag		output_iterator_tag;
+typedef std::forward_iterator_tag		forward_iterator_tag;
+typedef std::bidirectional_iterator_tag	bidirectional_iterator_tag;
+typedef std::random_access_iterator_tag	random_access_iterator_tag;
 
 // Iterator Traits
 namespace internal {
@@ -86,6 +86,7 @@ template<
 	typedef Reference	reference;
 	typedef Category	iterator_category;
 };
+
 
 // Reverse Iterator
 template <class Iter>
@@ -197,7 +198,8 @@ distance_impl(RandomAccessIterator first, RandomAccessIterator last, ft::random_
 
 
 template <typename InputIterator, typename Distance>
-void advance_impl(InputIterator REF i, Distance n, ft::input_iterator_tag)
+void
+advance_impl(InputIterator REF i, Distance n, ft::input_iterator_tag)
 {
 	while (n--)
 		++i;
@@ -237,14 +239,16 @@ struct advance_bi_impl<true>
 
 
 template <typename BidirectionalIterator, typename Distance>
-void advance_impl(BidirectionalIterator REF i, Distance n, ft::bidirectional_iterator_tag)
+void
+advance_impl(BidirectionalIterator REF i, Distance n, ft::bidirectional_iterator_tag)
 {
 	advance_bi_impl<ft::is_signed<Distance>::value>::advance_impl(i, n);
 }
 
 
 template <typename RandomAccessIterator, typename Distance>
-void advance_impl(RandomAccessIterator REF i, Distance n, ft::random_access_iterator_tag)
+void
+advance_impl(RandomAccessIterator REF i, Distance n, ft::random_access_iterator_tag)
 {
 	i += n;
 }
