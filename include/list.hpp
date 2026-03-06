@@ -6,6 +6,7 @@
 #include ".helper/iterator.hpp"
 #include ".helper/type_traits.hpp"
 #include ".helper/doublyLinkedList.hpp"
+#include ".helper/dispatch.hpp"
 
 namespace ft {
 
@@ -30,9 +31,9 @@ class list {
 		// Constructors & Destructors
 		explicit								list(allocator_type CREF alloc = allocator_type());
 		explicit								list(size_type n, value_type CREF val = value_type(), allocator_type CREF alloc = allocator_type());
-		template<class InputIt>					list (InputIt first, InputIt last, allocator_type CREF alloc = allocator_type());
+		template<class Iterator>				list (Iterator first, Iterator last, allocator_type CREF alloc = allocator_type());
 		list(list CREF x);
-		list REF operator						= (list CREF rhs);
+		list REF					operator	= (list CREF rhs);
 		~list();
 
 		// Iterators
@@ -58,14 +59,14 @@ class list {
 
 		// Modifiers
 		void									assign(size_type count, value_type CREF value);
-		template <class InputIt> void			assign(InputIt first, InputIt last);
+		template <class Iterator> void			assign(Iterator first, Iterator last);
 		void									push_front(value_type CREF val);
 		void									pop_front();
 		void									push_back(value_type CREF val);
 		void									pop_back();
 		iterator								insert(iterator position, value_type CREF value);
 		void									insert(iterator position, size_type count, value_type CREF value);
-		template<class InputIt> void			insert(iterator position, InputIt first, InputIt last);
+		template<class Iterator> void			insert(iterator position, Iterator first, Iterator last);
 		iterator								erase(iterator position);
 		iterator								erase(iterator first, iterator last);
 		void									swap(list REF x);
@@ -77,13 +78,13 @@ class list {
 		void									splice(iterator position, list REF other, iterator it);
 		void									splice(iterator position, list REF other, iterator first, iterator last);
 		void									remove(value_type CREF val);
-		template <class Predicate> void			remove_if(Predicate pred);
+		template <class Predicate>		 void	remove_if(Predicate pred);
 		void									unique();
 		template <class BinaryPredicate> void	unique(BinaryPredicate pred);
 		void									merge(list REF other);
-		template <class Compare> void			merge(list REF other, Compare comp);
+		template <class Compare>		 void	merge(list REF other, Compare comp);
 		void									sort();
-		template <class Compare> void			sort(Compare comp);
+		template <class Compare>		 void	sort(Compare comp);
 		void									reverse();
 
 		// Observers
@@ -97,11 +98,12 @@ class list {
 
 		// Helper methods
 		_base_type*									_createNode(value_type CREF val) const;
-		void										_assignHelper(size_type n, value_type CREF val, ft::true_type);
+		void										_assignFill(size_type n, value_type CREF val);
+		template <class Integer> void				_assignHelper(Integer first, Integer last, ft::true_type);
 		template <class InputIt> void				_assignHelper(InputIt first, InputIt last, ft::false_type);
-		iterator									_insertHelper(iterator position, list REF other);
-		list										_insertHelper(size_type n, value_type CREF val, ft::true_type);
-		template <class InputIt> list				_insertHelper(InputIt first, InputIt last, ft::false_type);
+		void										_insertImpl(iterator position, list REF other);
+		void										_insertHelper(iterator position, size_type count, value_type CREF value, ft::true_type);
+		template <class InputIt> void				_insertHelper(iterator position, InputIt first, InputIt last, ft::false_type);
 		void										_duplicate(_base_type *newSentinel) const;
 		void										_shrinkHelper(size_type n);
 		void										_clearHelper();

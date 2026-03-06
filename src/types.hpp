@@ -94,8 +94,8 @@ typedef ::testing::Types<
 
 
 typedef ::testing::Types<
-	// intList_t,		strList_t,		fatList_t,
-	intDeque_t,		strDeque_t,		fatDeque_t
+	intList_t,		strList_t,		fatList_t//,
+	// intDeque_t,		strDeque_t,		fatDeque_t
 	// intVector_t,	strVector_t,	fatVector_t
 >	sequenceContainers_type;
 
