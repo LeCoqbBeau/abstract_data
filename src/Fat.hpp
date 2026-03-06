@@ -10,14 +10,12 @@
 
 struct Fat
 {
-	Fat(int num=0, std::string CREF str=std::string()) : integer(num), string(str), chonk(NULL) { chonk = new char; }
-	Fat(Fat CREF rhs) : integer(rhs.integer), string(rhs.string), chonk(NULL) { chonk = new char; }
+	Fat(int num=0, std::string CREF str=std::string()) : integer(num), string(str), chonk(new char) {}
+	Fat(Fat CREF rhs) : integer(rhs.integer), string(rhs.string), chonk(new char) {}
 	Fat REF operator = (Fat CREF rhs) {
 		if (this != &rhs) {
 			integer = rhs.integer;
 			string = rhs.string;
-			if (!chonk)
-				chonk = new char;
 		}
 		return *this;
 	}

@@ -5,175 +5,11 @@
 #ifndef DEQUE_TPP
 #define DEQUE_TPP
 
+
 #include "iostream"
 #include ".helper/ftexcept.hpp"
 #include ".helper/new.hpp"
 
-//	//
-//	//	ft::_dequeIterator<T, TRef, TPtr>
-//	//
-
-// Constructor
-template <typename T, typename TRef, typename TPtr>
-ft::_dequeIterator<T, TRef, TPtr>::_dequeIterator(value_type** map, value_type *curr)
-	: _mCurrent(curr), _mMap(map)
-{
-	if (!map) {
-		_mBegin = NULL;
-		_mEnd = NULL;
-	} else {
-		_mBegin = *map;
-		_mEnd = _mBegin + DEQUE_ARRAY_SIZE;
-	}
-}
-
-
-template <typename T, typename TRef, typename TPtr>
-ft::_dequeIterator<T, TRef, TPtr>::_dequeIterator(_dequeIterator<T, T REF, T*> CREF iterator)
-	: _mCurrent(iterator._mCurrent), _mBegin(iterator._mBegin), _mEnd(iterator._mEnd), _mMap(iterator._mMap)
-{}
-
-
-// In/Equality Operator
-template <typename T, typename TRef, typename TPtr>
-template <class U, class URef, class UPtr>
-bool
-ft::_dequeIterator<T, TRef, TPtr>::operator ==(_dequeIterator<U, URef, UPtr> CREF rhs) const
-{
-	return _mCurrent == rhs._mCurrent;
-}
-
-
-template <typename T, typename TRef, typename TPtr>
-template <class U, class URef, class UPtr>
-bool
-ft::_dequeIterator<T, TRef, TPtr>::operator !=(_dequeIterator<U, URef, UPtr> CREF rhs) const
-{
-	return _mCurrent != rhs._mCurrent;
-}
-
-
-// Shift Operators
-template <typename T, typename TRef, typename TPtr>
-typename ft::_dequeIterator<T, TRef, TPtr>::this_type REF
-ft::_dequeIterator<T, TRef, TPtr>::operator ++()
-{
-	if (FT_UNLIKELY(++_mCurrent == _mEnd)) {
-		if (FT_UNLIKELY(*(_mMap + 1) == NULL))
-			return *this;
-		_mBegin = *++_mMap;
-		_mCurrent = _mBegin;
-		_mEnd = _mBegin + DEQUE_ARRAY_SIZE;
-	}
-	return *this;
-}
-
-
-template <typename T, typename TRef, typename TPtr>
-typename ft::_dequeIterator<T, TRef, TPtr>::this_type
-ft::_dequeIterator<T, TRef, TPtr>::operator ++ (int)
-{
-	this_type temp(*this);
-	operator++();
-	return temp;
-}
-
-
-template <typename T, typename TRef, typename TPtr>
-typename ft::_dequeIterator<T, TRef, TPtr>::this_type REF
-ft::_dequeIterator<T, TRef, TPtr>::operator += (difference_type n)
-{
-	const difference_type arrayPos = (_mCurrent - _mBegin) + n;
-
-	if (static_cast<ft::size_t>(arrayPos) < static_cast<ft::size_t>(n))
-		_mCurrent += n;
-	else {
-#define LARGE_OFFSET (1 << 24)
-		difference_type arrayIndex = (LARGE_OFFSET + arrayPos) / static_cast<difference_type>(DEQUE_ARRAY_SIZE);
-		arrayIndex -= (LARGE_OFFSET / DEQUE_ARRAY_SIZE);
-		_mMap += arrayIndex;
-		_mBegin = *_mMap;
-		_mEnd = _mBegin + DEQUE_ARRAY_SIZE;
-		_mCurrent = _mBegin + (arrayPos - (arrayIndex * DEQUE_ARRAY_SIZE));
-#undef LARGE_OFFSET
-	}
-	return *this;
-}
-
-
-template <typename T, typename TRef, typename TPtr>
-typename ft::_dequeIterator<T, TRef, TPtr>::this_type
-ft::_dequeIterator<T, TRef, TPtr>::operator + (difference_type n) const
-{
-	return this_type(*this).operator+=(n);
-}
-
-
-template <typename T, typename TRef, typename TPtr>
-typename ft::_dequeIterator<T, TRef, TPtr>::this_type REF
-ft::_dequeIterator<T, TRef, TPtr>::operator -- ()
-{
-	if (FT_UNLIKELY(_mCurrent == _mBegin)) {
-		_mBegin = *--_mMap;
-		_mEnd = _mBegin + DEQUE_ARRAY_SIZE;
-		_mCurrent = _mEnd;
-	}
-	--_mCurrent;
-	return *this;
-}
-
-
-template <typename T, typename TRef, typename TPtr>
-typename ft::_dequeIterator<T, TRef, TPtr>::this_type
-ft::_dequeIterator<T, TRef, TPtr>::operator -- (int)
-{
-	this_type temp(*this);
-	operator--();
-	return temp;
-}
-
-
-template <typename T, typename TRef, typename TPtr>
-typename ft::_dequeIterator<T, TRef, TPtr>::this_type REF
-ft::_dequeIterator<T, TRef, TPtr>::operator -= (difference_type n)
-{
-	return this->operator+=(-n);
-}
-
-
-template <typename T, typename TRef, typename TPtr>
-typename ft::_dequeIterator<T, TRef, TPtr>::this_type
-ft::_dequeIterator<T, TRef, TPtr>::operator - (difference_type n) const
-{
-	return this_type(*this).operator+=(-n);
-}
-
-
-template <typename T, typename TRef, typename TPtr>
-template <class U, class URef, class UPtr>
-typename ft::_dequeIterator<T, TRef, TPtr>::difference_type
-ft::_dequeIterator<T, TRef, TPtr>::operator - (_dequeIterator<U, URef, UPtr> CREF rhs) const
-{
-	typedef typename ft::_dequeIterator<T, TRef, TPtr>::difference_type difference_type;
-	difference_type const bufferSize = static_cast<difference_type>(DEQUE_ARRAY_SIZE);
-	difference_type const nodeDiff = this->_mMap - rhs._mMap;
-	difference_type const offset = (this->_mCurrent - this->_mBegin) - (rhs._mCurrent - rhs._mBegin);
-	return bufferSize * nodeDiff + offset;
-}
-
-
-// to handle n + iterator
-template <typename T, typename Ref, typename Ptr>
-ft::_dequeIterator<T, Ref, Ptr>
-operator + (ft::ptrdiff_t n, ft::_dequeIterator<T, Ref, Ptr> CREF iterator)
-{
-	return iterator + n;
-}
-
-
-//	//
-//	//	ft::_deque<T, Allocator>
-//	//
 
 // Public Members
 // Constructor
@@ -392,7 +228,7 @@ template <class T, class Allocator>
 typename ft::deque<T, Allocator>::reference
 ft::deque<T, Allocator>::back()
 {
-	return *(_end._mCurrent - 1);
+	return *ft::next(_end, -1);
 }
 
 
@@ -400,7 +236,7 @@ template <class T, class Allocator>
 typename ft::deque<T, Allocator>::const_reference
 ft::deque<T, Allocator>::back() const
 {
-	return *(_end._mCurrent - 1);
+	return *ft::next(_end, -1);
 }
 
 
@@ -426,10 +262,10 @@ template <typename T, typename Allocator>
 void
 ft::deque<T, Allocator>::push_back(value_type CREF value)
 {
-	if (FT_UNLIKELY(_end._mCurrent == _end._mEnd))
-		_expandBack();
 	_allocator.construct(_end._mCurrent, value);
 	++_end._mCurrent;
+	if (FT_UNLIKELY(_end._mCurrent == _end._mEnd))
+		_expandBack();
 }
 
 
@@ -437,13 +273,11 @@ template <typename T, typename Allocator>
 void
 ft::deque<T, Allocator>::push_front(value_type CREF value)
 {
-	if (FT_UNLIKELY(_start._mCurrent == _start._mBegin)) {
+	if (FT_UNLIKELY(_start._mCurrent == _start._mBegin))
 		_expandFront();
-		_allocator.construct(_start._mCurrent, value);
-		return ;
-	}
-	_allocator.construct(_start._mCurrent - 1, value);
-	--_start._mCurrent;
+	else
+		--_start._mCurrent;
+	_allocator.construct(_start._mCurrent, value);
 }
 
 
@@ -659,15 +493,8 @@ template <typename ForwardIt>
 void
 ft::deque<T, Allocator>::_assignHelper(ForwardIt first, ForwardIt last, ft::dispatch_forward)
 {
-	if (_map)
-		_clearHelper();
-	size_type const	elemNum = static_cast<size_type>(ft::distance(first, last));
-	size_type		newSize = _mapSize;
-	if (!newSize)
-		newSize = DEQUE_INIT_ARRAY_NUM;
-	while (newSize * DEQUE_ARRAY_SIZE < elemNum)
-		newSize *= 2;
-	_init(newSize);
+	clear();
+	_reserveBack(ft::distance(first, last));
 	while (first != last) {
 		push_back(*first);
 		++first;
@@ -681,11 +508,10 @@ ft::deque<T, Allocator>::_expandBack()
 {
 	if (FT_UNLIKELY(_end._mMap == _map + _mapSize + 2))
 		_reallocateMap(_mapSize * 2);
-	_end._mMap[1] = _allocateBuffer();
-	++_end._mMap;
-	_end._mCurrent = *_end._mMap;
-	_end._mBegin = _end._mCurrent;
-	_end._mEnd = _end._mBegin + DEQUE_ARRAY_SIZE;
+	if (_end._mMap[1] == NULL)
+		_end._mMap[1] = _allocateBuffer();
+	_end._setSubarray(_end._mMap + 1);
+	_end._mCurrent = _end._mBegin;
 }
 
 
@@ -695,11 +521,10 @@ ft::deque<T, Allocator>::_expandFront()
 {
 	if (FT_UNLIKELY(_start._mMap - 1 == _map))
 		_reallocateMap(_mapSize * 2);
-	_start._mMap[-1] = _allocateBuffer();
-	--_start._mMap;
+	if (_start._mMap[-1] == NULL)
+		_start._mMap[-1] = _allocateBuffer();
+	_start._setSubarray(_start._mMap - 1);
 	_start._mCurrent = *_start._mMap + DEQUE_ARRAY_SIZE - 1;
-	_start._mBegin = *_start._mMap;
-	_start._mEnd = _start._mBegin + DEQUE_ARRAY_SIZE;
 }
 
 
@@ -709,11 +534,12 @@ ft::deque<T, Allocator>::_reserveBack(size_type n)
 {
 	if (_end._mCurrent + n < _end._mEnd)
 		return ;
-	if (FT_UNLIKELY(_end._mMap > &_map[_mapSize]))
+	if (FT_UNLIKELY(_end._mMap > _map + _mapSize + 2))
 		_reallocateMap(_mapSize + n);
 	size_type j = 1;
 	for (difference_type i = n; i > 0; i -= DEQUE_ARRAY_SIZE) {
-		*(_end._mMap + j) = _allocateBuffer();
+		if (!_end._mMap[j])
+			_end._mMap[j] = _allocateBuffer();
 		++j;
 	}
 }
@@ -723,13 +549,14 @@ template <typename T, typename Allocator>
 void
 ft::deque<T, Allocator>::_reserveFront(size_type n)
 {
-	if (_start._mEnd - _start._mCurrent > static_cast<difference_type>(n))
+	if (_start._mCurrent - _start._mBegin > static_cast<difference_type>(n))
 		return ;
-	if (FT_UNLIKELY(_start._mMap == _map))
+	if (FT_UNLIKELY(_start._mMap == _map + 1))
 		_reallocateMap(_mapSize + n);
 	size_type j = 1;
 	for (difference_type i = n; i > 0; i -= DEQUE_ARRAY_SIZE) {
-		*(_start._mMap - j) = _allocateBuffer();
+		if (!_start._mMap[-j])
+			_start._mMap[-j] = _allocateBuffer();
 		++j;
 	}
 }
@@ -768,7 +595,7 @@ ft::deque<T, Allocator>::_insertFill(iterator pos, size_type n, value_type CREF 
 		// Fill the fresh hole with the correct values
 		ft::advance(it, -n);
 		for (size_type i = 0; i < n; ++i, ++it)
-			if (_start >= it)
+			if (_start > it)
 				_allocator.construct(it._mCurrent, saveValue);
 			else
 				*it._mCurrent = saveValue;
@@ -779,7 +606,7 @@ ft::deque<T, Allocator>::_insertFill(iterator pos, size_type n, value_type CREF 
 		_reserveBack(n);
 		// Shift the front elements to the left to make a hole
 		iterator it = end() - 1;
-		for (size_type i = 0; i < posIndex; ++i, --it) {
+		for (size_type i = 0; i < elemAfter; ++i, --it) {
 			value_type *shifted = (it + n)._mCurrent;
 			if (i < n)
 				_allocator.construct(shifted, *it);
@@ -863,7 +690,7 @@ ft::deque<T, Allocator>::_insertHelper(iterator position, ForwardIt first, Forwa
 	size_type	posIndex			= position - _start;
 	size_type	const n				= ft::distance(first, last);
 	size_type	const elemBefore	= posIndex;
-	size_type	const elemAfter		= size() - elemBefore - n;
+	size_type	const elemAfter		= size() - n;
 
 	if (FT_UNLIKELY(position == _start)) {
 		_reserveFront(n);
@@ -894,7 +721,7 @@ ft::deque<T, Allocator>::_insertHelper(iterator position, ForwardIt first, Forwa
 		// Fill the fresh hole with the correct values
 		ft::advance(it, -n);
 		while (first != last) {
-			if (_start >= it)
+			if (_start > it)
 				_allocator.construct(it._mCurrent, *first);
 			else
 				*it._mCurrent = *first;
@@ -908,7 +735,7 @@ ft::deque<T, Allocator>::_insertHelper(iterator position, ForwardIt first, Forwa
 		_reserveBack(n);
 		// Shift the back elements to the right to make a hole
 		iterator it = end() - 1;
-		for (size_type i = 0; i < posIndex; ++i, --it) {
+		for (size_type i = 0; i < elemAfter; ++i, --it) {
 			value_type *shifted = (it + n)._mCurrent;
 			if (i < n)
 				_allocator.construct(shifted, *it);
@@ -934,20 +761,11 @@ ft::deque<T, Allocator>::_insertHelper(iterator position, ForwardIt first, Forwa
 template <typename T, typename Allocator>
 void ft::deque<T, Allocator>::_clearHelper(bool preserveMap)
 {
-	if (!_map || empty())
+	if (!_map)
 		return;
-	std::cout << "begin()._mCurrent: " << begin()._mCurrent << std::endl;
-	std::cout << "begin()._mMap: " << begin()._mMap << std::endl;
-	std::cout << "begin()._mBegin: " << begin()._mBegin << std::endl;
-	std::cout << "begin()._mEnd: " << begin()._mEnd << std::endl;
-	std::cout << "end()._mCurrent: " << end()._mCurrent << std::endl;
-	std::cout << "end()._mMap: " << end()._mMap << std::endl;
-	std::cout << "end()._mBegin: " << end()._mBegin << std::endl;
-	std::cout << "end()._mEnd: " << end()._mEnd << std::endl;
-	std::cout << "size: " << size() << std::endl;
 	for (iterator it = begin(); it != end(); ++it)
 		_allocator.destroy(it._mCurrent);
-	for (size_type i = 1; i < _mapSize + 1; ++i) {
+	for (size_type i = 0; i < _mapSize + 2; ++i) {
 		if (FT_LIKELY(!preserveMap || i != (_mapSize + 2) / 2)) {
 			_allocator.deallocate(_map[i], DEQUE_ARRAY_SIZE);
 			_map[i] = NULL;

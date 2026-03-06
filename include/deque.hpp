@@ -35,9 +35,9 @@ struct _dequeIterator
 
 	// In/Equality Operator
 	template <class U, class URef, class UPtr>
-	bool operator	== (_dequeIterator<U, URef, UPtr> CREF rhs) const;
+	bool			operator	== (_dequeIterator<U, URef, UPtr> CREF rhs) const;
 	template <class U, class URef, class UPtr>
-	bool operator	!= (_dequeIterator<U, URef, UPtr> CREF rhs) const;
+	bool			operator	!= (_dequeIterator<U, URef, UPtr> CREF rhs) const;
 
 	// Dereference Operator
 	reference		operator	* () 					{ return *_mCurrent; }
@@ -56,27 +56,15 @@ struct _dequeIterator
 	template <class U, class URef, class UPtr>
 	difference_type	operator	- (_dequeIterator<U, URef, UPtr> CREF rhs) const;
 
+	// Helper Function
+	void						_setSubarray(value_type **map);
+
 	// Attributes
 	value_type*		_mCurrent;	// Current element in buffer
 	value_type*		_mBegin;	// Start of buffer
 	value_type*		_mEnd;		// End of buffer
 	value_type**	_mMap;		// Map that holds the current buffer
 };
-
-
-// DequeIterators Comparison Operators
-#define TWO_DEQUEIT_TEMPLATE		template <typename U, typename RefA, typename PtrA, typename RefB, typename PtrB>
-#define TWO_DEQUEIT_PARAMETERS		ft::_dequeIterator<U, RefA, PtrA> CREF a, ft::_dequeIterator<U, RefB, PtrB> CREF b
-#define TWO_DEQUEIT_COMPARISON(op)	TWO_DEQUEIT_TEMPLATE inline bool operator op (TWO_DEQUEIT_PARAMETERS)
-
-TWO_DEQUEIT_COMPARISON(<) 	{ return (a._mMap == b._mMap) ? (a._mCurrent < b._mCurrent) : (a._mMap < b._mMap); }
-TWO_DEQUEIT_COMPARISON(<=)	{ return !(b < a); }
-TWO_DEQUEIT_COMPARISON(>)	{ return (b < a); }
-TWO_DEQUEIT_COMPARISON(>=)	{ return !(a < b); }
-
-#undef TWO_DEQUEIT_TEMPLATE
-#undef TWO_DEQUEIT_PARAMETERS
-#undef TWO_DEQUEIT_COMPARISON
 
 
 template <typename T, typename Allocator = ft::allocator<T> >
@@ -189,6 +177,18 @@ void swap(ft::deque<T, Allocator> REF x, ft::deque<T, Allocator> REF y) {
 }
 
 
+#define TWO_DEQUEIT_COMPARISON(op)																					\
+	template <typename U, typename RefA, typename PtrA, typename RefB, typename PtrB>								\
+	inline bool operator op (ft::_dequeIterator<U, RefA, PtrA> CREF a, ft::_dequeIterator<U, RefB, PtrB> CREF b)	\
+
+TWO_DEQUEIT_COMPARISON(<) 	{ return (a._mMap == b._mMap) ? (a._mCurrent < b._mCurrent) : (a._mMap < b._mMap); }
+TWO_DEQUEIT_COMPARISON(<=)	{ return !(b < a); }
+TWO_DEQUEIT_COMPARISON(>)	{ return (b < a); }
+TWO_DEQUEIT_COMPARISON(>=)	{ return !(a < b); }
+
+#undef TWO_DEQUEIT_COMPARISON
+
+
 # define DEQUE_COMPARISON_OPERATOR(op)	template <class T, class Allocator> bool operator op						\
 										(ft::deque<T, Allocator> CREF lhs, ft::deque<T, Allocator> CREF rhs)
 
@@ -205,6 +205,7 @@ DEQUE_COMPARISON_OPERATOR(>=)	{ return !(lhs < rhs); }
 }
 
 
+#include ".containers/dequeIterator.tpp"
 #include ".containers/deque.tpp"
 
 
