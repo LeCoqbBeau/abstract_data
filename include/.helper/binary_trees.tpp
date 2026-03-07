@@ -149,7 +149,7 @@ ft::internal::rbt_node<T>::insert(this_type* node, Compare comp)
 	this->next[insertSide] = node;
 	node->color = RBT_RED;
 	node->parent = this;
-	ft::fill_n(node->next, 2, static_cast<base_type*>(NULL));
+	node->left() = node->right() = NULL;
 	return node;
 }
 

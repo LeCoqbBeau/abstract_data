@@ -10,20 +10,6 @@
 #include ".helper/type_traits.hpp"
 
 
-#include "iostream"
-#define SHOWL(var) std::cout << #var ": " << var << std::endl;
-#ifndef PRINTCONTAINER
-#define PRINTCONTAINER
-template <typename TypeParam>
-void printContainer(TypeParam CREF c, std::ostream REF os = std::cout)
-{
-	for (typename TypeParam::const_iterator it = c.begin(); it != c.end(); ++it)
-		os << *it << " > ";
-	os << std::endl;
-}
-#endif
-
-
 template <class T, class Allocator>
 ft::list<T, Allocator>::list(allocator_type CREF alloc)
 	: _sentinel(), _allocator(alloc)

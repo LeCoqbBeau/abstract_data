@@ -51,13 +51,6 @@ ForwardIt next(ForwardIt it, typename std::iterator_traits<ForwardIt>::differenc
 // Okay look again :D
 
 
-template <typename T, typename U>
-std::ostream REF operator << (std::ostream REF os, std::pair<T, U> CREF pair)
-{
-	os << "< " << pair.first << " -=- " << pair.second << " >";
-	return os;
-}
-
 #ifndef PRINTCONTAINER
 #define PRINTCONTAINER
 template <typename TypeParam>

@@ -2,8 +2,8 @@
 // Created by mscheman on 11/20/25.
 //
 
-#ifndef UTILITY_H
-#define UTILITY_H
+#ifndef UTILITY_HPP
+#define UTILITY_HPP
 
 #include "ftdef.hpp"
 
@@ -104,4 +104,4 @@ ft::pair<T1, T2> ft::make_pair(T1 x, T2 y) {
 }
 
 
-#endif //UTILITY_H
+#endif //UTILITY_HPP

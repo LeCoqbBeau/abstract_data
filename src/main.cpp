@@ -9,9 +9,17 @@
 #include "vector.hpp"
 #include "list.hpp"
 
-#include "SequenceContainersTests/Tests.hpp"
-// #include "AssociativeContainersTests/Tests.hpp"
-// #include "AdaptorContainersTests/Tests.hpp"
+#if ENABLE_SEQUENCE == true
+# include "SequenceContainersTests/Tests.hpp"
+#endif
+
+#if ENABLE_ASSOCIATIVE == true
+# include "AssociativeContainersTests/Tests.hpp"
+#endif
+
+#if ENABLE_ADAPTORS == true
+# include "AdaptorContainersTests/Tests.hpp"
+#endif
 
 
 int main(int argc, char *argv[]) {

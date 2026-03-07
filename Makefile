@@ -67,7 +67,7 @@ SRC_DIR			=	src/
 SRC_NAME		=	main.cpp
 
 INCLUDES		=	-I$(INC) -I$(GTEST_INCLUDE)
-CFLAGS			=	$(INCLUDES) -Wall -Werror -Wextra -g -std=c++98 -MMD -MP -fsanitize=address
+CFLAGS			=	$(INCLUDES) -Wall -Werror -Wextra -g -std=c++98 -MMD -MP
 CXX				=	clang++
 
 OBJ_DIR			=	.build/

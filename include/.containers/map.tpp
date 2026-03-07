@@ -209,7 +209,7 @@ void
 ft::map<Key, T, Comp, Allocator>::insert(InputIt first, InputIt last)
 {
 	while (first != last) {
-		insert(*first);
+		this->insert(*first);
 		++first;
 	}
 }

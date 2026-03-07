@@ -10,8 +10,8 @@
 #include "Fat.hpp"
 
 
-#define ENABLE_SEQUENCE		true
-#define ENABLE_ASSOCIATIVE	false
+#define ENABLE_SEQUENCE		false
+#define ENABLE_ASSOCIATIVE	true
 #define ENABLE_ADAPTORS		false
 
 
@@ -23,9 +23,17 @@
 #  include <list>
 # endif
 
-# if ENABLE_SEQUENCE
+# if ENABLE_ASSOCIATIVE
 #  include <set>
 #  include <map>
+
+template <typename T, typename U>
+std::ostream REF operator << (std::ostream REF os, std::pair<T, U> CREF pair)
+{
+	os << "< " << pair.first << " -=- " << pair.second << " >";
+	return os;
+}
+
 # endif
 
 # if ENABLE_ADAPTORS
@@ -41,12 +49,22 @@
 #  include "list.hpp"
 # endif
 
-# if ENABLE_SEQUENCE
+# if ENABLE_ASSOCIATIVE == true
 #  include "set.hpp"
 #  include "map.hpp"
+
+namespace ft {
+template <typename T, typename U>
+std::ostream REF operator << (std::ostream REF os, ft::pair<T, U> CREF pair)
+{
+	os << "< " << pair.first << " -=- " << pair.second << " >";
+	return os;
+}
+}
+
 # endif
 
-# if ENABLE_ADAPTORS
+# if ENABLE_ADAPTORS == true
 #  include "queue.hpp"
 #  include "stack.hpp"
 # endif
@@ -94,9 +112,9 @@ typedef ::testing::Types<
 
 
 typedef ::testing::Types<
-	intList_t,		strList_t,		fatList_t//,
-	// intDeque_t,		strDeque_t,		fatDeque_t
-	// intVector_t,	strVector_t,	fatVector_t
+	intList_t,		strList_t,		fatList_t,
+	intDeque_t,		strDeque_t,		fatDeque_t,
+	intVector_t,	strVector_t,	fatVector_t
 >	sequenceContainers_type;
 
 
@@ -107,24 +125,24 @@ typedef ::testing::Types<
 #if ENABLE_ASSOCIATIVE == true
 
 
-typedef ns::set<int>			intSet_t;
-typedef ns::set<str>			strSet_t;
-typedef ns::set<Fat>			fatSet_t;
+typedef ns::set<int>								intSet_t;
+typedef ns::set<str>								strSet_t;
+typedef ns::set<Fat>								fatSet_t;
 
 
-typedef ns::multiset<int>		intMSet_t;
-typedef ns::multiset<str>		strMSet_t;
-typedef ns::multiset<Fat>		fatMSet_t;
+typedef ns::multiset<int>							intMSet_t;
+typedef ns::multiset<str>							strMSet_t;
+typedef ns::multiset<Fat>							fatMSet_t;
 
 
-typedef ns::map<int, int>		intMap_t;
-typedef ns::map<str, str>		strMap_t;
-typedef ns::map<Fat, Fat>		fatMap_t;
+typedef ns::map<int, int>							intMap_t;
+typedef ns::map<str, str>							strMap_t;
+typedef ns::map<Fat, Fat>							fatMap_t;
 
 
-typedef ns::multimap<int, int>	intMMap_t;
-typedef ns::multimap<str, str>	strMMap_t;
-typedef ns::multimap<Fat, Fat>	fatMMap_t;
+typedef ns::multimap<int, int>						intMMap_t;
+typedef ns::multimap<str, str>						strMMap_t;
+typedef ns::multimap<Fat, Fat>						fatMMap_t;
 
 
 typedef ::testing::Types<
@@ -148,10 +166,10 @@ typedef ::testing::Types<
 
 
 typedef ::testing::Types<
-	intSet_t,	strSet_t,	fatSet_t,
-	intMSet_t,	strMSet_t,	fatMSet_t,
-	intMap_t,	strMap_t,	fatMap_t,
-	intMMap_t,	strMMap_t,	fatMMap_t
+	// intSet_t,	strSet_t,	fatSet_t,
+	// intMSet_t,	strMSet_t,	fatMSet_t,
+	// intMap_t,	strMap_t,	fatMap_t,
+	// intMMap_t,	strMMap_t,	fatMMap_t
 >	associativeContainers_type;
 
 
