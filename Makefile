@@ -67,7 +67,7 @@ SRC_DIR			=	src/
 SRC_NAME		=	main.cpp
 
 INCLUDES		=	-I$(INC) -I$(GTEST_INCLUDE)
-CFLAGS			=	$(INCLUDES) -Wall -Werror -Wextra -g -std=c++98 -MMD -MP
+CFLAGS			=	$(INCLUDES) -Wall -Werror -Wextra -g -std=c++98 -MMD -MP -fsanitize=address
 CXX				=	clang++
 
 OBJ_DIR			=	.build/
@@ -135,10 +135,10 @@ std: $(NAME_STD)
 	./$(NAME_STD) $(GTEST_FLAGS)
 
 valstd: $(NAME_STD)
-	valgrind --exit-on-first-error=yes --leak-check=full --show-leak-kinds=all --log-file=.valgrind -q ./$(NAME_STD) $(GTEST_FLAGS)
+	@valgrind --error-exitcode=1 --exit-on-first-error=yes --leak-check=full --show-leak-kinds=all --log-file=.valgrind -q ./$(NAME_STD) $(GTEST_FLAGS)
 
 valft: $(NAME_FT)
-	valgrind --exit-on-first-error=yes --leak-check=full --show-leak-kinds=all --log-file=.valgrind -q ./$(NAME_FT) $(GTEST_FLAGS)
+	@valgrind --error-exitcode=1 --exit-on-first-error=yes --leak-check=full --show-leak-kinds=all --log-file=.valgrind -q ./$(NAME_FT) $(GTEST_FLAGS)
 
 $(DOXYGEN_HTML): $(DOXYFILE) $(DOXYGEN_SRCS)
 	@echo "\033[0;35m Updated Doxygen documentation" $(CLR)

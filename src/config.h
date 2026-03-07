@@ -58,7 +58,8 @@ std::ostream REF operator << (std::ostream REF os, std::pair<T, U> CREF pair)
 	return os;
 }
 
-
+#ifndef PRINTCONTAINER
+#define PRINTCONTAINER
 template <typename TypeParam>
 void printContainer(TypeParam CREF c, std::ostream REF os = std::cout)
 {
@@ -66,6 +67,7 @@ void printContainer(TypeParam CREF c, std::ostream REF os = std::cout)
 		os << *it << " > ";
 	os << std::endl;
 }
+#endif
 
 
 #include "types.hpp"

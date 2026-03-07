@@ -6,6 +6,7 @@
 #include "gtest/gtest.h"
 #include "config.h"
 
+#include "vector.hpp"
 #include "list.hpp"
 
 #include "SequenceContainersTests/Tests.hpp"

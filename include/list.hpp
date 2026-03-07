@@ -31,7 +31,7 @@ class list {
 		// Constructors & Destructors
 		explicit								list(allocator_type CREF alloc = allocator_type());
 		explicit								list(size_type n, value_type CREF val = value_type(), allocator_type CREF alloc = allocator_type());
-		template<class Iterator>				list (Iterator first, Iterator last, allocator_type CREF alloc = allocator_type());
+		template<class Iterator>				list(Iterator first, Iterator last, allocator_type CREF alloc = allocator_type());
 		list(list CREF x);
 		list REF					operator	= (list CREF rhs);
 		~list();

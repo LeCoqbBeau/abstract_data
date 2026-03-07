@@ -121,9 +121,13 @@ ForwardIt remove(
 	T CREF value
 ) {
 	first = ft::find(first, last, value);
+	if (first == last)
+		return first;
 	for (ForwardIt it = first; ++it != last;)
-		if (!(*it == value))
-			*first++ = *it;
+		if (!(*it == value)) {
+			*first = *it;
+			++first;
+		}
 	return first;
 }
 
@@ -135,6 +139,8 @@ ForwardIt remove_if(
 	UnaryPred pred
 ) {
 	first = ft::find_if(first, last, pred);
+	if (first == last)
+		return first;
 	for (ForwardIt it = first; it != last; ++it)
 		if (!pred(*it))
 			*first++ = *it;
