@@ -25,7 +25,7 @@ template <
 {
 	protected:
 		// Typedef
-		typedef ft::internal::hashmap<Key, Hash, KeyEqual, Allocator, ft::false_type, false>	hashmap_type;
+		typedef internal::hashmap<Key, Hash, KeyEqual, Allocator, false_type, false>	hashmap_type;
 
 	public:
 		// Typedefs
@@ -77,11 +77,11 @@ template <
 		iterator						find(key_type CREF key);
 		const_iterator					find(key_type CREF key) const;
 		size_type						count(key_type CREF key) const;
-		ft::utility<iterator>				equal_range(key_type CREF key);
-		ft::utility<const_iterator>		equal_range(key_type CREF key) const;
+		pair<iterator>					equal_range(key_type CREF key);
+		pair<const_iterator>			equal_range(key_type CREF key) const;
 
 		// Modifiers
-		ft::utility<iterator, bool>		insert(value_type CREF value);
+		pair<iterator, bool>			insert(value_type CREF value);
 		iterator						insert(const_iterator hint, value_type CREF value);
 		template <class InputIt>
 		void							insert(InputIt first, InputIt last);
@@ -124,7 +124,7 @@ template <
 {
 	protected:
 		// Typedef
-		typedef ft::internal::hashmap<Key, Hash, KeyEqual, Allocator, ft::false_type, false>	hashmap_type;
+		typedef internal::hashmap<Key, Hash, KeyEqual, Allocator, false_type, false>	hashmap_type;
 
 	public:
 		// Typedefs
@@ -176,11 +176,11 @@ template <
 		iterator							find(key_type CREF key);
 		const_iterator						find(key_type CREF key) const;
 		size_type							count(key_type CREF key) const;
-		ft::utility<iterator>					equal_range(key_type CREF key);
-		ft::utility<const_iterator>			equal_range(key_type CREF key) const;
+		pair<iterator>						equal_range(key_type CREF key);
+		pair<const_iterator>				equal_range(key_type CREF key) const;
 
 		// Modifiers
-		ft::utility<iterator, bool>			insert(value_type CREF value);
+		iterator							insert(value_type CREF value);
 		iterator							insert(const_iterator hint, value_type CREF value);
 		template <class InputIt>
 		void								insert(InputIt first, InputIt last);

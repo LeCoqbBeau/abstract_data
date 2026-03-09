@@ -48,7 +48,6 @@ ForwardIt next(ForwardIt it, typename std::iterator_traits<ForwardIt>::differenc
 	return it;
 }
 }
-// Okay look again :D
 
 
 #ifndef PRINTCONTAINER
@@ -66,9 +65,6 @@ void printContainer(TypeParam CREF c, std::ostream REF os = std::cout)
 #include "types.hpp"
 #include "Generator.hpp"
 #include "HelperFunctors.hpp"
-
-
-#include <fstream>
 
 
 #endif //CONFIG_H

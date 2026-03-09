@@ -13,7 +13,7 @@ class gtOutOfClassTests : public ::testing::Test
 		typedef typename Container::value_type	value_type;
 
 		// Setup
-		gtOutOfClassTests() : container(arrayGenerator<value_type>()(), arrayGenerator<value_type>()() + ARRAY_TINY) {}
+		gtOutOfClassTests() : container(arrayGenerator<value_type>()(), arrayGenerator<value_type>()() + Container::size()) {}
 
 		// Attributes
 		Container container;
@@ -28,7 +28,7 @@ TYPED_TEST_P(gtOutOfClassTests, Swap)
 	arrayGenerator<typename TypeParam::value_type>	array;
 	TypeParam REF									c = this->container;
 	TypeParam										cCopy = c;
-	TypeParam										other(ARRAY_TINY, array[1]);
+	TypeParam										other(array[1]);
 	TypeParam										otherCopy = other;
 
 	// Normal cases
@@ -73,35 +73,35 @@ TYPED_TEST_P(gtOutOfClassTests, Swap)
 TYPED_TEST_P(gtOutOfClassTests, RelationalOperators)
 {
 	arrayGenerator<typename TypeParam::value_type>	array;
-	TypeParam		a(array() + 1, array() + ARRAY_TINY + 1);
-	TypeParam		b(array(), array() + ARRAY_TINY); // this is indeed c, but it's not a direct copy
+	TypeParam		a(array() + 1, array() + TypeParam::size() + 1);
+	TypeParam		b(array(), array() + TypeParam::size()); // this is indeed c, but it's not a direct copy
 	TypeParam REF	c = this->container;
 	TypeParam		copy = c;
 
 	// operator ==
-	EXPECT_TRUE((a == b) == false);
-	EXPECT_TRUE((b == c) == true);
-	EXPECT_TRUE((c == copy) == true);
+	EXPECT_EQ(a == b, false);
+	EXPECT_EQ(b == c, true);
+	EXPECT_EQ(c == copy, true);
 	// operator !=
-	EXPECT_TRUE((a != b) == true);
-	EXPECT_TRUE((b != c) == false);
-	EXPECT_TRUE((c != copy) == false);
+	EXPECT_EQ(a != b, true);
+	EXPECT_EQ(b != c, false);
+	EXPECT_EQ(c != copy, false);
 	// operator <
-	EXPECT_TRUE((a < b) == false);
-	EXPECT_TRUE((b < c) == false);
-	EXPECT_TRUE((c < copy) == false);
+	EXPECT_EQ(a < b, false);
+	EXPECT_EQ(b < c, false);
+	EXPECT_EQ(c < copy, false);
 	// operator <=
-	EXPECT_TRUE((a <= b) == false);
-	EXPECT_TRUE((b <= c) == true);
-	EXPECT_TRUE((c <= copy) == true);
+	EXPECT_EQ(a <= b, false);
+	EXPECT_EQ(b <= c, true);
+	EXPECT_EQ(c <= copy, true);
 	// operator >
-	EXPECT_TRUE((a > b) == true);
-	EXPECT_TRUE((b > c) == false);
-	EXPECT_TRUE((c > copy) == false);
+	EXPECT_EQ(a > b, true);
+	EXPECT_EQ(b > c, false);
+	EXPECT_EQ(c > copy, false);
 	// operator >=
-	EXPECT_TRUE((a >= b) == true);
-	EXPECT_TRUE((b >= c) == true);
-	EXPECT_TRUE((c >= copy) == true);
+	EXPECT_EQ(a >= b, true);
+	EXPECT_EQ(b >= c, true);
+	EXPECT_EQ(c >= copy, true);
 }
 
 
@@ -115,7 +115,7 @@ REGISTER_TYPED_TEST_CASE_P(
 INSTANTIATE_TYPED_TEST_CASE_P(
 	SequenceContainers,
 	gtOutOfClassTests,
-	sequenceContainers_type
+	testGrid_type
 );
 
 

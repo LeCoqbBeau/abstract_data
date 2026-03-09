@@ -11,8 +11,9 @@
 
 
 #define ENABLE_SEQUENCE		false
-#define ENABLE_ASSOCIATIVE	true
+#define ENABLE_ASSOCIATIVE	false
 #define ENABLE_ADAPTORS		false
+#define ENABLE_GRID			true
 
 
 #ifndef USE_FT
@@ -166,10 +167,10 @@ typedef ::testing::Types<
 
 
 typedef ::testing::Types<
-	// intSet_t,	strSet_t,	fatSet_t,
-	// intMSet_t,	strMSet_t,	fatMSet_t,
-	// intMap_t,	strMap_t,	fatMap_t,
-	// intMMap_t,	strMMap_t,	fatMMap_t
+	intSet_t,	strSet_t,	fatSet_t,
+	intMSet_t,	strMSet_t,	fatMSet_t,
+	intMap_t,	strMap_t,	fatMap_t,
+	intMMap_t,	strMMap_t,	fatMMap_t
 >	associativeContainers_type;
 
 
@@ -241,6 +242,49 @@ typedef ::testing::Types<
 
 
 #endif // ENABLE_ADPATORS
+
+// Grid
+#if ENABLE_GRID == true
+
+
+#include "grid.hpp"
+
+typedef ft::grid<int, 3, 3>	intSquareGrid_t;
+typedef ft::grid<str, 3, 3>	strSquareGrid_t;
+typedef ft::grid<Fat, 3, 3>	fatSquareGrid_t;
+
+typedef ft::grid<int, 1, 3>	intLineGrid_t;
+typedef ft::grid<str, 1, 3>	strLineGrid_t;
+typedef ft::grid<Fat, 1, 3>	fatLineGrid_t;
+
+typedef ft::grid<int, 3, 1>	intColGrid_t;
+typedef ft::grid<str, 3, 1>	strColGrid_t;
+typedef ft::grid<Fat, 3, 1>	fatColGrid_t;
+
+typedef ft::grid<int, 0, 3>	intNoRowGrid_t;
+typedef ft::grid<str, 0, 3>	strNoRowGrid_t;
+typedef ft::grid<Fat, 0, 3>	fatNoRowGrid_t;
+
+typedef ft::grid<int, 3, 0>	intNoColGrid_t;
+typedef ft::grid<str, 3, 0>	strNoColGrid_t;
+typedef ft::grid<Fat, 3, 0>	fatNoColGrid_t;
+
+typedef ft::grid<int, 0, 0>	intEmptyGrid_t;
+typedef ft::grid<str, 0, 0>	strEmptyGrid_t;
+typedef ft::grid<Fat, 0, 0>	fatEmptyGrid_t;
+
+
+typedef ::testing::Types<
+	intSquareGrid_t, strSquareGrid_t, fatSquareGrid_t,
+	intLineGrid_t, strLineGrid_t, fatLineGrid_t,
+	intColGrid_t, strColGrid_t, fatColGrid_t,
+	intNoRowGrid_t, strNoRowGrid_t, fatNoRowGrid_t,
+	intNoColGrid_t, strNoColGrid_t, fatNoColGrid_t,
+	intEmptyGrid_t, strEmptyGrid_t, fatEmptyGrid_t
+>	testGrid_type;
+
+
+#endif
 
 
 #endif //TYPES_HPP

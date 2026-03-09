@@ -1,4 +1,4 @@
-7//
+//
 // Created by mscheman on 2/4/26.
 //
 
@@ -206,7 +206,7 @@ ft::unordered_map<Key, T, Hash, KeyEqual, Allocator>::at(key_type CREF key)
 {
 	iterator it = _hashmap.find(key);
 	if (it == end())
-		throw ft::out_of_range(UNORDERED_MAP_AT_EXCEPTION_MSG);
+		throw out_of_range(UNORDERED_MAP_AT_EXCEPTION_MSG);
 	return *it;
 }
 
@@ -217,7 +217,7 @@ ft::unordered_map<Key, T, Hash, KeyEqual, Allocator>::at(key_type CREF key) cons
 {
 	iterator it = _hashmap.find(key);
 	if (it == end())
-		throw ft::out_of_range(UNORDERED_MAP_AT_EXCEPTION_MSG);
+		throw out_of_range(UNORDERED_MAP_AT_EXCEPTION_MSG);
 	return *it;
 }
 
@@ -239,7 +239,7 @@ ft::unordered_map<Key, T, Hash, KeyEqual, Allocator>::count(key_type CREF key) c
 
 
 template <class Key, class T, class Hash, class KeyEqual, class Allocator>
-ft::utility<typename ft::unordered_map<Key, T, Hash, KeyEqual, Allocator>::iterator>
+pair<typename ft::unordered_map<Key, T, Hash, KeyEqual, Allocator>::iterator>
 ft::unordered_map<Key, T, Hash, KeyEqual, Allocator>::equal_range(key_type CREF key)
 {
 	return _hashmap.equal_range(key);
@@ -247,7 +247,7 @@ ft::unordered_map<Key, T, Hash, KeyEqual, Allocator>::equal_range(key_type CREF 
 
 
 template <class Key, class T, class Hash, class KeyEqual, class Allocator>
-ft::utility<typename ft::unordered_map<Key, T, Hash, KeyEqual, Allocator>::const_iterator>
+pair<typename ft::unordered_map<Key, T, Hash, KeyEqual, Allocator>::const_iterator>
 ft::unordered_map<Key, T, Hash, KeyEqual, Allocator>::equal_range(key_type CREF key) const
 {
 	return _hashmap.equal_range(key);
@@ -256,7 +256,7 @@ ft::unordered_map<Key, T, Hash, KeyEqual, Allocator>::equal_range(key_type CREF 
 
 // Modifiers
 template <class Key, class T, class Hash, class KeyEqual, class Allocator>
-ft::utility<typename ft::unordered_map<Key, T, Hash, KeyEqual, Allocator>::iterator, bool>
+pair<typename ft::unordered_map<Key, T, Hash, KeyEqual, Allocator>::iterator, bool>
 ft::unordered_map<Key, T, Hash, KeyEqual, Allocator>::insert(value_type CREF value)
 {
 	iterator	elem = _hashmap.find(value);
@@ -265,7 +265,7 @@ ft::unordered_map<Key, T, Hash, KeyEqual, Allocator>::insert(value_type CREF val
 		elem = _hashmap.insert(value);
 		isNew = true;
 	}
-	return ft::make_pair(elem, isNew);
+	return make_pair(elem, isNew);
 }
 
 
@@ -621,7 +621,7 @@ ft::unordered_multimap<Key, T, Hash, KeyEqual, Allocator>::at(key_type CREF key)
 {
 	iterator it = _hashmap.find(key);
 	if (it == end())
-		throw ft::out_of_range(UNORDERED_MAP_AT_EXCEPTION_MSG);
+		throw out_of_range(UNORDERED_MAP_AT_EXCEPTION_MSG);
 	return *it;
 }
 
@@ -632,7 +632,7 @@ ft::unordered_multimap<Key, T, Hash, KeyEqual, Allocator>::at(key_type CREF key)
 {
 	iterator it = _hashmap.find(key);
 	if (it == end())
-		throw ft::out_of_range(UNORDERED_MAP_AT_EXCEPTION_MSG);
+		throw out_of_range(UNORDERED_MAP_AT_EXCEPTION_MSG);
 	return *it;
 }
 
@@ -663,7 +663,7 @@ ft::unordered_multimap<Key, T, Hash, KeyEqual, Allocator>::count(key_type CREF k
 
 
 template <class Key, class T, class Hash, class KeyEqual, class Allocator>
-ft::utility<typename ft::unordered_multimap<Key, T, Hash, KeyEqual, Allocator>::iterator>
+pair<typename ft::unordered_multimap<Key, T, Hash, KeyEqual, Allocator>::iterator>
 ft::unordered_multimap<Key, T, Hash, KeyEqual, Allocator>::equal_range(key_type CREF key)
 {
 	return _hashmap.equal_range(key);
@@ -671,7 +671,7 @@ ft::unordered_multimap<Key, T, Hash, KeyEqual, Allocator>::equal_range(key_type 
 
 
 template <class Key, class T, class Hash, class KeyEqual, class Allocator>
-ft::utility<typename ft::unordered_multimap<Key, T, Hash, KeyEqual, Allocator>::const_iterator>
+pair<typename ft::unordered_multimap<Key, T, Hash, KeyEqual, Allocator>::const_iterator>
 ft::unordered_multimap<Key, T, Hash, KeyEqual, Allocator>::equal_range(key_type CREF key) const
 {
 	return _hashmap.equal_range(key);

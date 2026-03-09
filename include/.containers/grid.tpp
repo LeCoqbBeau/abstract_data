@@ -53,6 +53,15 @@ ft::internal::gridIterator<T, Ref, Ptr, M, N>::operator -> ()
 	return _data + _pos;
 }
 
+
+template <typename T, typename Ref, typename Ptr, unsigned int M, unsigned int N>
+typename ft::internal::gridIterator<T, Ref, Ptr, M, N>::reference
+ft::internal::gridIterator<T, Ref, Ptr, M, N>::operator [] (difference_type n)
+{
+	return _data[_pos + n];
+}
+
+
 // Shift Operators
 template <typename T, typename Ref, typename Ptr, unsigned int M, unsigned int N>
 typename ft::internal::gridIterator<T, Ref, Ptr, M, N>::this_type REF
@@ -156,7 +165,9 @@ TWO_GRIDIT_COMPARISON(>=)	{ return !(lhs < rhs); }
 // Constructors
 template <typename T, unsigned int M, unsigned int N>
 ft::grid<T, M, N>::grid()
-{}
+{
+	fill(value_type());
+}
 
 
 template <typename T, unsigned int M, unsigned int N>
@@ -173,8 +184,9 @@ ft::grid<T, M, N>::grid(InputIt first, InputIt last)
 	for (size_type m = 0; m != M; ++m)
 		for (size_type n = 0; n != N; ++n) {
 			if (first == last)
-				return;
-			_grid[m][n] = *first++;
+				_grid[m][n] = value_type();
+			else
+				_grid[m][n] = *first++;
 		}
 }
 

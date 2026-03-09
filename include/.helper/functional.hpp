@@ -99,7 +99,7 @@ struct less_equal : binary_function<T, T, bool> {
 
 // Hash Functor
 namespace internal {
-static const ft::uint64_t	hash_secret[8] = {
+static const uint64_t	hash_secret[8] = {
 	0x2d358dccaa6c78a5ull,
 	0x8bb84b93962eacc9ull,
 	0x4b33a62ed433d4a3ull,
@@ -111,39 +111,39 @@ static const ft::uint64_t	hash_secret[8] = {
 };
 
 
-inline void rapid_num(ft::uint64_t REF A, ft::uint64_t REF B)
+inline void rapid_num(uint64_t REF A, uint64_t REF B)
 {
-	ft::uint128_t r = A;
+	uint128_t r = A;
 	r *= B;
-	A = static_cast<ft::uint64_t>(r);
-	B = static_cast<ft::uint64_t>(r >> 64);
+	A = static_cast<uint64_t>(r);
+	B = static_cast<uint64_t>(r >> 64);
 }
 
 
-static ft::uint64_t rapid_mix(uint64_t A, uint64_t B)
+static uint64_t rapid_mix(uint64_t A, uint64_t B)
 {
 	rapid_num(A, B);
 	return A ^ B;
 }
 
 
-inline ft::uint64_t rapid_read64(ft::uint8_t const* p)
+inline uint64_t rapid_read64(uint8_t const* p)
 {
-	ft::int64_t v;
+	int64_t v;
 	ft::memcpy(&v, p, sizeof(uint64_t));
 	return v;
 }
 
 
-inline ft::uint32_t rapid_read32(ft::uint8_t const* p)
+inline uint32_t rapid_read32(uint8_t const* p)
 {
-	ft::int32_t v;
+	int32_t v;
 	ft::memcpy(&v, p, sizeof(uint32_t));
 	return v;
 }
 
 
-inline uint64_t rapidhash(void const* key, size_t len, ft::uint64_t seed, ft::uint64_t const* secret)
+inline uint64_t rapidhash(void const* key, size_t len, uint64_t seed, uint64_t const* secret)
 {
 	uint8_t	const* p = static_cast<uint8_t const*>(key);
 	seed ^= rapid_mix(seed ^ secret[2], secret[1]);
@@ -238,7 +238,7 @@ inline uint64_t rapidhash(void const* key, size_t len, ft::uint64_t seed, ft::ui
 
 
 inline uint64_t doHash(void const* key, size_t len) {
-	return internal::rapidhash(key, len, 0, ft::internal::hash_secret);
+	return internal::rapidhash(key, len, 0, internal::hash_secret);
 }
 
 
@@ -249,23 +249,23 @@ struct hash_impl;
 template <typename T>
 struct hash_impl<
 	T,
-	typename ft::enable_if<ft::is_arithmetic<T>::value>::type
+	typename enable_if<is_arithmetic<T>::value>::type
 > {
-	ft::uint64_t operator()(T CREF x) const { return doHash(&x, sizeof(x)); }
+	uint64_t operator()(T CREF x) const { return doHash(&x, sizeof(x)); }
 };
 
 
 template <>
 struct hash_impl<str>
 {
-	ft::uint64_t operator()(str CREF x) const { return doHash(x.data(), x.length()); }
+	uint64_t operator()(str CREF x) const { return doHash(x.data(), x.length()); }
 };
 
 
 template <>
 struct hash_impl<char const*>
 {
-	ft::uint64_t operator()(char const* x) const { size_t len = 0; while (x && x[len]) len++; return doHash(x, len); }
+	uint64_t operator()(char const* x) const { size_t len = 0; while (x && x[len]) len++; return doHash(x, len); }
 };
 
 
@@ -273,8 +273,8 @@ struct hash_impl<char const*>
 
 
 template <typename T>
-struct hash : unary_function<T, ft::uint64_t>, internal::hash_impl<T> {
-	// ft::uint64_t operator()(T CREF x) const { return internal::hash_impl<T>()(x); }
+struct hash : unary_function<T, uint64_t>, internal::hash_impl<T> {
+	uint64_t operator()(T CREF x) const { return internal::hash_impl<T>()(x); }
 };
 
 

@@ -9,7 +9,6 @@
 #include "ftexcept.hpp"
 #include "new.hpp"
 
-
 //
 //	rbt_node_base
 //
@@ -142,7 +141,7 @@ template <typename Compare>
 typename ft::internal::rbt_node<T>::this_type*
 ft::internal::rbt_node<T>::insert(this_type* node, Compare comp)
 {
-	// node < this
+	// node.value < this.value
 	side_type insertSide = (comp(node->value, this->value)) ? RBT_LEFT : RBT_RIGHT;
 	if (this->next[insertSide])
 		return RBT_NODE(this->next[insertSide])->insert(node, comp);
@@ -582,6 +581,8 @@ ft::internal::rbt<T, Comp, Allocator, extractKey, mutableIterators>::_fastErase(
 	// Actually remove the node
 	if (toRemove == _root && toRemove->right())
 		rootReplacement = RBT_NODE(toRemove->right()->min());
+	else if (toRemove == _root && toRemove->left())
+		rootReplacement = RBT_NODE(toRemove->left()->max());
 	remove_result result = toRemove->erase(_node_allocator(), _deallocateNode);
 	--_size;
 	// Fixup the _root

@@ -4,10 +4,7 @@
 
 
 #include "gtest/gtest.h"
-#include "config.h"
-
-#include "vector.hpp"
-#include "list.hpp"
+#include "mandatory/config.h"
 
 #if ENABLE_SEQUENCE == true
 # include "SequenceContainersTests/Tests.hpp"
@@ -21,6 +18,12 @@
 # include "AdaptorContainersTests/Tests.hpp"
 #endif
 
+#if ENABLE_GRID == true
+# include "GridTests/Tests.hpp"
+#endif
+
+
+#include "map.hpp"
 
 int main(int argc, char *argv[]) {
 	(void)argc;

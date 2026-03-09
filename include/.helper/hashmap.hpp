@@ -25,8 +25,8 @@ struct bucket {
 	typedef Key CREF													const_reference;
 	typedef _doublyLinkedListIterator<Key, Key REF, Key *>				iterator;
 	typedef _doublyLinkedListIterator<Key, Key CREF, Key const*>		const_iterator;
-	typedef ft::size_t													size_type;
-	typedef ft::ptrdiff_t												difference_type;
+	typedef size_t														size_type;
+	typedef ptrdiff_t													difference_type;
 	typedef _doublyLinkedListBase										base_type;
 	typedef _doublyLinkedList<Key>										node_type;
 
@@ -34,7 +34,7 @@ struct bucket {
 	bucket() : _sentinel() { _sentinel.next() = &_sentinel; _sentinel.prev() = &_sentinel; }
 	template <typename Allocator>
 	bucket(bucket CREF rhs, Allocator allocator) { rhs.duplicate(this->_sentinel, allocator); }
-	~bucket() { if (_sentinel.next() != &_sentinel) throw ft::runtime_error("Memory is leaked!"); }
+	~bucket() { if (_sentinel.next() != &_sentinel) throw runtime_error("Memory is leaked!"); }
 
 	// Iterators
 	iterator		begin();
@@ -46,42 +46,48 @@ struct bucket {
 
 	// Methods
 	size_type		size() const;
+
 	template <typename Allocator, typename Predicate>
 	iterator		insert(value_type CREF val, Allocator allocator, Predicate predicate);
 	void			insert(base_type *node);
+
 	template <typename Allocator>
 	iterator		erase(const_iterator position, Allocator allocator);
+
 	template <typename Allocator, typename Predicate>
 	size_type		erase(key_type CREF key, Allocator allocator, Predicate pred);
+
 	template <typename Allocator>
 	base_type		*createNode(key_type CREF val, Allocator allocator) const;
+
 	template <typename Allocator>
 	void			duplicate(base_type *newSentinel, Allocator allocator) const;
 	void			swap(bucket REF x);
+
 	template <typename Allocator>
 	void			clear(Allocator allocator);
 
 	//	Attributes
-	base_type				_sentinel;
+	base_type		_sentinel;
 };
 
 
 template <typename T, typename Ref, typename Ptr>
 struct hashmap_iterator
-	: iterator<ft::bidirectional_iterator_tag, T, ft::ptrdiff_t, Ptr, Ref>
+	: iterator<bidirectional_iterator_tag, T, ptrdiff_t, Ptr, Ref>
 {
 	// Typedefs
-	typedef hashmap_iterator<T, Ref, Ptr>		this_type;
-	typedef T									value_type;
-	typedef Ref									reference;
-	typedef Ptr									pointer;
-	typedef ft::ptrdiff_t						difference_type;
-	typedef ft::internal::_doublyLinkedList<T>	node_type;
-	typedef ft::internal::_doublyLinkedListBase	base_type;
-	typedef ft::internal::bucket<T>				bucket_type;
+	typedef hashmap_iterator<T, Ref, Ptr>	this_type;
+	typedef T								value_type;
+	typedef Ref								reference;
+	typedef Ptr								pointer;
+	typedef ptrdiff_t						difference_type;
+	typedef _doublyLinkedList<T>			node_type;
+	typedef _doublyLinkedListBase			base_type;
+	typedef bucket<T>						bucket_type;
 
 	// Constructors
-	explicit	hashmap_iterator(bucket_type *bucket, ft::size_t bucket_count, ft::size_t idx, base_type *current = NULL) {
+	explicit	hashmap_iterator(bucket_type *bucket, size_t bucket_count, size_t idx, base_type *current = NULL) {
 		_bucket = bucket;
 		_bucket_count = bucket_count;
 		_bucket_idx = idx;
@@ -130,17 +136,17 @@ struct hashmap_iterator
 	// Attributes
 	base_type*		_curr;
 	bucket_type*	_bucket;
-	ft::size_t		_bucket_count;
-	ft::size_t		_bucket_idx;
+	size_t		_bucket_count;
+	size_t		_bucket_idx;
 };
 
 
 template <
 	class Key,
-	class Hash = ft::hash<Key>,
-	class KeyEqual = ft::equal_to<Key>,
-	class Allocator = ft::allocator<Key>,
-	typename extractKey = ft::false_type,
+	class Hash = hash<Key>,
+	class KeyEqual = equal_to<Key>,
+	class Allocator = allocator<Key>,
+	typename extractKey = false_type,
 	bool mutableIterators = false
 >
 struct hashmap {
@@ -174,8 +180,8 @@ struct hashmap {
 			typename bucket_type::const_iterator
 		)																local_iterator;
 		typedef typename bucket_type::const_iterator					const_local_iterator;
-		typedef ft::size_t												size_type;
-		typedef ft::ptrdiff_t											difference_type;
+		typedef size_t												size_type;
+		typedef ptrdiff_t											difference_type;
 
 		// Constructor
 		hashmap(size_type n = HASHMAP_INIT_SIZE, hasher CREF hash = hasher(), key_equal CREF equal = key_equal(), allocator_type CREF allocator = allocator_type())
@@ -208,8 +214,8 @@ struct hashmap {
 		iterator					find(key_type CREF key);
 		const_iterator				find(key_type CREF key) const;
 		size_type					count(key_type CREF key) const;
-		ft::utility<iterator>			equal_range(key_type CREF key);
-		ft::utility<const_iterator>	equal_range(key_type CREF key) const;
+		pair<iterator>				equal_range(key_type CREF key);
+		pair<const_iterator>		equal_range(key_type CREF key) const;
 
 		// Modifiers
 		iterator					insert(value_type CREF value);
@@ -265,17 +271,17 @@ struct KeyHasher {};
 
 
 template <typename Hash>
-struct KeyHasher<ft::false_type, Hash>  { // Don't extract keys
+struct KeyHasher<false_type, Hash>  { // Don't extract keys
 	explicit KeyHasher(Hash CREF hasher) : _hasher(hasher) {}
-	template <typename T>	ft::uint64_t operator()(T CREF x) const { return _hasher(x); }
+	template <typename T>	uint64_t operator()(T CREF x) const { return _hasher(x); }
 	Hash CREF _hasher;
 };
 
 
 template <typename Hash>
-struct KeyHasher<ft::true_type, Hash>  { // Extract keys
+struct KeyHasher<true_type, Hash>  { // Extract keys
 	explicit KeyHasher(Hash CREF hasher) : _hasher(hasher) {}
-	template <typename T>	ft::uint64_t operator()(T CREF x) const { return _hasher(x.first); }
+	template <typename T>	uint64_t operator()(T CREF x) const { return _hasher(x.first); }
 	Hash CREF _hasher;
 };
 
@@ -285,7 +291,7 @@ struct KeyComparator {};
 
 
 template <typename Comp>
-struct KeyComparator<ft::false_type, Comp>  { // Don't extract keys
+struct KeyComparator<false_type, Comp>  { // Don't extract keys
 	explicit KeyComparator(Comp CREF comp) : _comp(comp) {}
 	template <typename T>	bool operator()(T CREF key, T CREF elem) { return _comp(key, elem); }
 	template <typename T>	bool operator()(T CREF key, T CREF elem) const { return _comp(key, elem); }
@@ -294,7 +300,7 @@ struct KeyComparator<ft::false_type, Comp>  { // Don't extract keys
 
 
 template <typename Comp>
-struct KeyComparator<ft::true_type, Comp>  { // Extract keys
+struct KeyComparator<true_type, Comp>  { // Extract keys
 	explicit KeyComparator(Comp CREF comp) : _comp(comp) {}
 	template <typename T>	bool operator()(T CREF key, T CREF elem) { return _comp(key, elem.first); }
 	template <typename T>	bool operator()(T CREF key, T CREF elem) const { return _comp(key, elem.first); }

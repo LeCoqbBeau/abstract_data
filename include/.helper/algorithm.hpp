@@ -495,8 +495,8 @@ void make_heap(
 	RandomAccessIterator first,
 	RandomAccessIterator last
 ) {
-	typedef typename ft::iterator_traits<RandomAccessIterator>::difference_type	difference_type;
-	typedef typename ft::iterator_traits<RandomAccessIterator>::value_type		value_type;
+	typedef typename iterator_traits<RandomAccessIterator>::difference_type	difference_type;
+	typedef typename iterator_traits<RandomAccessIterator>::value_type		value_type;
 
 	difference_type const heapSize = last - first;
 	if (heapSize < 2)
@@ -522,8 +522,8 @@ void make_heap(
 	RandomAccessIterator last,
 	Compare compare
 ) {
-	typedef typename ft::iterator_traits<RandomAccessIterator>::difference_type difference_type;
-	typedef typename ft::iterator_traits<RandomAccessIterator>::value_type      value_type;
+	typedef typename iterator_traits<RandomAccessIterator>::difference_type difference_type;
+	typedef typename iterator_traits<RandomAccessIterator>::value_type      value_type;
 
 	const difference_type heapSize = last - first;
 
@@ -550,8 +550,8 @@ void push_heap(
 	RandomAccessIterator first,
 	RandomAccessIterator last
 ) {
-	typedef typename ft::iterator_traits<RandomAccessIterator>::difference_type	difference_type;
-	typedef typename ft::iterator_traits<RandomAccessIterator>::value_type		value_type;
+	typedef typename iterator_traits<RandomAccessIterator>::difference_type	difference_type;
+	typedef typename iterator_traits<RandomAccessIterator>::value_type		value_type;
 
 	value_type const tempBottom(*(last - 1));
 	ft::promote_heap<RandomAccessIterator, difference_type, value_type>(
@@ -566,8 +566,8 @@ void push_heap(
 template <typename RandomAccessIterator, typename Compare>
 void push_heap(RandomAccessIterator first, RandomAccessIterator last, Compare compare)
 {
-	typedef typename ft::iterator_traits<RandomAccessIterator>::difference_type	difference_type;
-	typedef typename ft::iterator_traits<RandomAccessIterator>::value_type		value_type;
+	typedef typename iterator_traits<RandomAccessIterator>::difference_type	difference_type;
+	typedef typename iterator_traits<RandomAccessIterator>::value_type		value_type;
 
 	const value_type tempBottom(*(last - 1));
 
@@ -586,8 +586,8 @@ void pop_heap(
 	RandomAccessIterator first,
 	RandomAccessIterator last
 ) {
-	typedef typename ft::iterator_traits<RandomAccessIterator>::difference_type difference_type;
-	typedef typename ft::iterator_traits<RandomAccessIterator>::value_type      value_type;
+	typedef typename iterator_traits<RandomAccessIterator>::difference_type difference_type;
+	typedef typename iterator_traits<RandomAccessIterator>::value_type      value_type;
 
 	value_type tempBottom(*(last - 1));
 	*(last - 1) = *first;
@@ -607,8 +607,8 @@ void pop_heap(
 	RandomAccessIterator last,
 	Compare compare
 ) {
-	typedef typename ft::iterator_traits<RandomAccessIterator>::difference_type difference_type;
-	typedef typename ft::iterator_traits<RandomAccessIterator>::value_type      value_type;
+	typedef typename iterator_traits<RandomAccessIterator>::difference_type difference_type;
+	typedef typename iterator_traits<RandomAccessIterator>::value_type      value_type;
 
 	value_type tempBottom(*(last - 1));
 	*(last - 1) = *first;

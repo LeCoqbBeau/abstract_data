@@ -56,14 +56,14 @@ struct _doublyLinkedList : _doublyLinkedListBase {
 
 template <class T, class Ref, class Ptr>
 struct _doublyLinkedListIterator
-	: public ft::iterator<ft::bidirectional_iterator_tag, T, ft::ptrdiff_t, Ref, Ptr>
+	: public iterator<bidirectional_iterator_tag, T, ptrdiff_t, Ref, Ptr>
 {
 	// Typedef
 	typedef _doublyLinkedListIterator<T, Ref, Ptr>	this_type;
 	typedef T										value_type;
 	typedef Ref										reference;
 	typedef Ptr										pointer;
-	typedef ft::ptrdiff_t							difference_type;
+	typedef ptrdiff_t								difference_type;
 	typedef _doublyLinkedListBase					node_type;
 
 	// Constructor

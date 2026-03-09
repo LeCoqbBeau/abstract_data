@@ -278,7 +278,7 @@ template <typename Key, typename T, typename Comp, typename Allocator>
 typename ft::map<Key, T, Comp, Allocator>::value_compare
 ft::map<Key, T, Comp, Allocator>::value_comp() const
 {
-	return value_compare();
+	return value_compare(_tree.value_comp());
 }
 
 

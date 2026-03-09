@@ -445,7 +445,7 @@ ft::internal::hashmap<Key, Hash, KeyEqual, Allocator, extractKey, mutableIterato
 
 
 template <typename Key, typename Hash, typename KeyEqual, typename Allocator, typename extractKey, bool mutableIterators>
-ft::utility<typename ft::internal::hashmap<Key, Hash, KeyEqual, Allocator, extractKey, mutableIterators>::iterator>
+pair<typename ft::internal::hashmap<Key, Hash, KeyEqual, Allocator, extractKey, mutableIterators>::iterator>
 ft::internal::hashmap<Key, Hash, KeyEqual, Allocator, extractKey, mutableIterators>::equal_range(key_type CREF key)
 {
 	iterator	first = find(key);
@@ -462,7 +462,7 @@ ft::internal::hashmap<Key, Hash, KeyEqual, Allocator, extractKey, mutableIterato
 
 
 template <typename Key, typename Hash, typename KeyEqual, typename Allocator, typename extractKey, bool mutableIterators>
-ft::utility<typename ft::internal::hashmap<Key, Hash, KeyEqual, Allocator, extractKey, mutableIterators>::const_iterator>
+pair<typename ft::internal::hashmap<Key, Hash, KeyEqual, Allocator, extractKey, mutableIterators>::const_iterator>
 ft::internal::hashmap<Key, Hash, KeyEqual, Allocator, extractKey, mutableIterators>::equal_range(key_type CREF key) const
 {
 	const_iterator	first = find(key);
@@ -511,7 +511,7 @@ template <class InputIt>
 void
 ft::internal::hashmap<Key, Hash, KeyEqual, Allocator, extractKey, mutableIterators>::insert(InputIt first, InputIt last)
 {
-	size_type newElem = ft::distance(first, last);
+	size_type newElem = distance(first, last);
 	_elemNum += newElem;
 	if (_shouldRehash(newElem))
 		rehash((_elemNum + newElem) / _maxLoadFactor);

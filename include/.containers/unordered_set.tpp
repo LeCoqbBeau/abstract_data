@@ -26,8 +26,9 @@ ft::unordered_set<Key, Hash, KeyEqual, Allocator>::unordered_set(allocator_type 
 template <class Key, class Hash, class KeyEqual, class Allocator>
 template <class InputIt>
 ft::unordered_set<Key, Hash, KeyEqual, Allocator>::unordered_set(InputIt first, InputIt last, UST_DEFAULT_PARAMETERS)
-	: _hashmap(HASHMAP_INIT_SIZE, hasher(), key_equal(), allocator)
+	: _hashmap(HASHMAP_INIT_SIZE, hash, equal, allocator)
 {
+	(void)n;
 	_hashmap.insert(first, last);
 }
 
@@ -205,7 +206,7 @@ ft::unordered_set<Key, Hash, KeyEqual, Allocator>::count(key_type CREF key) cons
 
 
 template <class Key, class Hash, class KeyEqual, class Allocator>
-ft::utility<typename ft::unordered_set<Key, Hash, KeyEqual, Allocator>::iterator>
+pair<typename ft::unordered_set<Key, Hash, KeyEqual, Allocator>::iterator>
 ft::unordered_set<Key, Hash, KeyEqual, Allocator>::equal_range(key_type CREF key)
 {
 	return _hashmap.equal_range(key);
@@ -213,7 +214,7 @@ ft::unordered_set<Key, Hash, KeyEqual, Allocator>::equal_range(key_type CREF key
 
 
 template <class Key, class Hash, class KeyEqual, class Allocator>
-ft::utility<typename ft::unordered_set<Key, Hash, KeyEqual, Allocator>::const_iterator>
+pair<typename ft::unordered_set<Key, Hash, KeyEqual, Allocator>::const_iterator>
 ft::unordered_set<Key, Hash, KeyEqual, Allocator>::equal_range(key_type CREF key) const
 {
 	return _hashmap.equal_range(key);
@@ -222,7 +223,7 @@ ft::unordered_set<Key, Hash, KeyEqual, Allocator>::equal_range(key_type CREF key
 
 // Modifiers
 template <class Key, class Hash, class KeyEqual, class Allocator>
-ft::utility<typename ft::unordered_set<Key, Hash, KeyEqual, Allocator>::iterator, bool>
+pair<typename ft::unordered_set<Key, Hash, KeyEqual, Allocator>::iterator, bool>
 ft::unordered_set<Key, Hash, KeyEqual, Allocator>::insert(value_type CREF value)
 {
 	iterator	elem = _hashmap.find(value);
@@ -231,7 +232,7 @@ ft::unordered_set<Key, Hash, KeyEqual, Allocator>::insert(value_type CREF value)
 		elem = _hashmap.insert(value);
 		isNew = true;
 	}
-	return ft::make_pair(elem, isNew);
+	return make_pair(elem, isNew);
 }
 
 
@@ -438,7 +439,7 @@ ft::unordered_multiset<Key, Hash, KeyEqual, Allocator>::unordered_multiset(unord
 
 
 template <class Key, class Hash, class KeyEqual, class Allocator>
-ft::unordered_multiset<Key, Hash, KeyEqual, Allocator>::unordered_multiset REF
+ft::unordered_multiset<Key, Hash, KeyEqual, Allocator> REF
 ft::unordered_multiset<Key, Hash, KeyEqual, Allocator>::operator = (unordered_multiset CREF rhs)
 {
 	if (this != &rhs) {
@@ -596,7 +597,7 @@ ft::unordered_multiset<Key, Hash, KeyEqual, Allocator>::count(key_type CREF key)
 
 
 template <class Key, class Hash, class KeyEqual, class Allocator>
-ft::utility<typename ft::unordered_multiset<Key, Hash, KeyEqual, Allocator>::iterator>
+pair<typename ft::unordered_multiset<Key, Hash, KeyEqual, Allocator>::iterator>
 ft::unordered_multiset<Key, Hash, KeyEqual, Allocator>::equal_range(key_type CREF key)
 {
 	return _hashmap.equal_range(key);
@@ -604,7 +605,7 @@ ft::unordered_multiset<Key, Hash, KeyEqual, Allocator>::equal_range(key_type CRE
 
 
 template <class Key, class Hash, class KeyEqual, class Allocator>
-ft::utility<typename ft::unordered_multiset<Key, Hash, KeyEqual, Allocator>::const_iterator>
+pair<typename ft::unordered_multiset<Key, Hash, KeyEqual, Allocator>::const_iterator>
 ft::unordered_multiset<Key, Hash, KeyEqual, Allocator>::equal_range(key_type CREF key) const
 {
 	return _hashmap.equal_range(key);

@@ -24,24 +24,41 @@ class map
 		// Typedefs
 		typedef ft::internal::rbt<ft::pair<const Key, T>, Compare, Allocator, ft::true_type, true>	rbt_type;
 
+		// Nested Structure
+		class _value_compare :	public binary_function<typename rbt_type::value_type, typename rbt_type::value_type, bool>
+		{
+			friend class map;
+			protected:
+				Compare comp;
+				explicit _value_compare (Compare c) : comp(c) {}  // constructed with map's comparison object
+			public:
+				typedef bool result_type;
+				typedef typename rbt_type::value_type first_argument_type;
+				typedef typename rbt_type::value_type second_argument_type;
+				bool operator() (typename rbt_type::value_type CREF lhs, typename rbt_type::value_type CREF rhs) const
+				{
+					return ft::internal::ValueComparator<true_type, Compare>(comp)(lhs, rhs);
+				}
+		};
+
 	public:
 		// Typedefs
-		typedef	Key														key_type;
-		typedef T														mapped_type;
-		typedef	typename rbt_type::value_type							value_type;
-		typedef	typename rbt_type::key_compare							key_compare;
-		typedef	ft::internal::ValueComparator<Compare, ft::true_type>	value_compare;
-		typedef	typename rbt_type::allocator_type						allocator_type;
-		typedef	typename rbt_type::reference							reference;
-		typedef	typename rbt_type::const_reference						const_reference;
-		typedef	typename rbt_type::pointer								pointer;
-		typedef	typename rbt_type::const_pointer						const_pointer;
-		typedef	typename rbt_type::iterator								iterator;
-		typedef	typename rbt_type::const_iterator						const_iterator;
-		typedef	typename rbt_type::reverse_iterator						reverse_iterator;
-		typedef	typename rbt_type::const_reverse_iterator				const_reverse_iterator;
-		typedef	typename rbt_type::difference_type						difference_type;
-		typedef	typename rbt_type::size_type							size_type;
+		typedef	Key											key_type;
+		typedef T											mapped_type;
+		typedef	typename rbt_type::value_type				value_type;
+		typedef	typename rbt_type::key_compare				key_compare;
+		typedef	_value_compare								value_compare;
+		typedef	typename rbt_type::allocator_type			allocator_type;
+		typedef	typename rbt_type::reference				reference;
+		typedef	typename rbt_type::const_reference			const_reference;
+		typedef	typename rbt_type::pointer					pointer;
+		typedef	typename rbt_type::const_pointer			const_pointer;
+		typedef	typename rbt_type::iterator					iterator;
+		typedef	typename rbt_type::const_iterator			const_iterator;
+		typedef	typename rbt_type::reverse_iterator			reverse_iterator;
+		typedef	typename rbt_type::const_reverse_iterator	const_reverse_iterator;
+		typedef	typename rbt_type::difference_type			difference_type;
+		typedef	typename rbt_type::size_type				size_type;
 
 		// Constructors
 		explicit							map(key_compare CREF comp = key_compare(), allocator_type CREF allocator = allocator_type());
@@ -119,24 +136,41 @@ class multimap
 		// Typedefs
 		typedef ft::internal::rbt<ft::pair<const Key, T>, Compare, Allocator, ft::true_type, true>	rbt_type;
 
+		// Nested Structure
+		class _value_compare :	public binary_function<typename rbt_type::value_type, typename rbt_type::value_type, bool>
+		{
+			friend class multimap;
+			protected:
+				Compare comp;
+				explicit _value_compare (Compare c) : comp(c) {}  // constructed with map's comparison object
+			public:
+				typedef bool result_type;
+				typedef typename rbt_type::value_type first_argument_type;
+				typedef typename rbt_type::value_type second_argument_type;
+				bool operator() (typename rbt_type::value_type CREF lhs, typename rbt_type::value_type CREF rhs) const
+				{
+					return ft::internal::ValueComparator<true_type, Compare>(comp)(lhs, rhs);
+				}
+		};
+
 	public:
 		// Typedefs
-		typedef	Key														key_type;
-		typedef T														mapped_type;
-		typedef	typename rbt_type::value_type							value_type;
-		typedef	typename rbt_type::key_compare							key_compare;
-		typedef	ft::internal::ValueComparator<ft::true_type, Compare>	value_compare;
-		typedef	typename rbt_type::allocator_type						allocator_type;
-		typedef	typename rbt_type::reference							reference;
-		typedef	typename rbt_type::const_reference						const_reference;
-		typedef	typename rbt_type::pointer								pointer;
-		typedef	typename rbt_type::const_pointer						const_pointer;
-		typedef	typename rbt_type::iterator								iterator;
-		typedef	typename rbt_type::const_iterator						const_iterator;
-		typedef	typename rbt_type::reverse_iterator						reverse_iterator;
-		typedef	typename rbt_type::const_reverse_iterator				const_reverse_iterator;
-		typedef	typename rbt_type::difference_type						difference_type;
-		typedef	typename rbt_type::size_type							size_type;
+		typedef	Key											key_type;
+		typedef T											mapped_type;
+		typedef	typename rbt_type::value_type				value_type;
+		typedef	typename rbt_type::key_compare				key_compare;
+		typedef	_value_compare								value_compare;
+		typedef	typename rbt_type::allocator_type			allocator_type;
+		typedef	typename rbt_type::reference				reference;
+		typedef	typename rbt_type::const_reference			const_reference;
+		typedef	typename rbt_type::pointer					pointer;
+		typedef	typename rbt_type::const_pointer			const_pointer;
+		typedef	typename rbt_type::iterator					iterator;
+		typedef	typename rbt_type::const_iterator			const_iterator;
+		typedef	typename rbt_type::reverse_iterator			reverse_iterator;
+		typedef	typename rbt_type::const_reverse_iterator	const_reverse_iterator;
+		typedef	typename rbt_type::difference_type			difference_type;
+		typedef	typename rbt_type::size_type				size_type;
 
 		// Constructors
 		explicit							multimap(key_compare CREF comp = key_compare(), allocator_type CREF allocator = allocator_type());
@@ -211,6 +245,7 @@ MAPS_COMPARISON_OPERATOR(<,  { return ft::lexicographical_compare(lhs.begin(), l
 MAPS_COMPARISON_OPERATOR(<=, { return !(rhs < lhs); });
 MAPS_COMPARISON_OPERATOR(>,  { return (rhs < lhs); });
 MAPS_COMPARISON_OPERATOR(>=, { return !(lhs < rhs); });
+
 
 #undef MAPS_COMPARISON_OPERATOR
 #undef MAP_COMPARISON_OPERATOR

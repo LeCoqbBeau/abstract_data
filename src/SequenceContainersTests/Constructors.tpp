@@ -6,12 +6,12 @@
 #define SCT_CONSTRUCTOR_TPP
 
 template <typename Container>
-class sctConstructorTests : public ::testing::Test {};
+class gtConstructorTests : public ::testing::Test {};
 
 TYPED_TEST_CASE_P(sctConstructorTests);
 
 
-TYPED_TEST_P(sctConstructorTests, Default)
+TYPED_TEST_P(gtConstructorTests, Default)
 {
 	TypeParam container;
 	EXPECT_EQ(container.empty(), true);
@@ -19,7 +19,7 @@ TYPED_TEST_P(sctConstructorTests, Default)
 }
 
 
-TYPED_TEST_P(sctConstructorTests, Fill)
+TYPED_TEST_P(gtConstructorTests, Fill)
 {
 	typedef typename TypeParam::value_type		value_type;
 	typedef typename TypeParam::size_type		size_type;
@@ -40,7 +40,7 @@ TYPED_TEST_P(sctConstructorTests, Fill)
 }
 
 
-TYPED_TEST_P(sctConstructorTests, Range)
+TYPED_TEST_P(gtConstructorTests, Range)
 {
 	typedef typename TypeParam::value_type		value_type;
 	typedef typename TypeParam::size_type		size_type;
@@ -73,7 +73,7 @@ TYPED_TEST_P(sctConstructorTests, Range)
 }
 
 
-TYPED_TEST_P(sctConstructorTests, Copy)
+TYPED_TEST_P(gtConstructorTests, Copy)
 {
 	typedef typename TypeParam::value_type		value_type;
 	value_type const*	array = arrayGenerator<value_type>()();
@@ -89,7 +89,7 @@ TYPED_TEST_P(sctConstructorTests, Copy)
 }
 
 
-TYPED_TEST_P(sctConstructorTests, AssignementOperator)
+TYPED_TEST_P(gtConstructorTests, AssignementOperator)
 {
 	typedef typename TypeParam::value_type		value_type;
 	typedef typename TypeParam::size_type		size_type;
@@ -140,7 +140,7 @@ REGISTER_TYPED_TEST_CASE_P(
 
 INSTANTIATE_TYPED_TEST_CASE_P(
 	SequenceContainers,
-	sctConstructorTests,
+	gtConstructorTests,
 	sequenceContainers_type
 );
 

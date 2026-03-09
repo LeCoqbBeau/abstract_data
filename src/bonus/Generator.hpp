@@ -5,6 +5,9 @@
 #ifndef GENERATOR_HPP
 #define GENERATOR_HPP
 
+#ifdef USE_FT
+# include "utility.hpp"
+#endif
 
 #define ARRAY	X(-1),																	\
 				X(0), X(1), X(2), X(3), X(4), X(5), X(6), X(7), X(8), X(9),				\
@@ -116,20 +119,18 @@ struct intConvertor<int>
 	int operator()(int const i) const { return i; }
 };
 
-#define TOSTR( x )	static_cast< std::ostringstream REF>(				\
-					( std::ostringstream() << std::dec << x ) ).str()
 
 template <>
 struct intConvertor<str>
 {
-	str operator()(int const i) const { return TOSTR(i); }
+	str operator()(int const i) const { return std::to_string(i); }
 };
 
 
 template <>
 struct intConvertor<Fat>
 {
-	Fat operator()(int const i) const { return Fat(i, TOSTR(i)); }
+	Fat operator()(int const i) const { return Fat(i, std::to_string(i)); }
 };
 
 

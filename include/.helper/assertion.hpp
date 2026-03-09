@@ -21,19 +21,19 @@ struct assertion<true>
 
 
 template <int A, int B>
-struct is_equal : ft::false_type{};
+struct is_equal : false_type{};
 
 
 template<int A>
-struct is_equal<A, A> : ft::true_type{};
+struct is_equal<A, A> : true_type{};
 
 
 template <int A, int B>
-struct is_not_equal : ft::true_type{};
+struct is_not_equal : true_type{};
 
 
 template <int A>
-struct is_not_equal<A, A> : ft::false_type{};
+struct is_not_equal<A, A> : false_type{};
 
 
 }

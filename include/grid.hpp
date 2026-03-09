@@ -5,6 +5,7 @@
 #ifndef GRID_HPP
 #define GRID_HPP
 
+#include ".helper/algorithm.hpp"
 #include ".helper/ftdef.hpp"
 #include ".helper/iterator.hpp"
 #include ".helper/ftexcept.hpp"
@@ -23,7 +24,7 @@ struct gridIterator
 	: ft::iterator<ft::random_access_iterator_tag, T, ft::ptrdiff_t, Ptr, Ref>
 {
 	// Typedefs
-	typedef gridIterator<T, Ref, Ptr, N, M>	this_type;
+	typedef gridIterator<T, Ref, Ptr, M, N>	this_type;
 	typedef T								value_type;
 	typedef Ref								reference;
 	typedef Ptr								pointer;
@@ -42,6 +43,7 @@ struct gridIterator
 	// Dereference Operator
 	reference		operator	*	();
 	pointer			operator	->	();
+	reference		operator	[]	(difference_type n);
 
 	// Shift Operators
 	this_type REF	operator	++	();
@@ -59,6 +61,18 @@ struct gridIterator
 	size_type	_pos;
 };
 
+#define GRIDIT_COMPARISON(op)																											\
+	template <typename T, typename Ref, typename Ptr, unsigned int M, unsigned int N>													\
+	bool operator op (ft::internal::gridIterator<T, T REF, T*, M, N> CREF lhs, ft::internal::gridIterator<T, T REF, T*, M, N> CREF rhs)	\
+	{ return lhs._pos op rhs._pos; }
+
+GRIDIT_COMPARISON(<);
+GRIDIT_COMPARISON(<=);
+GRIDIT_COMPARISON(>);
+GRIDIT_COMPARISON(>=);
+
+#undef GRIDIT_COMPARISON
+
 
 }
 
@@ -71,15 +85,15 @@ class grid
 		typedef T													value_type;
 		typedef T													row_type[N];
 		typedef T													grid_type[M][N];
-		typedef	ft::size_t											size_type;
-		typedef ft::ptrdiff_t										difference_type;
+		typedef	size_t												size_type;
+		typedef ptrdiff_t											difference_type;
 		typedef value_type REF										reference;
 		typedef value_type CREF										const_reference;
 		typedef T*													pointer;
 		typedef T const*											const_pointer;
 		typedef internal::gridIterator<T, T REF, T*, M, N>			iterator;
 		typedef internal::gridIterator<T, T CREF, T const*, M, N>	const_iterator;
-		typedef ft::reverse_iterator<iterator>						reverse_iterator;
+		typedef reverse_iterator<iterator>							reverse_iterator;
 		typedef ft::reverse_iterator<const_iterator>				const_reverse_iterator;
 
 		// Constructors
@@ -100,17 +114,19 @@ class grid
 		 */
 		grid(const_reference value);
 
-
 		/**
 		 * @brief The range constructor.
 		 * * Constructs a grid with the contents of the range [first, last).
 		 * * Iterators in [first, last) is at most dereferenced exactly once.
 		 * @warning If the distance between first and last is bigger than M * N,
 		 then the constructor stop after initializing M * N elements.
+		 * @warning If the distance between first and last is less than M * N,
+		 then the constructor initializes the rest of the element with their default value.
 		 * @tparam InputIt A class that satisfies the requirements of LegacyInputIterator.
 		 * @param first, last the pair of iterators defining the source range of elements to copy
 		 * @throw Nothing unless T copy assignment operator does.
-		 * @details Complexity: max(M * N, ft::distance(first, last)) calls to T's copy assignment operator .
+		 * @details Complexity: ft::distance(first, last) calls to T's copy assignment operator,
+		 and M*N - ft::distance(first, last) calls to T's default constructor.
 		 */
 		template <typename InputIt> grid(InputIt first, InputIt last);
 
@@ -226,7 +242,7 @@ class grid
 		 * @details Complexity: Compile-time.
 		 * @return The template parameter M.
 		 */
-		size_type					rows() const		{ return M; };
+		static unsigned int			rows()		{ return M; };
 
 		/**
 		 * @brief Returns the number of column in the grid.
@@ -234,7 +250,7 @@ class grid
 		 * @details Complexity: Compile-time.
 		 * @return The template parameter N.
 		 */
-		size_type					cols() const		{ return N; };
+		static unsigned int			cols()		{ return N; };
 
 		/**
 		 * @brief Returns the number of elements in the container.
@@ -242,7 +258,7 @@ class grid
 		 * @details Complexity: Compile-time.
 		 * @return M * N
 		 */
-		size_type					size() const		{ return M * N; };
+		static unsigned int			size()		{ return M * N; };
 
 		/**
 		 * @brief Checks if the container has no elements.
@@ -251,7 +267,7 @@ class grid
 		 * @return true if the container is empty, false otherwise.
 		 * @note The container is considered empty if it has 0 columns or rows.
 		 */
-		size_type					max_size() const	{ return M * N; };
+		static unsigned int			max_size()	{ return M * N; };
 
 		/**
 		 * @brief Checks if the container has no elements.
@@ -260,7 +276,7 @@ class grid
 		 * @return true if the container is empty, false otherwise.
 		 * @note The container is considered empty if it has 0 columns or rows.
 		 */
-		bool						empty() const		{ return !M || !N; }
+		static bool					empty()		{ return !M || !N; }
 
 		// Element Access
 
@@ -431,6 +447,25 @@ class grid
 		// Attributes
 		grid_type					_grid;
 };
+
+#define GRID_COMPARISON(op) template <typename T, unsigned int M, unsigned int N> bool operator op (ft::grid<T, M, N> CREF lhs, ft::grid<T, M, N> CREF rhs)
+
+GRID_COMPARISON(==) { return ft::equal(lhs.begin(), lhs.end(), rhs.begin()); }
+GRID_COMPARISON(!=) { return !(lhs == rhs); }
+GRID_COMPARISON(<)	{ return ft::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end()); }
+GRID_COMPARISON(<=)	{ return !(rhs < lhs); }
+GRID_COMPARISON(>)	{ return rhs < lhs; }
+GRID_COMPARISON(>=)	{ return !(lhs < rhs); }
+
+#undef GRID_COMPARISON
+
+
+template <typename T, unsigned int M, unsigned int N>
+void swap(ft::grid<T, M, N> CREF lhs, ft::grid<T, M, N> CREF rhs)
+{
+	lhs.swap(rhs);
+}
+
 
 }
 
