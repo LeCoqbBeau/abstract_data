@@ -2,28 +2,28 @@
 // Created by mscheman on 2/16/26.
 //
 
-#ifndef SCT_ITERATORS_TPP
-#define SCT_ITERATORS_TPP
+#ifndef GT_ITERATORS_TPP
+#define GT_ITERATORS_TPP
 
 
 template <typename Container>
-class sctIteratorsTests : public ::testing::Test
+class gtIteratorsTests : public ::testing::Test
 {
 	public:
 		// Helper Typedefs
 		typedef typename Container::value_type	value_type;
 
-		sctIteratorsTests() : container(arrayGenerator<value_type>()(), arrayGenerator<value_type>()() + ARRAY_TINY) {}
+		gtIteratorsTests() : container(arrayGenerator<value_type>()(), arrayGenerator<value_type>()() + Container::size()) {}
 
 		// Attributes
 		Container container;
 };
 
 
-TYPED_TEST_CASE_P(sctIteratorsTests);
+TYPED_TEST_CASE_P(gtIteratorsTests);
 
 
-TYPED_TEST_P(sctIteratorsTests, Loop)
+TYPED_TEST_P(gtIteratorsTests, Loop)
 {
 	typedef typename TypeParam::iterator iterator;
 
@@ -34,7 +34,26 @@ TYPED_TEST_P(sctIteratorsTests, Loop)
 }
 
 
-TYPED_TEST_P(sctIteratorsTests, ConstLoop)
+TYPED_TEST_P(gtIteratorsTests, RowLoop)
+{
+	typedef typename TypeParam::iterator iterator;
+
+	iterator	it;
+	for (unsigned int i = 0; i < TypeParam::rows(); ++i) {
+		int pos = 0;
+		for (it = this->container.begin(i); it != this->container.end(i); ++it) {
+			EXPECT_EQ(it._pos, i * TypeParam::rows() + pos);
+			++pos;
+		}
+		EXPECT_EQ(it, this->container.end(i));
+	}
+	if (!TypeParam::rows())
+		return SUCCEED();
+	EXPECT_EQ(it, this->container.end());
+}
+
+
+TYPED_TEST_P(gtIteratorsTests, ConstLoop)
 {
 	typedef typename TypeParam::const_iterator const_iterator;
 
@@ -45,7 +64,7 @@ TYPED_TEST_P(sctIteratorsTests, ConstLoop)
 }
 
 
-TYPED_TEST_P(sctIteratorsTests, ReverseLoop)
+TYPED_TEST_P(gtIteratorsTests, ReverseLoop)
 {
 	typedef typename TypeParam::reverse_iterator reverse_iterator;
 
@@ -56,7 +75,7 @@ TYPED_TEST_P(sctIteratorsTests, ReverseLoop)
 }
 
 
-TYPED_TEST_P(sctIteratorsTests, ConstReverseLoop)
+TYPED_TEST_P(gtIteratorsTests, ConstReverseLoop)
 {
 	typedef typename TypeParam::const_reverse_iterator const_reverse_iterator;
 
@@ -67,7 +86,7 @@ TYPED_TEST_P(sctIteratorsTests, ConstReverseLoop)
 }
 
 
-TYPED_TEST_P(sctIteratorsTests, LoopModification)
+TYPED_TEST_P(gtIteratorsTests, LoopModification)
 {
 	typedef typename TypeParam::value_type	value_type;
 	typedef typename TypeParam::iterator	iterator;
@@ -89,7 +108,7 @@ TYPED_TEST_P(sctIteratorsTests, LoopModification)
 }
 
 
-TYPED_TEST_P(sctIteratorsTests, ReverseLoopModification)
+TYPED_TEST_P(gtIteratorsTests, ReverseLoopModification)
 {
 	typedef typename TypeParam::value_type			value_type;
 	typedef typename TypeParam::reverse_iterator	reverse_iterator;
@@ -110,32 +129,33 @@ TYPED_TEST_P(sctIteratorsTests, ReverseLoopModification)
 }
 
 
-TYPED_TEST_P(sctIteratorsTests, BidirectionalTest)
+TYPED_TEST_P(gtIteratorsTests, BidirectionalTest)
 {
 	typedef typename TypeParam::iterator iterator;
 
+	if (TypeParam::empty())
+		return SUCCEED();
 	iterator it = this->container.end();
 	--it;
 	EXPECT_EQ(*it, this->container.back());
 }
 
 
-TYPED_TEST_P(sctIteratorsTests, Comparison)
+TYPED_TEST_P(gtIteratorsTests, Comparison)
 {
 	typedef typename TypeParam::iterator iterator;
 
 	iterator first = this->container.begin();
 	iterator last = this->container.end();
-	for (int i = 0; i < 5; ++i) {
-		EXPECT_TRUE(first != last);
+	for (unsigned int i = 0; i < TypeParam::size(); ++i) {
+		EXPECT_NE(first, last);
 		++first;
-		--last;
 	}
-	EXPECT_TRUE(first == last);
+	EXPECT_EQ(first, last);
 }
 
 
-TYPED_TEST_P(sctIteratorsTests, ArrowOperator)
+TYPED_TEST_P(gtIteratorsTests, ArrowOperator)
 {
 	typedef typename TypeParam::iterator iterator;
 
@@ -145,8 +165,9 @@ TYPED_TEST_P(sctIteratorsTests, ArrowOperator)
 
 
 REGISTER_TYPED_TEST_CASE_P(
-	sctIteratorsTests,
+	gtIteratorsTests,
 	Loop,
+	RowLoop,
 	ConstLoop,
 	ReverseLoop,
 	ConstReverseLoop,
@@ -159,10 +180,10 @@ REGISTER_TYPED_TEST_CASE_P(
 
 
 INSTANTIATE_TYPED_TEST_CASE_P(
-	SequenceContainers,
-	sctIteratorsTests,
-	sequenceContainers_type
+	GridContainer,
+	gtIteratorsTests,
+	testGrid_type
 );
 
 
-#endif //SCT_ITERATORS_TPP
+#endif //GT_ITERATORS_TPP

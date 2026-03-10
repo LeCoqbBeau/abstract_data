@@ -233,6 +233,22 @@ ft::grid<T, M, N>::begin() const
 
 template <typename T, unsigned int M, unsigned int N>
 typename ft::grid<T, M, N>::iterator
+ft::grid<T, M, N>::begin(size_type m)
+{
+	return iterator(data(), m * M);
+}
+
+
+template <typename T, unsigned int M, unsigned int N>
+typename ft::grid<T, M, N>::const_iterator
+ft::grid<T, M, N>::begin(size_type m) const
+{
+	return iterator(data(), m * M);
+}
+
+
+template <typename T, unsigned int M, unsigned int N>
+typename ft::grid<T, M, N>::iterator
 ft::grid<T, M, N>::end()
 {
 	return iterator(data(), M * N);
@@ -244,6 +260,22 @@ typename ft::grid<T, M, N>::const_iterator
 ft::grid<T, M, N>::end() const
 {
 	return const_iterator(data(), M * N);
+}
+
+
+template <typename T, unsigned int M, unsigned int N>
+typename ft::grid<T, M, N>::iterator
+ft::grid<T, M, N>::end(size_type m)
+{
+	return iterator(data(), (m + 1) * M);
+}
+
+
+template <typename T, unsigned int M, unsigned int N>
+typename ft::grid<T, M, N>::const_iterator
+ft::grid<T, M, N>::end(size_type m) const
+{
+	return iterator(data(), (m + 1) * M);
 }
 
 
@@ -265,6 +297,22 @@ ft::grid<T, M, N>::rbegin() const
 
 template <typename T, unsigned int M, unsigned int N>
 typename ft::grid<T, M, N>::reverse_iterator
+ft::grid<T, M, N>::rbegin(size_type m)
+{
+	return reverse_iterator(end(m));
+}
+
+
+template <typename T, unsigned int M, unsigned int N>
+typename ft::grid<T, M, N>::const_reverse_iterator
+ft::grid<T, M, N>::rbegin(size_type m) const
+{
+	return const_reverse_iterator(end(m));
+}
+
+
+template <typename T, unsigned int M, unsigned int N>
+typename ft::grid<T, M, N>::reverse_iterator
 ft::grid<T, M, N>::rend()
 {
 	return reverse_iterator(begin());
@@ -276,6 +324,22 @@ typename ft::grid<T, M, N>::const_reverse_iterator
 ft::grid<T, M, N>::rend() const
 {
 	return const_reverse_iterator(begin());
+}
+
+
+template <typename T, unsigned int M, unsigned int N>
+typename ft::grid<T, M, N>::reverse_iterator
+ft::grid<T, M, N>::rend(size_type m)
+{
+	return reverse_iterator(begin(m));
+}
+
+
+template <typename T, unsigned int M, unsigned int N>
+typename ft::grid<T, M, N>::const_reverse_iterator
+ft::grid<T, M, N>::rend(size_type m) const
+{
+	return const_reverse_iterator(begin(m));
 }
 
 

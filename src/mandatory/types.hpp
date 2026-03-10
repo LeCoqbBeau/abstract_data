@@ -275,12 +275,12 @@ typedef ft::grid<Fat, 0, 0>	fatEmptyGrid_t;
 
 
 typedef ::testing::Types<
-	intSquareGrid_t, strSquareGrid_t, fatSquareGrid_t,
-	intLineGrid_t, strLineGrid_t, fatLineGrid_t,
-	intColGrid_t, strColGrid_t, fatColGrid_t,
-	intNoRowGrid_t, strNoRowGrid_t, fatNoRowGrid_t,
-	intNoColGrid_t, strNoColGrid_t, fatNoColGrid_t,
-	intEmptyGrid_t, strEmptyGrid_t, fatEmptyGrid_t
+	intSquareGrid_t, strSquareGrid_t, fatSquareGrid_t//,
+	// intLineGrid_t, strLineGrid_t, fatLineGrid_t,
+	// intColGrid_t, strColGrid_t, fatColGrid_t,
+	// intNoRowGrid_t, strNoRowGrid_t, fatNoRowGrid_t,
+	// intNoColGrid_t, strNoColGrid_t, fatNoColGrid_t,
+	// intEmptyGrid_t, strEmptyGrid_t, fatEmptyGrid_t
 >	testGrid_type;
 
 

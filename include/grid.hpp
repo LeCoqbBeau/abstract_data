@@ -32,7 +32,7 @@ struct gridIterator
 	typedef ft::size_t						size_type;
 
 	// Constructor
-	explicit	gridIterator(pointer data, size_type pos);
+	explicit	gridIterator(pointer data = NULL, size_type pos = 0);
 				gridIterator(gridIterator<T, T REF, T*, M, N> CREF iterator);
 	~gridIterator() {}
 
@@ -177,6 +177,24 @@ class grid
 		const_iterator				begin() const;
 
 		/**
+		 * @brief Returns an iterator to the first element of the m-th row.
+		 * * If *this is empty, the returned iterator will be equal to end().
+		 * @throw Nothing this function never throws.
+		 * @details Complexity: Constant.
+		 * @return Iterator to the first element of the m-th row.
+		 */
+		iterator					begin(size_type m);
+
+		/**
+		 * @brief Returns an iterator to the first element of the m-th row.
+		 * * If *this is empty, the returned iterator will be equal to end().
+		 * @throw Nothing this function never throws.
+		 * @details Complexity: Constant.
+		 * @return Iterator to the first element of the m-th row.
+		 */
+		const_iterator				begin(size_type m) const;
+
+		/**
 		 * @brief Returns an iterator past the last element of *this.
 		 * * This returned iterator only acts as a sentinel. It is not guaranteed to be dereferenceable.
 		 * @throw Nothing this function never throws.
@@ -193,6 +211,24 @@ class grid
 		 * @return Iterator past the last element.
 		 */
 		const_iterator				end() const;
+
+		/**
+		 * @brief Returns an iterator past the last element of the m-th row.
+		 * * If *this is empty, the returned iterator will be equal to end().
+		 * @throw Nothing this function never throws.
+		 * @details Complexity: Constant.
+		 * @return Iterator past the last element of the m-th row.
+		 */
+		iterator					end(size_type m);
+
+		/**
+		 * @brief Returns an iterator past the last element of the m-th row.
+		 * * If *this is empty, the returned iterator will be equal to end().
+		 * @throw Nothing this function never throws.
+		 * @details Complexity: Constant.
+		 * @return Iterator past the last element of the m-th row.
+		 */
+		const_iterator				end(size_type m) const;
 
 		/**
 		 * @brief Returns a reverse iterator to the first element of the reversed *this.
@@ -215,6 +251,26 @@ class grid
 		const_reverse_iterator		rbegin() const;
 
 		/**
+		 * @brief Returns a reverse iterator to the first element of the reversed m-th row.
+		 * * It corresponds to the last element of the non-reversed m-th row.
+		 * * If *this is empty, the returned iterator is equal to rend().
+		 * @throw Nothing this function never throws.
+		 * @details Complexity: Constant.
+		 * @return Reverse iterator to the first element of the m-th row.
+		 */
+		reverse_iterator			rbegin(size_type m);
+
+		/**
+		 * @brief Returns a reverse iterator to the first element of the reversed m-th row.
+		 * * It corresponds to the last element of the non-reversed m-th row.
+		 * * If *this is empty, the returned iterator is equal to rend().
+		 * @throw Nothing this function never throws.
+		 * @details Complexity: Constant.
+		 * @return Reverse iterator to the first element of the m-th row.
+		 */
+		const_reverse_iterator		rbegin(size_type m) const;
+
+		/**
 		 * @brief Returns a reverse iterator past the last element of the reversed *this.
 		 * * It corresponds to the element preceding the first element of the non-reversed *this.
 		 * * This returned iterator only acts as a sentinel. It is not guaranteed to be dereferenceable.
@@ -234,8 +290,27 @@ class grid
 		 */
 		const_reverse_iterator		rend() const;
 
-		// Capacity
+		/**
+		 * @brief Returns a reverse iterator past the last element of the reversed m-th row.
+		 * * It corresponds to the element preceding the first element of the non-reversed m-th row.
+		 * * This returned iterator only acts as a sentinel. It is not guaranteed to be dereferenceable.
+		 * @throw Nothing this function never throws.
+		 * @details Complexity: Constant.
+		 * @return Reverse iterator to the element following the last element of the m-th row.
+		 */
+		reverse_iterator			rend(size_type m);
 
+		/**
+		 * @brief Returns a reverse iterator past the last element of the reversed m-th row.
+		 * * It corresponds to the element preceding the first element of the non-reversed m-th row.
+		 * * This returned iterator only acts as a sentinel. It is not guaranteed to be dereferenceable.
+		 * @throw Nothing this function never throws.
+		 * @details Complexity: Constant.
+		 * @return Reverse iterator to the element following the last element of the m-th row.
+		 */
+		const_reverse_iterator		rend(size_type m) const;
+
+		// Capacity
 		/**
 		 * @brief Returns the number of rows in the grid.
 		 * @throw Nothing this function never throws.

@@ -54,8 +54,4 @@ namespace otherspace	= UNTESTED_NAMESPACE;
 
 
 
-
-
-
-
 #endif //TYPES_HPP
