@@ -416,11 +416,8 @@ void
 ft::grid<T, M, N>::swap(grid REF rhs)
 {
 	for (size_type m = 0; m != M; ++m)
-		for (size_type n = 0; n != N; ++n) {
-			value_type tmp = _grid[m][n];
-			_grid[m][n] = rhs[m][n];
-			rhs[m][n] = tmp;
-		}
+		for (size_type n = 0; n != N; ++n)
+			ft::swap(_grid[m][n], rhs[m][n]);
 }
 
 

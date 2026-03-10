@@ -103,16 +103,19 @@ TYPED_TEST_P(gtConstructorTests, AssignementOperator)
 	// Return by value
 	TypeParam	partially(array(), array() + TypeParam::size() / 2);
 	(dudeSeriously = partially) = copy; // dudeSeriosly = partially; dudeSeriously = copy;
-	EXPECT_NE(dudeSeriously, partially);
+	if (!TypeParam::empty())
+		EXPECT_NE(dudeSeriously, partially);
+	else
+		EXPECT_EQ(dudeSeriously, partially);
 	EXPECT_EQ(dudeSeriously, copy);
 	// Empty Assignement
 	TypeParam empty;
 	dest = empty;
 	empty = copy;
-	if (!TypeParam::empty())
+	if (!TypeParam::empty()) {
 		EXPECT_NE(empty, dest);
-	if (!TypeParam::empty())
 		EXPECT_NE(dest, copy);
+	}
 	EXPECT_EQ(empty, copy);
 }
 

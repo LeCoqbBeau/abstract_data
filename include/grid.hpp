@@ -261,11 +261,10 @@ class grid
 		static unsigned int			size()		{ return M * N; };
 
 		/**
-		 * @brief Checks if the container has no elements.
+		 * @brief Returns the maximum number of elements in the container.
 		 * @throw Nothing this function never throws.
 		 * @details Complexity: Compile-time.
-		 * @return true if the container is empty, false otherwise.
-		 * @note The container is considered empty if it has 0 columns or rows.
+		 * @return M * N
 		 */
 		static unsigned int			max_size()	{ return M * N; };
 

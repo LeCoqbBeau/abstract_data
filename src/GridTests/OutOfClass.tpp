@@ -45,26 +45,26 @@ TYPED_TEST_P(gtOutOfClassTests, Swap)
 	other = TypeParam(); // create empty container without using assign nor clear
 	otherCopy = other;
 	ns::swap(c, other);
-	EXPECT_EQ(c.empty(), true);
-	EXPECT_EQ(other.empty(), false);
+	EXPECT_EQ(c.empty(), TypeParam::empty());
+	EXPECT_EQ(other.empty(), TypeParam::empty());
 	EXPECT_EQ(c, otherCopy);
 	EXPECT_EQ(other, cCopy);
 	ns::swap(other, c);
-	EXPECT_EQ(c.empty(), false);
-	EXPECT_EQ(other.empty(), true);
+	EXPECT_EQ(c.empty(), TypeParam::empty());
+	EXPECT_EQ(other.empty(), TypeParam::empty());
 	EXPECT_EQ(c, cCopy);
 	EXPECT_EQ(other, otherCopy);
 	// Empty swap with empty
 	c = TypeParam();
 	cCopy = c;
 	ns::swap(c, other); // other is already empty
-	EXPECT_EQ(c.empty(), true);
-	EXPECT_EQ(other.empty(), true);
+	EXPECT_EQ(c.empty(), TypeParam::empty());
+	EXPECT_EQ(other.empty(), TypeParam::empty());
 	EXPECT_EQ(c, otherCopy);
 	EXPECT_EQ(other, cCopy);
 	ns::swap(other, c);
-	EXPECT_EQ(c.empty(), true);
-	EXPECT_EQ(other.empty(), true);
+	EXPECT_EQ(c.empty(), TypeParam::empty());
+	EXPECT_EQ(other.empty(), TypeParam::empty());
 	EXPECT_EQ(c, cCopy);
 	EXPECT_EQ(other, otherCopy);
 }
@@ -77,6 +77,35 @@ TYPED_TEST_P(gtOutOfClassTests, RelationalOperators)
 	TypeParam		b(array(), array() + TypeParam::size()); // this is indeed c, but it's not a direct copy
 	TypeParam REF	c = this->container;
 	TypeParam		copy = c;
+
+	if (TypeParam::empty()) {
+		// operator ==
+		EXPECT_EQ(a == b, true);
+		EXPECT_EQ(b == c, true);
+		EXPECT_EQ(c == copy, true);
+		// operator !=
+		EXPECT_EQ(a != b, false);
+		EXPECT_EQ(b != c, false);
+		EXPECT_EQ(c != copy, false);
+		// operator <
+		EXPECT_EQ(a < b, false);
+		EXPECT_EQ(b < c, false);
+		EXPECT_EQ(c < copy, false);
+		// operator <=
+		EXPECT_EQ(a <= b, true);
+		EXPECT_EQ(b <= c, true);
+		EXPECT_EQ(c <= copy, true);
+		// operator >
+		EXPECT_EQ(a > b, false);
+		EXPECT_EQ(b > c, false);
+		EXPECT_EQ(c > copy, false);
+		// operator >=
+		EXPECT_EQ(a >= b, true);
+		EXPECT_EQ(b >= c, true);
+		EXPECT_EQ(c >= copy, true);
+
+		return;
+	}
 
 	// operator ==
 	EXPECT_EQ(a == b, false);

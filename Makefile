@@ -76,14 +76,15 @@ OBJ_BONUS_STD		= $(addprefix $(OBJ_BONUS_STD_DIR), $(SRC_BONUS_NAME:.cpp=.o))
 #	Doxygen																									#
 #-----------------------------------------------------------------------------------------------------------#
 
-DOXYGEN_SRCS	=	$(INC)grid.hpp
-
-DOXYFILE		=	Doxyfile
-DOXYGEN_DIR		=	.doxygen/
-DOXYGEN_DOC		=	$(DOXYGEN_DIR)doc/
-DOXYGEN_HTML	=	$(DOXYGEN_DOC)index.html
-DOXYGEN_LATEX	=	$(DOXYGEN_DIR)latex/
-DOXYGEN_SUBDIR	=	$(DOXYGEN_DOC) $(DOXYGEN_LATEX)
+DOXYFILE				=	Doxyfile
+DOXYGEN_SRCS			=	$(INC)grid.hpp
+DOXYGEN_DIR				=	.doxygen/
+DOXYGEN_DOC				=	$(DOXYGEN_DIR)doc/
+DOXYGEN_HTML			=	$(DOXYGEN_DOC)index.html
+DOXYGEN_AWESOME			=	$(DOXYGEN_DIR)doxygen-awesome-css/
+DOXYGEN_LATEX			=	$(DOXYGEN_DIR)latex/
+DOXYGEN_SUBDIR			=	$(DOXYGEN_DOC) $(DOXYGEN_LATEX)
+DOXYGEN_AWESOME_LINK	=	https://github.com/jothepro/doxygen-awesome-css.git
 
 
 #-----------------------------------------------------------------------------------------------------------#
@@ -195,7 +196,12 @@ valbft: $(NAME_BONUS_FT)
 	@valgrind $(VALGRIND_FLAGS) ./$(NAME_BONUS_FT) $(GTEST_FLAGS)
 
 
-$(DOXYGEN_HTML): $(DOXYFILE) $(DOXYGEN_SRCS)
+$(DOXYGEN_AWESOME):
+	@mkdir -p $(DOXYGEN_DIR)
+	@git clone -q $(DOXYGEN_AWESOME_LINK) $(DOXYGEN_AWESOME)
+	@echo "\033[1;32m Cloned Doxygen Awesome CSS" $(CLR)
+
+$(DOXYGEN_HTML): $(DOXYFILE) $(DOXYGEN_SRCS) $(DOXYGEN_AWESOME)
 	@echo "\033[0;35m Updated Doxygen documentation" $(CLR)
 	@doxygen $(DOXYFILE)
 

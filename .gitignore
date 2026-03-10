@@ -1,6 +1,6 @@
 .idea/
 .build/
-*_abstract_data_*
+*abstract_data*
 obj/
 output.txt
 .output
