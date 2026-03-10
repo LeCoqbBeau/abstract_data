@@ -40,6 +40,7 @@ ft::map<Key, T, Compare, Allocator>::operator = (map CREF rhs)
 {
 	if (this != &rhs) {
 		_tree.clear();
+		_tree._comp = rhs._tree._comp;
 		insert(rhs.begin(), rhs.end());
 	}
 	return *this;
@@ -405,6 +406,7 @@ ft::multimap<Key, T, Compare, Allocator>::operator = (multimap CREF rhs)
 {
 	if (this != &rhs) {
 		_tree.clear();
+		_tree._comp = rhs._tree._comp;
 		insert(rhs.begin(), rhs.end());
 	}
 	return *this;

@@ -40,6 +40,7 @@ ft::set<Key, Compare, Allocator>::operator = (set CREF rhs)
 {
 	if (this != &rhs) {
 		_tree.clear();
+		_tree._comp = rhs._tree._comp;
 		insert(rhs.begin(), rhs.end());
 	}
 	return *this;
@@ -364,6 +365,7 @@ ft::multiset<Key, Compare, Allocator>::operator = (multiset CREF rhs)
 {
 	if (this != &rhs) {
 		_tree.clear();
+		_tree._comp = rhs._tree._comp;
 		insert(rhs.begin(), rhs.end());
 	}
 	return *this;
