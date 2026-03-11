@@ -5,8 +5,8 @@
 #ifndef DOUBLYLINKEDLIST_HPP
 #define DOUBLYLINKEDLIST_HPP
 
-#include "ftdef.hpp"
-#include "iterator.hpp"
+#include ".helper/ftdef.hpp"
+#include ".helper/iterator.hpp"
 
 
 namespace ft { namespace internal {

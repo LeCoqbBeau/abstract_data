@@ -50,18 +50,6 @@ ForwardIt next(ForwardIt it, typename std::iterator_traits<ForwardIt>::differenc
 }
 
 
-#ifndef PRINTCONTAINER
-#define PRINTCONTAINER
-template <typename TypeParam>
-void printContainer(TypeParam CREF c, std::ostream REF os = std::cout)
-{
-	for (typename TypeParam::const_iterator it = c.begin(); it != c.end(); ++it)
-		os << *it << " > ";
-	os << std::endl;
-}
-#endif
-
-
 #include "types.hpp"
 #include "Generator.hpp"
 #include "HelperFunctors.hpp"

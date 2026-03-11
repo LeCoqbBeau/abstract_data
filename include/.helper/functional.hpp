@@ -5,8 +5,7 @@
 #ifndef FUNCTIONAL_H
 #define FUNCTIONAL_H
 
-#include "assertion.hpp"
-#include "algorithm.hpp"
+#include ".helper/algorithm.hpp"
 
 namespace ft {
 
@@ -62,7 +61,7 @@ struct negate : unary_function<T, T> {
 
 
 template <typename T>
-struct equal_to : binary_function<T, T, bool> {
+struct equal_to : binary_function<T, T, bool>{
 	bool operator () (T CREF x, T CREF y) const { return x == y; }
 };
 

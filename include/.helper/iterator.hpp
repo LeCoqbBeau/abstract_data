@@ -5,8 +5,8 @@
 #ifndef ITERATOR_H
 #define ITERATOR_H
 
-#include "ftdef.hpp"
-#include "type_traits.hpp"
+#include ".helper/ftdef.hpp"
+#include ".helper/type_traits.hpp"
 
 namespace ft {
 
@@ -53,7 +53,7 @@ struct iterator_traits : internal::default_iterator_traits<Iterator> {};
 template <typename T>
 struct iterator_traits<T*>
 {
-	typedef ft::random_access_iterator_tag	iterator_category;
+	typedef random_access_iterator_tag		iterator_category;
 	typedef T								value_type;
 	typedef ptrdiff_t						difference_type;
 	typedef T*								pointer;
@@ -64,7 +64,7 @@ struct iterator_traits<T*>
 template <typename T>
 struct iterator_traits<T const*>
 {
-	typedef ft::random_access_iterator_tag	iterator_category;
+	typedef random_access_iterator_tag		iterator_category;
 	typedef T								value_type;
 	typedef ptrdiff_t						difference_type;
 	typedef T const*						pointer;
@@ -76,7 +76,7 @@ struct iterator_traits<T const*>
 template<
 	class Category,
 	class T,
-	class Distance = ft::ptrdiff_t,
+	class Distance = ptrdiff_t,
 	class Pointer = T*,
 	class Reference = T REF
 > struct iterator {

@@ -5,9 +5,9 @@
 #ifndef ALGORITHM_H
 #define ALGORITHM_H
 
-#include "ftdef.hpp"
-#include "iterator.hpp"
-
+#include ".helper/ftdef.hpp"
+#include ".helper/iterator.hpp"
+#include ".helper/utility.hpp"
 
 namespace ft {
 
@@ -620,6 +620,108 @@ void pop_heap(
 		tempBottom,
 		compare
 	);
+}
+
+
+template<class InputIt1, class InputIt2>
+pair<InputIt1, InputIt2>
+mismatch(InputIt1 first1, InputIt1 last1, InputIt2 first2)
+{
+	while (first1 != last1 && *first1 == *first2) {
+		++first1;
+		++first2;
+	}
+	return ft::make_pair(first1, first2);
+}
+
+
+template<class InputIt1, class InputIt2, class BinaryPred>
+pair<InputIt1, InputIt2>
+mismatch(InputIt1 first1, InputIt1 last1, InputIt2 first2, BinaryPred p)
+{
+	while (first1 != last1 && p(*first1, *first2)) {
+		++first1;
+		++first2;
+	}
+	return ft::make_pair(first1, first2);
+}
+
+
+template<class InputIt1, class InputIt2>
+pair<InputIt1, InputIt2>
+mismatch(InputIt1 first1, InputIt1 last1, InputIt2 first2, InputIt2 last2)
+{
+	while (first1 != last1 && first2 != last2 && *first1 == *first2) {
+		++first1;
+		++first2;
+	}
+	return ft::make_pair(first1, first2);
+}
+
+
+template<class InputIt1, class InputIt2, class BinaryPred>
+pair<InputIt1, InputIt2>
+mismatch(InputIt1 first1, InputIt1 last1, InputIt2 first2, InputIt2 last2, BinaryPred p)
+{
+	while (first1 != last1 && first2 != last2 && p(*first1, *first2)) {
+		++first1;
+		++first2;
+	}
+	return ft::make_pair(first1, first2);
+}
+
+
+template <class InputIt, class T>
+typename std::iterator_traits<InputIt>::difference_type
+count(InputIt first, InputIt last, T CREF value)
+{
+	typename iterator_traits<InputIt>::difference_type ret = 0;
+	for (; first != last; ++first)
+		if (*first == value)
+			++ret;
+	return ret;
+}
+
+
+template<class InputIt, class UnaryPred>
+typename std::iterator_traits<InputIt>::difference_type
+count_if(InputIt first, InputIt last, UnaryPred p)
+{
+	typename iterator_traits<InputIt>::difference_type ret = 0;
+	for (; first != last; ++first)
+		if (p(*first))
+			++ret;
+	return ret;
+}
+
+
+template<class ForwardIt1, class ForwardIt2>
+bool
+is_permutation(
+	ForwardIt1 first,
+	ForwardIt1 last,
+	ForwardIt2 d_first
+) {
+	pair<ForwardIt1, ForwardIt2> mismatch_result = ft::mismatch(first, last, d_first);
+	first = mismatch_result.first;
+	d_first = mismatch_result.second;
+
+	// iterate over the rest, counting how many times each element
+	// from [first, last) appears in [d_first, d_last)
+	if (first != last)
+	{
+		ForwardIt2 d_last = ft::next(d_first, ft::distance(first, last));
+		for (ForwardIt1 i = first; i != last; ++i)
+		{
+			if (i != ft::find(first, i, *i))
+				continue; // this *i has been checked
+
+			typename iterator_traits<ForwardIt1>::difference_type m = ft::count(d_first, d_last, *i);
+			if (m == 0 || ft::count(i, last, *i) != m)
+				return false;
+		}
+	}
+	return true;
 }
 
 

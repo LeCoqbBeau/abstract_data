@@ -8,6 +8,8 @@
 
 #include "Constructors.tpp"
 #include "Iterators.tpp"
+#include "ElementAccess.tpp"
+#include "Operations.tpp"
 #include "OutOfClass.tpp"
 
 

@@ -2,10 +2,10 @@
 #ifndef BINARY_TREE_HPP
 #define BINARY_TREE_HPP
 
-#include "ftdef.hpp"
-#include "algorithm.hpp"
-#include "functional.hpp"
-#include "utility.hpp"
+#include ".helper/ftdef.hpp"
+#include ".helper/algorithm.hpp"
+#include ".helper/functional.hpp"
+#include ".helper/utility.hpp"
 
 
 #define RBT_LEFT	0
@@ -295,7 +295,7 @@ typename ft::internal::rbt_node<T>::remove_result
 twoChildrenRemove(ft::internal::rbt_node<T>* node);
 
 
-#include "binary_trees.tpp"
+#include ".helper/binary_trees.tpp"
 
 
 #undef RBT_NODE

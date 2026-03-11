@@ -6,8 +6,7 @@
 #include "gtest/gtest.h"
 #include "bonus/config.h"
 
-
-#include "GridTests/Tests.hpp"
+#include "HashmapsContainersTests/Tests.hpp"
 #include "../include/unordered_set.hpp"
 #include "../include/unordered_map.hpp"
 

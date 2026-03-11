@@ -5,8 +5,9 @@
 #ifndef HASHMAP_TPP
 #define HASHMAP_TPP
 
-#include "hashmap.hpp"
-#include "new.hpp"
+
+#include ".helper/new.hpp"
+
 
 //
 //	bucket<Key>
@@ -264,6 +265,10 @@ ft::internal::hashmap<Key, Hash, KeyEqual, Allocator, extractKey, mutableIterato
 	if (this != &rhs) {
 		if (_bucketArray)
 			_deallocate();
+		if (rhs.empty()) {
+			_init(HASHMAP_INIT_SIZE);
+			return *this;
+		}
 		_bucketArray = NULL;
 		_bucketNum = rhs._bucketNum;
 		_elemNum = rhs._elemNum;
@@ -272,14 +277,7 @@ ft::internal::hashmap<Key, Hash, KeyEqual, Allocator, extractKey, mutableIterato
 		_equal = rhs._equal;
 		_allocator = rhs._allocator;
 		_init(_bucketNum);
-		for (size_type i = 0; i < _bucketNum; ++i)
-			rhs._bucketArray[i].duplicate(&_bucketArray[i]._sentinel);
-		_first = iterator(
-			_bucketArray,
-			_bucketNum,
-			rhs._first._bucket_idx,
-			_bucketArray[rhs._first._bucket_idx]._sentinel.next()
-		);
+		insert(rhs.begin(), rhs.end());
 	}
 	return *this;
 }
@@ -445,7 +443,7 @@ ft::internal::hashmap<Key, Hash, KeyEqual, Allocator, extractKey, mutableIterato
 
 
 template <typename Key, typename Hash, typename KeyEqual, typename Allocator, typename extractKey, bool mutableIterators>
-pair<typename ft::internal::hashmap<Key, Hash, KeyEqual, Allocator, extractKey, mutableIterators>::iterator>
+::ft::pair<typename ft::internal::hashmap<Key, Hash, KeyEqual, Allocator, extractKey, mutableIterators>::iterator>
 ft::internal::hashmap<Key, Hash, KeyEqual, Allocator, extractKey, mutableIterators>::equal_range(key_type CREF key)
 {
 	iterator	first = find(key);
@@ -462,7 +460,7 @@ ft::internal::hashmap<Key, Hash, KeyEqual, Allocator, extractKey, mutableIterato
 
 
 template <typename Key, typename Hash, typename KeyEqual, typename Allocator, typename extractKey, bool mutableIterators>
-pair<typename ft::internal::hashmap<Key, Hash, KeyEqual, Allocator, extractKey, mutableIterators>::const_iterator>
+::ft::pair<typename ft::internal::hashmap<Key, Hash, KeyEqual, Allocator, extractKey, mutableIterators>::const_iterator>
 ft::internal::hashmap<Key, Hash, KeyEqual, Allocator, extractKey, mutableIterators>::equal_range(key_type CREF key) const
 {
 	const_iterator	first = find(key);
@@ -511,10 +509,6 @@ template <class InputIt>
 void
 ft::internal::hashmap<Key, Hash, KeyEqual, Allocator, extractKey, mutableIterators>::insert(InputIt first, InputIt last)
 {
-	size_type newElem = distance(first, last);
-	_elemNum += newElem;
-	if (_shouldRehash(newElem))
-		rehash((_elemNum + newElem) / _maxLoadFactor);
 	while (first != last) {
 		insert(*first);
 		++first;
@@ -725,7 +719,7 @@ ft::internal::hashmap<Key, Hash, KeyEqual, Allocator, extractKey, mutableIterato
 {
 	array_type newArray = _bucketAllocator().allocate(n);
 	for (size_type i = 0; i < n; ++i)
-		::new(static_cast<void*>(newArray + i)) bucket_type; // horrible war crimes I have to commit to default initialize my buckets
+		::new(static_cast<void*>(newArray + i)) bucket_type; // horrible war crime I have to commit to default initialize my buckets
 	ft::swap(_bucketArray, newArray);
 	_bucketNum = n;
 	_first = iterator(_bucketArray, _bucketNum, 0, NULL);

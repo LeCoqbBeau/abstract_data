@@ -5,11 +5,11 @@
 #ifndef HASHMAP_HPP
 #define HASHMAP_HPP
 
-#include "ftdef.hpp"
-#include "functional.hpp"
-#include "ftexcept.hpp"
-#include "utility.hpp"
-#include "doublyLinkedList.hpp"
+#include ".helper/ftdef.hpp"
+#include ".helper/functional.hpp"
+#include ".helper/ftexcept.hpp"
+#include ".helper/utility.hpp"
+#include ".helper/doublyLinkedList.hpp"
 
 # define HASHMAP_INIT_SIZE 16
 
@@ -34,7 +34,7 @@ struct bucket {
 	bucket() : _sentinel() { _sentinel.next() = &_sentinel; _sentinel.prev() = &_sentinel; }
 	template <typename Allocator>
 	bucket(bucket CREF rhs, Allocator allocator) { rhs.duplicate(this->_sentinel, allocator); }
-	~bucket() { if (_sentinel.next() != &_sentinel) throw runtime_error("Memory is leaked!"); }
+	~bucket() { if (_sentinel.next() != &_sentinel) exit(EXIT_FAILURE); }
 
 	// Iterators
 	iterator		begin();
@@ -119,6 +119,17 @@ struct hashmap_iterator
 		return *this;
 	}
 	this_type		operator ++ (int) { this_type tmp = *this; operator++(); return tmp; }
+	this_type REF	operator -- () {
+		if (_bucket_idx > _bucket_count) {
+			_bucket_idx = _bucket_count;
+			return *this;
+		}
+		_curr = _curr->prev();
+		if (dynamic_cast<node_type*>(_curr) == NULL)
+			_getPrevBucket();
+		return *this;
+	}
+	this_type		operator -- (int)	{ this_type tmp = *this; operator--(); return tmp; }
 
 	// Helper Function
 	void _getNextBucket() {
@@ -132,12 +143,23 @@ struct hashmap_iterator
 		}
 		_curr = NULL;
 	}
+	void _getPrevBucket() {
+		if (_curr != NULL)
+			--_bucket_idx;
+		for (; _bucket_idx < _bucket_count; --_bucket_idx) {
+			if (_bucket[_bucket_idx].begin() == _bucket[_bucket_idx].end())
+				continue;
+			_curr = _bucket[_bucket_idx].end()._currentNode->prev();
+			return;
+		}
+		_curr = NULL;
+	}
 
 	// Attributes
 	base_type*		_curr;
 	bucket_type*	_bucket;
-	size_t		_bucket_count;
-	size_t		_bucket_idx;
+	size_t			_bucket_count;
+	size_t			_bucket_idx;
 };
 
 
@@ -152,36 +174,36 @@ template <
 struct hashmap {
 	protected:
 		// Helper Typedefs
-		typedef hashmap<Key, Hash, KeyEqual, Allocator>					this_type;
-		typedef typename Hash::result_type								index_type;
-		typedef bucket<Key>												bucket_type;
-		typedef bucket_type*											array_type;
-		typedef typename Allocator::template rebind<bucket_type>::other	bucket_allocator_type;
+		typedef hashmap<Key, Hash, KeyEqual, Allocator, extractKey, mutableIterators>	this_type;
+		typedef typename Hash::result_type												index_type;
+		typedef bucket<Key>																bucket_type;
+		typedef bucket_type*															array_type;
+		typedef typename Allocator::template rebind<bucket_type>::other					bucket_allocator_type;
 
 	public:
 		//  Typedefs
-		typedef Key														key_type;
-		typedef Key														value_type;
-		typedef Hash													hasher;
-		typedef KeyEqual												key_equal;
-		typedef Allocator												allocator_type;
-		typedef Key REF													reference;
-		typedef Key CREF												const_reference;
-		typedef typename allocator_type::pointer						pointer;
-		typedef typename allocator_type::const_pointer					const_pointer;
+		typedef Key																		key_type;
+		typedef Key																		value_type;
+		typedef Hash																	hasher;
+		typedef KeyEqual																key_equal;
+		typedef Allocator																allocator_type;
+		typedef Key REF																	reference;
+		typedef Key CREF																const_reference;
+		typedef typename allocator_type::pointer										pointer;
+		typedef typename allocator_type::const_pointer									const_pointer;
 		typedef hashmap_iterator<Key,
 			CONDITIONAL_TT(mutableIterators, Key REF, Key CREF),
 			CONDITIONAL_TT(mutableIterators, Key *, Key const*)
-		>																iterator;
-		typedef hashmap_iterator<Key, Key CREF, Key const*>				const_iterator;
+		>																				iterator;
+		typedef hashmap_iterator<Key, Key CREF, Key const*>								const_iterator;
 		typedef CONDITIONAL_TT(
 			mutableIterators,
 			typename bucket_type::iterator,
 			typename bucket_type::const_iterator
-		)																local_iterator;
-		typedef typename bucket_type::const_iterator					const_local_iterator;
-		typedef size_t												size_type;
-		typedef ptrdiff_t											difference_type;
+		)																				local_iterator;
+		typedef typename bucket_type::const_iterator									const_local_iterator;
+		typedef size_t																	size_type;
+		typedef ptrdiff_t																difference_type;
 
 		// Constructor
 		hashmap(size_type n = HASHMAP_INIT_SIZE, hasher CREF hash = hasher(), key_equal CREF equal = key_equal(), allocator_type CREF allocator = allocator_type())
@@ -293,7 +315,6 @@ struct KeyComparator {};
 template <typename Comp>
 struct KeyComparator<false_type, Comp>  { // Don't extract keys
 	explicit KeyComparator(Comp CREF comp) : _comp(comp) {}
-	template <typename T>	bool operator()(T CREF key, T CREF elem) { return _comp(key, elem); }
 	template <typename T>	bool operator()(T CREF key, T CREF elem) const { return _comp(key, elem); }
 	Comp CREF _comp;
 };
@@ -302,8 +323,7 @@ struct KeyComparator<false_type, Comp>  { // Don't extract keys
 template <typename Comp>
 struct KeyComparator<true_type, Comp>  { // Extract keys
 	explicit KeyComparator(Comp CREF comp) : _comp(comp) {}
-	template <typename T>	bool operator()(T CREF key, T CREF elem) { return _comp(key, elem.first); }
-	template <typename T>	bool operator()(T CREF key, T CREF elem) const { return _comp(key, elem.first); }
+	template <typename T>	bool operator()(T CREF key, T CREF elem) const { return _comp(key.first, elem.first); }
 	Comp CREF _comp;
 };
 
@@ -312,7 +332,7 @@ struct KeyComparator<true_type, Comp>  { // Extract keys
 } // ft
 
 
-#include "hashmap.tpp"
+#include ".helper/hashmap.tpp"
 
 
 #endif //HASHMAP_HPP

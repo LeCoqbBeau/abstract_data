@@ -6,6 +6,7 @@
 #define NUMSTRINGS_HPP
 
 
+#include <string>
 struct NumStrings : public std::string
 {
 	NumStrings()					= default;

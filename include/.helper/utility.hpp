@@ -5,7 +5,7 @@
 #ifndef UTILITY_HPP
 #define UTILITY_HPP
 
-#include "ftdef.hpp"
+#include ".helper/ftdef.hpp"
 
 namespace ft {
 

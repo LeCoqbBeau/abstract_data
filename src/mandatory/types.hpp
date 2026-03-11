@@ -10,9 +10,9 @@
 #include "Fat.hpp"
 
 
-#define ENABLE_SEQUENCE		false
-#define ENABLE_ASSOCIATIVE	false
-#define ENABLE_ADAPTORS		false
+#define ENABLE_SEQUENCE		true
+#define ENABLE_ASSOCIATIVE	true
+#define ENABLE_ADAPTORS		true
 #define ENABLE_GRID			true
 
 
@@ -53,16 +53,6 @@ std::ostream REF operator << (std::ostream REF os, std::pair<T, U> CREF pair)
 # if ENABLE_ASSOCIATIVE == true
 #  include "set.hpp"
 #  include "map.hpp"
-
-namespace ft {
-template <typename T, typename U>
-std::ostream REF operator << (std::ostream REF os, ft::pair<T, U> CREF pair)
-{
-	os << "< " << pair.first << " -=- " << pair.second << " >";
-	return os;
-}
-}
-
 # endif
 
 # if ENABLE_ADAPTORS == true
@@ -275,12 +265,12 @@ typedef ft::grid<Fat, 0, 0>	fatEmptyGrid_t;
 
 
 typedef ::testing::Types<
-	intSquareGrid_t, strSquareGrid_t, fatSquareGrid_t//,
-	// intLineGrid_t, strLineGrid_t, fatLineGrid_t,
-	// intColGrid_t, strColGrid_t, fatColGrid_t,
-	// intNoRowGrid_t, strNoRowGrid_t, fatNoRowGrid_t,
-	// intNoColGrid_t, strNoColGrid_t, fatNoColGrid_t,
-	// intEmptyGrid_t, strEmptyGrid_t, fatEmptyGrid_t
+	intSquareGrid_t, strSquareGrid_t, fatSquareGrid_t,
+	intLineGrid_t, strLineGrid_t, fatLineGrid_t,
+	intColGrid_t, strColGrid_t, fatColGrid_t,
+	intNoRowGrid_t, strNoRowGrid_t, fatNoRowGrid_t,
+	intNoColGrid_t, strNoColGrid_t, fatNoColGrid_t,
+	intEmptyGrid_t, strEmptyGrid_t, fatEmptyGrid_t
 >	testGrid_type;
 
 

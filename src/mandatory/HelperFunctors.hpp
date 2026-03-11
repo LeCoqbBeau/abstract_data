@@ -68,7 +68,12 @@ struct isSorted
 	struct opposite
 	{
 		opposite(Predicate p) : p(p) {}
-		bool operator()(typename Container::const_reference a, typename Container::const_reference b) const { return !p(a, b); }
+		bool operator()(typename Container::const_reference a, typename Container::const_reference b) const
+		{
+			if (p(a, b) == p(b, a) && !p(a, b))
+				return false;
+			return !p(a, b);
+		}
 		Predicate p;
 	};
 

@@ -1,5 +1,5 @@
 //
-// Created by mscheman on 2/4/26.
+// Created by mscheman on 2/4/26
 //
 
 #ifndef UNORDERED_MAP_TPP
@@ -34,7 +34,7 @@ ft::unordered_map<Key, T, Hash, KeyEqual, Allocator>::unordered_map(InputIt firs
 
 template <class Key, class T, class Hash, class KeyEqual, class Allocator>
 ft::unordered_map<Key, T, Hash, KeyEqual, Allocator>::unordered_map(unordered_map CREF rhs)
-	: _hashmap(rhs)
+	: _hashmap(rhs._hashmap)
 {}
 
 
@@ -42,7 +42,7 @@ template <class Key, class T, class Hash, class KeyEqual, class Allocator>
 ft::unordered_map<Key, T, Hash, KeyEqual, Allocator>::unordered_map(unordered_map CREF rhs, allocator_type CREF allocator)
 	: _hashmap(rhs)
 {
-	_hashmap._allocator = allocator;
+	(void)allocator;
 }
 
 
@@ -239,7 +239,7 @@ ft::unordered_map<Key, T, Hash, KeyEqual, Allocator>::count(key_type CREF key) c
 
 
 template <class Key, class T, class Hash, class KeyEqual, class Allocator>
-pair<typename ft::unordered_map<Key, T, Hash, KeyEqual, Allocator>::iterator>
+::ft::pair<typename ft::unordered_map<Key, T, Hash, KeyEqual, Allocator>::iterator>
 ft::unordered_map<Key, T, Hash, KeyEqual, Allocator>::equal_range(key_type CREF key)
 {
 	return _hashmap.equal_range(key);
@@ -247,7 +247,7 @@ ft::unordered_map<Key, T, Hash, KeyEqual, Allocator>::equal_range(key_type CREF 
 
 
 template <class Key, class T, class Hash, class KeyEqual, class Allocator>
-pair<typename ft::unordered_map<Key, T, Hash, KeyEqual, Allocator>::const_iterator>
+::ft::pair<typename ft::unordered_map<Key, T, Hash, KeyEqual, Allocator>::const_iterator>
 ft::unordered_map<Key, T, Hash, KeyEqual, Allocator>::equal_range(key_type CREF key) const
 {
 	return _hashmap.equal_range(key);
@@ -256,7 +256,7 @@ ft::unordered_map<Key, T, Hash, KeyEqual, Allocator>::equal_range(key_type CREF 
 
 // Modifiers
 template <class Key, class T, class Hash, class KeyEqual, class Allocator>
-pair<typename ft::unordered_map<Key, T, Hash, KeyEqual, Allocator>::iterator, bool>
+::ft::pair<typename ft::unordered_map<Key, T, Hash, KeyEqual, Allocator>::iterator, bool>
 ft::unordered_map<Key, T, Hash, KeyEqual, Allocator>::insert(value_type CREF value)
 {
 	iterator	elem = _hashmap.find(value);
@@ -326,7 +326,7 @@ template <class Key, class T, class Hash, class KeyEqual, class Allocator>
 void
 ft::unordered_map<Key, T, Hash, KeyEqual, Allocator>::swap(unordered_map REF rhs)
 {
-	_hashmap.swap(rhs);
+	_hashmap.swap(rhs._hashmap);
 }
 
 
@@ -459,15 +459,15 @@ ft::unordered_multimap<Key, T, Hash, KeyEqual, Allocator>::unordered_multimap(In
 
 template <class Key, class T, class Hash, class KeyEqual, class Allocator>
 ft::unordered_multimap<Key, T, Hash, KeyEqual, Allocator>::unordered_multimap(unordered_multimap CREF rhs)
-	: _hashmap(rhs)
+	: _hashmap(rhs._hashmap)
 {}
 
 
 template <class Key, class T, class Hash, class KeyEqual, class Allocator>
 ft::unordered_multimap<Key, T, Hash, KeyEqual, Allocator>::unordered_multimap(unordered_multimap CREF rhs, allocator_type CREF allocator)
-	: _hashmap(rhs)
+	: _hashmap(rhs._hashmap)
 {
-	_hashmap._allocator = allocator;
+	(void)allocator;
 }
 
 
@@ -663,7 +663,7 @@ ft::unordered_multimap<Key, T, Hash, KeyEqual, Allocator>::count(key_type CREF k
 
 
 template <class Key, class T, class Hash, class KeyEqual, class Allocator>
-pair<typename ft::unordered_multimap<Key, T, Hash, KeyEqual, Allocator>::iterator>
+::ft::pair<typename ft::unordered_multimap<Key, T, Hash, KeyEqual, Allocator>::iterator>
 ft::unordered_multimap<Key, T, Hash, KeyEqual, Allocator>::equal_range(key_type CREF key)
 {
 	return _hashmap.equal_range(key);
@@ -671,7 +671,7 @@ ft::unordered_multimap<Key, T, Hash, KeyEqual, Allocator>::equal_range(key_type 
 
 
 template <class Key, class T, class Hash, class KeyEqual, class Allocator>
-pair<typename ft::unordered_multimap<Key, T, Hash, KeyEqual, Allocator>::const_iterator>
+::ft::pair<typename ft::unordered_multimap<Key, T, Hash, KeyEqual, Allocator>::const_iterator>
 ft::unordered_multimap<Key, T, Hash, KeyEqual, Allocator>::equal_range(key_type CREF key) const
 {
 	return _hashmap.equal_range(key);
@@ -744,7 +744,7 @@ template <class Key, class T, class Hash, class KeyEqual, class Allocator>
 void
 ft::unordered_multimap<Key, T, Hash, KeyEqual, Allocator>::swap(unordered_multimap REF rhs)
 {
-	_hashmap.swap(rhs);
+	_hashmap.swap(rhs._hashmap);
 }
 
 

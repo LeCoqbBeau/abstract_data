@@ -2,8 +2,8 @@
 // Created by mscheman on 2/23/26.
 //
 
-#ifndef SCT_OUT_OF_CLASS_TPP
-#define SCT_OUT_OF_CLASS_TPP
+#ifndef GT_OUT_OF_CLASS_TPP
+#define GT_OUT_OF_CLASS_TPP
 
 template <typename Container>
 class gtOutOfClassTests : public ::testing::Test
@@ -148,4 +148,4 @@ INSTANTIATE_TYPED_TEST_CASE_P(
 );
 
 
-#endif //SCT_OUT_OF_CLASS_TPP
+#endif //GT_OUT_OF_CLASS_TPP

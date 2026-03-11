@@ -28,7 +28,9 @@ GTEST_ALL_A		=	$(GTEST_BUILD)libgtest.a
 GTEST_MAIN_A	=	$(GTEST_BUILD)libgtest_main.a
 GTEST_INCLUDE	=	$(GTEST_GTEST)include/
 GTEST_FILTER	=	*
-GTEST_FLAGS		=	--gtest_color=yes --gtest_filter=$(GTEST_FILTER)
+GTEST_REPEAT	=	1
+GTEST_SHUFFLE	=	#--gtest_shuffle=yes
+GTEST_FLAGS		=	--gtest_color=yes --gtest_filter=$(GTEST_FILTER) --gtest_repeat=$(GTEST_REPEAT) $(GTEST_SHUFFLE)
 VALGRIND_FLAGS	=	--error-exitcode=1 --exit-on-first-error=yes --leak-check=full --show-leak-kinds=all --log-file=.valgrind -q
 
 
@@ -70,6 +72,11 @@ OBJ_BONUS_FT_DIR	= $(OBJ_DIR)ft_bonus/
 OBJ_BONUS_STD_DIR	= $(OBJ_DIR)std_bonus/
 OBJ_BONUS_FT		= $(addprefix $(OBJ_BONUS_FT_DIR), $(SRC_BONUS_NAME:.cpp=.o))
 OBJ_BONUS_STD		= $(addprefix $(OBJ_BONUS_STD_DIR), $(SRC_BONUS_NAME:.cpp=.o))
+
+DEPS_BONUS_FT_SRC	=	$(SRC_BONUS_NAME:.cpp=.d)
+DEPS_BONUS_STD_SRC	=	$(SRC_BONUS_NAME:.cpp=.d)
+DEPS_BONUS_FT		=	$(patsubst %, $(OBJ_BONUS_FT_DIR)%, $(DEPS_BONUS_FT_SRC))
+DEPS_BONUS_STD		=	$(patsubst %, $(OBJ_BONUS_STD_DIR)%, $(DEPS_BONUS_STD_SRC))
 
 
 #-----------------------------------------------------------------------------------------------------------#
@@ -168,6 +175,7 @@ fclean: clean dclean gclean
 
 
 re: fclean all
+bre: fclean bonus
 
 
 ft: $(NAME_FT)
@@ -238,3 +246,5 @@ bear:
 
 -include $(DEPS_FT)
 -include $(DEPS_STD)
+-include $(DEPS_BONUS_FT)
+-include $(DEPS_BONUS_STD)

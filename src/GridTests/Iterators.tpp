@@ -39,13 +39,13 @@ TYPED_TEST_P(gtIteratorsTests, RowLoop)
 	typedef typename TypeParam::iterator iterator;
 
 	iterator	it;
-	for (unsigned int i = 0; i < TypeParam::rows(); ++i) {
+	for (unsigned int m = 0; m < TypeParam::rows(); ++m) {
 		int pos = 0;
-		for (it = this->container.begin(i); it != this->container.end(i); ++it) {
-			EXPECT_EQ(it._pos, i * TypeParam::rows() + pos);
+		for (it = this->container.begin(m); it != this->container.end(m); ++it) {
+			EXPECT_EQ(it._pos, m * TypeParam::cols() + pos);
 			++pos;
 		}
-		EXPECT_EQ(it, this->container.end(i));
+		EXPECT_EQ(it, this->container.end(m));
 	}
 	if (!TypeParam::rows())
 		return SUCCEED();
@@ -64,6 +64,25 @@ TYPED_TEST_P(gtIteratorsTests, ConstLoop)
 }
 
 
+TYPED_TEST_P(gtIteratorsTests, RowConstLoop)
+{
+	typedef typename TypeParam::const_iterator const_iterator;
+
+	const_iterator	it;
+	for (unsigned int m = 0; m < TypeParam::rows(); ++m) {
+		int pos = 0;
+		for (it = this->container.begin(m); it != this->container.end(m); ++it) {
+			EXPECT_EQ(it._pos, m * TypeParam::cols() + pos);
+			++pos;
+		}
+		EXPECT_EQ(it, this->container.end(m));
+	}
+	if (!TypeParam::rows())
+		return SUCCEED();
+	EXPECT_EQ(it, this->container.end());
+}
+
+
 TYPED_TEST_P(gtIteratorsTests, ReverseLoop)
 {
 	typedef typename TypeParam::reverse_iterator reverse_iterator;
@@ -75,6 +94,25 @@ TYPED_TEST_P(gtIteratorsTests, ReverseLoop)
 }
 
 
+TYPED_TEST_P(gtIteratorsTests, RowReverseLoop)
+{
+	typedef typename TypeParam::reverse_iterator reverse_iterator;
+
+	reverse_iterator	it;
+	for (unsigned int m = 0; m < TypeParam::rows(); ++m) {
+		unsigned int pos = (m + 1) * TypeParam::cols();
+		for (it = this->container.rbegin(m); it != this->container.rend(m); ++it) {
+			EXPECT_EQ(it.base()._pos, pos);
+			--pos;
+		}
+		EXPECT_EQ(it, this->container.rend(m));
+	}
+	if (!TypeParam::rows())
+		return SUCCEED();
+	EXPECT_EQ(it, this->container.rend(TypeParam::rows() - 1));
+}
+
+
 TYPED_TEST_P(gtIteratorsTests, ConstReverseLoop)
 {
 	typedef typename TypeParam::const_reverse_iterator const_reverse_iterator;
@@ -83,6 +121,25 @@ TYPED_TEST_P(gtIteratorsTests, ConstReverseLoop)
 	for (it = this->container.rbegin(); it != this->container.rend(); ++it)
 		;
 	EXPECT_TRUE(it == this->container.rend());
+}
+
+
+TYPED_TEST_P(gtIteratorsTests, RowConstReverseLoop)
+{
+	typedef typename TypeParam::const_reverse_iterator const_reverse_iterator;
+
+	const_reverse_iterator	it;
+	for (unsigned int m = 0; m < TypeParam::rows(); ++m) {
+		unsigned int pos = (m + 1) * TypeParam::cols();
+		for (it = this->container.rbegin(m); it != this->container.rend(m); ++it) {
+			EXPECT_EQ(it.base()._pos, pos);
+			--pos;
+		}
+		EXPECT_EQ(it, this->container.rend(m));
+	}
+	if (!TypeParam::rows())
+		return SUCCEED();
+	EXPECT_EQ(it, this->container.rend(TypeParam::rows() - 1));
 }
 
 
@@ -169,8 +226,11 @@ REGISTER_TYPED_TEST_CASE_P(
 	Loop,
 	RowLoop,
 	ConstLoop,
+	RowConstLoop,
 	ReverseLoop,
+	RowReverseLoop,
 	ConstReverseLoop,
+	RowConstReverseLoop,
 	LoopModification,
 	ReverseLoopModification,
 	BidirectionalTest,

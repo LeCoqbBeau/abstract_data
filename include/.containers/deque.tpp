@@ -6,7 +6,6 @@
 #define DEQUE_TPP
 
 
-#include "iostream"
 #include ".helper/ftexcept.hpp"
 #include ".helper/new.hpp"
 

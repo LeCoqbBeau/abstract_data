@@ -5,8 +5,8 @@
 #ifndef NEW_H
 #define NEW_H
 
-#include "ftdef.hpp"
-#include "exception.hpp"
+#include ".helper/ftdef.hpp"
+#include ".helper/exception.hpp"
 
 namespace ft
 {
@@ -20,7 +20,7 @@ class bad_alloc : public exception {
 };
 
 
-class bad_array_new_length : public ft::bad_alloc {
+class bad_array_new_length : public bad_alloc {
 	public:
 		explicit bad_array_new_length(str CREF error = "ft::bad_array_new_length") FT_NOTHROW : bad_alloc(error) {}
 		bad_array_new_length(bad_array_new_length CREF src) FT_NOTHROW : bad_alloc(src) {}

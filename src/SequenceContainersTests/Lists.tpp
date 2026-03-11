@@ -5,6 +5,7 @@
 #ifndef SCT_LIST_TPP
 #define SCT_LIST_TPP
 
+#include "functional.hpp"
 
 template <typename Container>
 class sctListsTests : public ::testing::Test
@@ -291,9 +292,9 @@ TYPED_TEST_P(sctListsTests, Sort)
 	for (int i = 0; i < 20000; ++i)
 		toSort.push_back(convert(rand()));
 	ASSERT_EQ(toSort.size(), typename TypeParam::size_type(20000));
-	EXPECT_FALSE(isSorted::check(toSort, std::greater<value_type>()));
+	EXPECT_FALSE(isSorted::check(toSort, ft::less<value_type>()));
 	toSort.sort();
-	EXPECT_TRUE(isSorted::check(toSort, std::greater<value_type>()));
+	EXPECT_TRUE(isSorted::check(toSort, ft::less<value_type>()));
 }
 
 
@@ -312,9 +313,9 @@ TYPED_TEST_P(sctListsTests, SortStability)
 		toSort.push_back(std::make_pair(convert(rand() % 10000), i)); // so we have some duplicates
 	ASSERT_EQ(toSort.size(), typename TypeParam::size_type(20000));
 
-	EXPECT_FALSE(isSorted::check(toSort, SCT::stableGreater()));
+	EXPECT_FALSE(isSorted::check(toSort, SCT::stableLess()));
 	toSort.sort(SCT::stableLess());
-	EXPECT_TRUE(isSorted::check(toSort, SCT::stableGreater()));
+	EXPECT_TRUE(isSorted::check(toSort, SCT::stableLess()));
 	iterator	violation = std::adjacent_find(toSort.begin(), toSort.end(), SCT::stableCheck());
 	EXPECT_TRUE(violation == toSort.end()) << "Sort isn't stable";
 

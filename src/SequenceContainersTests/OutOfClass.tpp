@@ -6,24 +6,24 @@
 #define SCT_OUT_OF_CLASS_TPP
 
 template <typename Container>
-class gtOutOfClassTests : public ::testing::Test
+class sctOutOfClassTests : public ::testing::Test
 {
 	public:
 		// Helper Typedefs
 		typedef typename Container::value_type	value_type;
 
 		// Setup
-		gtOutOfClassTests() : container(arrayGenerator<value_type>()(), arrayGenerator<value_type>()() + ARRAY_TINY) {}
+		sctOutOfClassTests() : container(arrayGenerator<value_type>()(), arrayGenerator<value_type>()() + ARRAY_TINY) {}
 
 		// Attributes
 		Container container;
 };
 
 
-TYPED_TEST_CASE_P(gtOutOfClassTests);
+TYPED_TEST_CASE_P(sctOutOfClassTests);
 
 
-TYPED_TEST_P(gtOutOfClassTests, Swap)
+TYPED_TEST_P(sctOutOfClassTests, Swap)
 {
 	arrayGenerator<typename TypeParam::value_type>	array;
 	TypeParam REF									c = this->container;
@@ -70,7 +70,7 @@ TYPED_TEST_P(gtOutOfClassTests, Swap)
 }
 
 
-TYPED_TEST_P(gtOutOfClassTests, RelationalOperators)
+TYPED_TEST_P(sctOutOfClassTests, RelationalOperators)
 {
 	arrayGenerator<typename TypeParam::value_type>	array;
 	TypeParam		a(array() + 1, array() + ARRAY_TINY + 1);
@@ -106,7 +106,7 @@ TYPED_TEST_P(gtOutOfClassTests, RelationalOperators)
 
 
 REGISTER_TYPED_TEST_CASE_P(
-	gtOutOfClassTests,
+	sctOutOfClassTests,
 	Swap,
 	RelationalOperators
 );
@@ -114,7 +114,7 @@ REGISTER_TYPED_TEST_CASE_P(
 
 INSTANTIATE_TYPED_TEST_CASE_P(
 	SequenceContainers,
-	gtOutOfClassTests,
+	sctOutOfClassTests,
 	sequenceContainers_type
 );
 

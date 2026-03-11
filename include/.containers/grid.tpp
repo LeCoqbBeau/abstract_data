@@ -100,6 +100,14 @@ ft::internal::gridIterator<T, Ref, Ptr, M, N>::operator + (difference_type n)
 
 
 template <typename T, typename Ref, typename Ptr, unsigned int M, unsigned int N>
+typename ft::internal::gridIterator<T, Ref, Ptr, M, N>::this_type
+operator + (typename ft::internal::gridIterator<T, Ref, Ptr, M, N>::difference_type n, ft::internal::gridIterator<T, Ref, Ptr, M, N> it)
+{
+	return it + n;
+}
+
+
+template <typename T, typename Ref, typename Ptr, unsigned int M, unsigned int N>
 typename ft::internal::gridIterator<T, Ref, Ptr, M, N>::this_type REF
 ft::internal::gridIterator<T, Ref, Ptr, M, N>::operator -- ()
 {
@@ -235,7 +243,7 @@ template <typename T, unsigned int M, unsigned int N>
 typename ft::grid<T, M, N>::iterator
 ft::grid<T, M, N>::begin(size_type m)
 {
-	return iterator(data(), m * M);
+	return iterator(data(), m * N);
 }
 
 
@@ -243,7 +251,7 @@ template <typename T, unsigned int M, unsigned int N>
 typename ft::grid<T, M, N>::const_iterator
 ft::grid<T, M, N>::begin(size_type m) const
 {
-	return iterator(data(), m * M);
+	return const_iterator(data(), m * N);
 }
 
 
@@ -267,7 +275,7 @@ template <typename T, unsigned int M, unsigned int N>
 typename ft::grid<T, M, N>::iterator
 ft::grid<T, M, N>::end(size_type m)
 {
-	return iterator(data(), (m + 1) * M);
+	return iterator(data(), (m + 1) * N);
 }
 
 
@@ -275,7 +283,7 @@ template <typename T, unsigned int M, unsigned int N>
 typename ft::grid<T, M, N>::const_iterator
 ft::grid<T, M, N>::end(size_type m) const
 {
-	return iterator(data(), (m + 1) * M);
+	return const_iterator(data(), (m + 1) * N);
 }
 
 
