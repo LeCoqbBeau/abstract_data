@@ -87,12 +87,12 @@ class grid
 		typedef T													grid_type[M][N];
 		typedef	size_t												size_type;
 		typedef ptrdiff_t											difference_type;
-		typedef value_type REF										reference;
-		typedef value_type CREF										const_reference;
+		typedef value_type &										reference;
+		typedef value_type const&									const_reference;
 		typedef T*													pointer;
 		typedef T const*											const_pointer;
-		typedef internal::gridIterator<T, T REF, T*, M, N>			iterator;
-		typedef internal::gridIterator<T, T CREF, T const*, M, N>	const_iterator;
+		typedef internal::gridIterator<T, T &, T*, M, N>			iterator;
+		typedef internal::gridIterator<T, T &, T const*, M, N>		const_iterator;
 		typedef reverse_iterator<iterator>							reverse_iterator;
 		typedef ft::reverse_iterator<const_iterator>				const_reverse_iterator;
 
@@ -147,7 +147,7 @@ class grid
 		 * @details Complexity: M * N calls to T's copy assignment operator.
 		 * @remark While this function does modify the container, it doesn't cause any reference/iterator invalidation.
 		 */
-		grid REF operator = (grid CREF other);
+		grid& operator = (grid CREF other);
 
 		/**
 		 * @brief Destructs the grid. The destructors of the elements are called.
