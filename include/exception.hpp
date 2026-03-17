@@ -1,1 +1,2 @@
-.helper/exception.hpp
+#pragma once
+#include ".helper/exception.hpp"

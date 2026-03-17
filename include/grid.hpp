@@ -1,1 +1,2 @@
-.containers/grid.hpp
+#pragma once
+#include ".containers/grid.hpp"

@@ -1,1 +1,2 @@
-.helper/new.hpp
+#pragma once
+#include ".helper/new.hpp"

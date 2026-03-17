@@ -40,11 +40,7 @@ TYPED_TEST_P(hctOutOfClassTests, Swap)
 	TypeParam										otherCopy = other;
 
 	// Normal cases
-	printContainer(c); std::cout << std::endl;
-	printContainer(other); std::cout << std::endl;
 	ns::swap(c, other);
-	printContainer(c); std::cout << std::endl;
-	printContainer(other); std::cout << std::endl;
 	EXPECT_EQ(c, otherCopy);
 	EXPECT_EQ(other, cCopy);
 	ns::swap(other, c);
@@ -109,7 +105,7 @@ REGISTER_TYPED_TEST_CASE_P(
 
 
 INSTANTIATE_TYPED_TEST_CASE_P(
-	GridContainer,
+	HashmapsContainer,
 	hctOutOfClassTests,
 	hashmapsContainers_type
 );

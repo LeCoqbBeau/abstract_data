@@ -1,1 +1,2 @@
-.helper/utility.hpp
+#pragma once
+#include ".helper/utility.hpp"

@@ -4,7 +4,7 @@
 
 
 #include ".helper/algorithm.hpp"
-#include ".helper/doublyLinkedList.hpp"
+#include ".helper/doubly_linked_list.hpp"
 #include ".helper/functional.hpp"
 #include ".helper/new.hpp"
 #include ".helper/type_traits.hpp"

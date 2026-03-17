@@ -21,9 +21,9 @@
 				X(80), X(81), X(82), X(83), X(84), X(85), X(86), X(87), X(88), X(89),	\
 				X(90), X(91), X(92), X(93), X(94), X(95), X(96), X(97), X(98), X(99),
 
-#define ARRAY_TINY 10
-#define ARRAY_SMOL 50
-#define ARRAY_HUGE 100
+#define ARRAY_TINY 10u
+#define ARRAY_SMOL 50u
+#define ARRAY_HUGE 100u
 
 #define X(e) e
 int const intArray[] = { ARRAY };

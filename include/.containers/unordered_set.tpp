@@ -30,9 +30,9 @@ ft::unordered_set<Key, Hash, KeyEqual, Allocator>::unordered_set(InputIt first, 
 {
 	(void)n;
 	_hashmap.insert(first, last);
+
+
 }
-
-
 template <class Key, class Hash, class KeyEqual, class Allocator>
 ft::unordered_set<Key, Hash, KeyEqual, Allocator>::unordered_set(unordered_set CREF rhs)
 	: _hashmap(rhs._hashmap)
@@ -71,7 +71,7 @@ template <class Key, class Hash, class KeyEqual, class Allocator>
 typename ft::unordered_set<Key, Hash, KeyEqual, Allocator>::size_type
 ft::unordered_set<Key, Hash, KeyEqual, Allocator>::size() const
 {
-	return _hashmap.empty();
+	return _hashmap.size();
 }
 
 
@@ -232,7 +232,7 @@ ft::unordered_set<Key, Hash, KeyEqual, Allocator>::insert(value_type CREF value)
 		elem = _hashmap.insert(value);
 		isNew = true;
 	}
-	return make_pair(elem, isNew);
+	return ft::make_pair(elem, isNew);
 }
 
 
@@ -253,7 +253,10 @@ template <class InputIt>
 void
 ft::unordered_set<Key, Hash, KeyEqual, Allocator>::insert(InputIt first, InputIt last)
 {
-	_hashmap.insert(first, last);
+	while (first != last) {
+		insert(*first);
+		++first;
+	}
 }
 
 
@@ -461,7 +464,7 @@ template <class Key, class Hash, class KeyEqual, class Allocator>
 typename ft::unordered_multiset<Key, Hash, KeyEqual, Allocator>::size_type
 ft::unordered_multiset<Key, Hash, KeyEqual, Allocator>::size() const
 {
-	return _hashmap.empty();
+	return _hashmap.size();
 }
 
 
@@ -778,8 +781,6 @@ ft::unordered_multiset<Key, Hash, KeyEqual, Allocator>::get_allocator() const
 {
 	return _hashmap.get_allocator();
 }
-
-
 
 
 #endif //UNORDERED_SET_TPP

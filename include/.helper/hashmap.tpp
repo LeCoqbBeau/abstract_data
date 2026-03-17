@@ -7,6 +7,7 @@
 
 
 #include ".helper/new.hpp"
+#include ".helper/iterator.hpp"
 
 
 //
@@ -95,6 +96,7 @@ ft::internal::bucket<Key>::insert(value_type CREF val, Allocator allocator, Pred
 	inserted->prev() = insertPos->prev();
 	inserted->next() = insertPos;
 	insertPos->prev() = inserted;
+	++_size;
 	return iterator(inserted);
 }
 
@@ -109,6 +111,7 @@ ft::internal::bucket<Key>::insert(base_type *node)
 	node->prev() = _sentinel.prev();
 	node->next() = &_sentinel;
 	_sentinel.prev() = node;
+	++_size;
 }
 
 
@@ -128,6 +131,7 @@ ft::internal::bucket<Key>::erase(const_iterator position, Allocator allocator)
 	erasedNode->next()->prev() = erasedNode->prev();
 	nodeAllocator.destroy(FT_DLLNODE(erasedNode));
 	nodeAllocator.deallocate(FT_DLLNODE(erasedNode), 1);
+	--_size;
 	return iterator(position._currentNode);
 }
 
@@ -266,18 +270,22 @@ ft::internal::hashmap<Key, Hash, KeyEqual, Allocator, extractKey, mutableIterato
 		if (_bucketArray)
 			_deallocate();
 		if (rhs.empty()) {
+			_elemNum = 0;
 			_init(HASHMAP_INIT_SIZE);
 			return *this;
 		}
 		_bucketArray = NULL;
 		_bucketNum = rhs._bucketNum;
-		_elemNum = rhs._elemNum;
 		_maxLoadFactor = rhs._maxLoadFactor;
 		_hasher = rhs._hasher;
 		_equal = rhs._equal;
 		_allocator = rhs._allocator;
 		_init(_bucketNum);
 		insert(rhs.begin(), rhs.end());
+		_first._bucket_idx = 0;
+		_first._curr = NULL;
+		_first._getNextBucket();
+		_elemNum = rhs._elemNum;
 	}
 	return *this;
 }
@@ -409,7 +417,7 @@ template <typename Key, typename Hash, typename KeyEqual, typename Allocator, ty
 typename ft::internal::hashmap<Key, Hash, KeyEqual, Allocator, extractKey, mutableIterators>::iterator
 ft::internal::hashmap<Key, Hash, KeyEqual, Allocator, extractKey, mutableIterators>::find(key_type CREF key)
 {
-	index_type index = KeyHasher<extractKey, Key>(_hasher)(key) % _bucketNum;
+	index_type index = KeyHasher<extractKey, Hash>(_hasher)(key) % _bucketNum;
 	for (local_iterator it = _bucketArray[index].begin(); it != _bucketArray[index].end(); ++it)
 		if (KeyComparator<extractKey, KeyEqual>(_equal)(key, *it))
 			return iterator(_bucketArray, _bucketNum, index, it._currentNode);
@@ -421,7 +429,7 @@ template <typename Key, typename Hash, typename KeyEqual, typename Allocator, ty
 typename ft::internal::hashmap<Key, Hash, KeyEqual, Allocator, extractKey, mutableIterators>::const_iterator
 ft::internal::hashmap<Key, Hash, KeyEqual, Allocator, extractKey, mutableIterators>::find(key_type CREF key) const
 {
-	index_type index = KeyHasher<extractKey, Key>(_hasher)(key) % _bucketNum;
+	index_type index = KeyHasher<extractKey, Hash>(_hasher)(key) % _bucketNum;
 	for (local_iterator it = _bucketArray[index].begin(); it != _bucketArray[index].end(); ++it)
 		if (KeyComparator<extractKey, KeyEqual>(_equal)(key, *it))
 			return iterator(_bucketArray, _bucketNum, index, it._currentNode);
@@ -433,11 +441,15 @@ template <typename Key, typename Hash, typename KeyEqual, typename Allocator, ty
 typename ft::internal::hashmap<Key, Hash, KeyEqual, Allocator, extractKey, mutableIterators>::size_type
 ft::internal::hashmap<Key, Hash, KeyEqual, Allocator, extractKey, mutableIterators>::count(key_type CREF key) const
 {
-	index_type	index = KeyHasher<extractKey, Key>(_hasher)(key) % _bucketNum;
+	const_iterator elementPosition = find(key);
+	if (elementPosition._curr == NULL)
+		return 0;
+	local_iterator it = local_iterator(elementPosition._curr);
 	size_type	count = 0;
-	for (local_iterator it = _bucketArray[index].begin(); it != _bucketArray[index].end(); ++it)
-		if (KeyComparator<extractKey, KeyEqual>(_equal)(key, *it))
-			++count;
+	while (it._currentNode != &_bucketArray[elementPosition._bucket_idx]._sentinel && KeyComparator<extractKey, KeyEqual>(_equal)(key, *it)) {
+		++it;
+		++count;
+	}
 	return count;
 }
 
@@ -448,14 +460,20 @@ ft::internal::hashmap<Key, Hash, KeyEqual, Allocator, extractKey, mutableIterato
 {
 	iterator	first = find(key);
 	if (first == end())
-		return make_pair(end(), end());
+		return ft::make_pair(end(), end());
+	iterator		last(first);
 	local_iterator	local_end = end(first._bucket_idx);
-	local_iterator	last(first._curr);
+	local_iterator	local_last(first._curr);
 	KeyComparator<extractKey, KeyEqual> predicate(_equal);
-	while (last != local_end
-		&& predicate(key, *last))
-		++last;
-	return make_pair(first, --last);
+	while (local_last != local_end
+		&& predicate(key, *local_last))
+		++local_last;
+	last._curr = local_last._currentNode;
+	if (local_last == local_end) {
+		last._curr = last._curr->mPrev;
+		ft::advance(last, 1u);
+	}
+	return ft::make_pair(first, last);
 }
 
 
@@ -465,14 +483,20 @@ ft::internal::hashmap<Key, Hash, KeyEqual, Allocator, extractKey, mutableIterato
 {
 	const_iterator	first = find(key);
 	if (first == end())
-		return make_pair(end(), end());
+		return ft::make_pair(end(), end());
+	const_iterator		last(first);
 	const_local_iterator	local_end = end(first._bucket_idx);
-	const_local_iterator	last(first._curr);
+	const_local_iterator	local_last(first._curr);
 	KeyComparator<extractKey, KeyEqual> predicate(_equal);
-	while (last != local_end
-		&& predicate(key, *last))
-		++last;
-	return make_pair(first, --last);
+	while (local_last != local_end
+		&& predicate(key, *local_last))
+		++local_last;
+	last._curr = local_last._currentNode;
+	if (local_last == local_end) {
+		last._curr = last._curr->mPrev;
+		ft::advance(last, 1u);
+	}
+	return ft::make_pair(first, last);
 }
 
 
@@ -521,9 +545,13 @@ typename ft::internal::hashmap<Key, Hash, KeyEqual, Allocator, extractKey, mutab
 ft::internal::hashmap<Key, Hash, KeyEqual, Allocator, extractKey, mutableIterators>::erase(const_iterator position)
 {
 	--_elemNum;
-	if (position == _first)
+	if (position == _first && _elemNum)
 		++_first;
-	return position._bucket[position._bucket_idx].erase(position, _allocator);
+	const_iterator ret = position;
+	++ret;
+	value_type saveRef = *position;
+	position._bucket[position._bucket_idx].erase(saveRef, _allocator, KeyComparator<extractKey, KeyEqual>(_equal));
+	return iterator(ret._bucket, ret._bucket_count, ret._bucket_idx, ret._curr);
 }
 
 
@@ -531,9 +559,12 @@ template <typename Key, typename Hash, typename KeyEqual, typename Allocator, ty
 typename ft::internal::hashmap<Key, Hash, KeyEqual, Allocator, extractKey, mutableIterators>::size_type
 ft::internal::hashmap<Key, Hash, KeyEqual, Allocator, extractKey, mutableIterators>::erase(key_type CREF key)
 {
+	if (empty())
+		return 0;
 	while (_first != end() && KeyComparator<extractKey, KeyEqual>(_equal)(key, *_first))
 		++_first;
-	size_type removed = _bucketArray[bucket(key)].erase(key, _allocator, _equal);
+	size_type removed = _bucketArray[bucket(key)].erase(key, _allocator, KeyComparator<extractKey, KeyEqual>(_equal));
+	_elemNum -= removed;
 	return removed;
 }
 
@@ -542,13 +573,20 @@ template <typename Key, typename Hash, typename KeyEqual, typename Allocator, ty
 typename ft::internal::hashmap<Key, Hash, KeyEqual, Allocator, extractKey, mutableIterators>::iterator
 ft::internal::hashmap<Key, Hash, KeyEqual, Allocator, extractKey, mutableIterators>::erase(const_iterator first, const_iterator last)
 {
+	KeyComparator<extractKey, KeyEqual>	predicate(_equal);
+	iterator ret(last._bucket, last._bucket_count, last._bucket_idx, last._curr);
+	if (first == last)
+		return ret;
 	if (first == _first)
-		_first = ++iterator(last);
+		_first = ret;
 	while (first != last) {
+		const_iterator next = first;
+		++next;
+		first._bucket[first._bucket_idx].erase(local_iterator(first._curr), _allocator);
 		--_elemNum;
-		++first;
+		first = next;
 	}
-	return last;
+	return ret;
 }
 
 
@@ -558,6 +596,8 @@ ft::internal::hashmap<Key, Hash, KeyEqual, Allocator, extractKey, mutableIterato
 {
 	for (array_type it = _bucketArray; it != _bucketArray + _bucketNum; ++it)
 		it->clear(_allocator);
+	_elemNum = 0;
+	_first = end();
 }
 
 
@@ -651,16 +691,16 @@ ft::internal::hashmap<Key, Hash, KeyEqual, Allocator, extractKey, mutableIterato
 	size_type newSize = _bucketNum;
 	while (newSize < n)
 		newSize *= 2;
-	array_type newArray = _bucketAllocator().allocate(newSize);
+	array_type newBucketArray = _bucketAllocator().allocate(newSize);
 	// Rehash the new hashmap without any copy, we steal the nodes
 	for (size_type i = 0; i < newSize; ++i)
-		::new(static_cast<void*>(newArray + i)) bucket_type;
+		::new(static_cast<void*>(newBucketArray + i)) bucket_type; // :D
 	for (size_type i = 0; i < _bucketNum; ++i) {
-		base_type *buckSentinel = &_bucketArray[i]._sentinel;
-		for (base_type *node = buckSentinel->next(); node != buckSentinel;) {
+		base_type *bucketSentinel = &_bucketArray[i]._sentinel;
+		for (base_type *node = bucketSentinel->next(); node != bucketSentinel;) {
 			base_type *nextNode = node->next();
-			index_type index = KeyHasher<extractKey, Hash>(_hasher)(FT_DLLNODE(node)->value) % _bucketNum;
-			newArray[index].insert(node);
+			index_type index = KeyHasher<extractKey, Hash>(_hasher)(FT_DLLNODE(node)->value) % newSize;
+			newBucketArray[index].insert(node);
 			node = nextNode;
 		}
 	}
@@ -670,9 +710,11 @@ ft::internal::hashmap<Key, Hash, KeyEqual, Allocator, extractKey, mutableIterato
 	}
 	// Swap and free old memory
 	_bucketAllocator().deallocate(_bucketArray, _bucketNum);
-	_bucketArray = newArray;
+	_bucketArray = newBucketArray;
 	_bucketNum = newSize;
-	_first = iterator(_bucketArray, _bucketNum, 0, NULL);
+	_first = iterator(_bucketArray, _bucketNum, 0, FT_DLLNODE(_bucketArray[0]._sentinel.next()));
+	if (_bucketArray[0]._size)
+		return ;
 	_first._getNextBucket();
 }
 

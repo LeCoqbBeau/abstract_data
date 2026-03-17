@@ -5,6 +5,7 @@
 #ifndef DOUBLYLINKEDLIST_HPP
 #define DOUBLYLINKEDLIST_HPP
 
+
 #include ".helper/ftdef.hpp"
 #include ".helper/iterator.hpp"
 
@@ -21,13 +22,13 @@ struct _doublyLinkedListBase {
 		: mNext(NULL), mPrev(NULL) {}
 	_doublyLinkedListBase(this_type CREF rhs)
 		: mNext(rhs.mNext), mPrev(rhs.mPrev) {}
-	virtual ~_doublyLinkedListBase() {}
+	~_doublyLinkedListBase() {}
 
 	// Accessors
-	virtual this_type* REF	next() { return mNext; }
-	virtual this_type* CREF	next() const { return mNext; }
-	virtual this_type* REF	prev() { return mPrev; }
-	virtual this_type* CREF	prev() const { return mPrev; }
+	this_type* REF	next() { return mNext; }
+	this_type* CREF	next() const { return mNext; }
+	this_type* REF	prev() { return mPrev; }
+	this_type* CREF	prev() const { return mPrev; }
 
 	// Attributes
 	this_type*	mNext;
@@ -46,7 +47,7 @@ struct _doublyLinkedList : _doublyLinkedListBase {
 		: value(value) {};
 	_doublyLinkedList(_doublyLinkedList CREF rhs)
 		: base_type(rhs), value(rhs.value) {};
-	virtual ~_doublyLinkedList() {}
+	~_doublyLinkedList() {}
 
 	// Attributes
 	T					value;
@@ -56,7 +57,7 @@ struct _doublyLinkedList : _doublyLinkedListBase {
 
 template <class T, class Ref, class Ptr>
 struct _doublyLinkedListIterator
-	: public iterator<bidirectional_iterator_tag, T, ptrdiff_t, Ref, Ptr>
+: public iterator<bidirectional_iterator_tag, T, ptrdiff_t, Ref, Ptr>
 {
 	// Typedef
 	typedef _doublyLinkedListIterator<T, Ref, Ptr>	this_type;

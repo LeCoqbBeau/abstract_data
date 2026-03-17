@@ -1,1 +1,2 @@
-.helper/type_traits.hpp
+#pragma once
+#include ".helper/type_traits.hpp"

@@ -1,1 +1,2 @@
-.containers/set.hpp
+#pragma once
+#include ".containers/set.hpp"

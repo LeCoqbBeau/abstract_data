@@ -1,1 +1,2 @@
-.helper/iterator.hpp
+#pragma once
+#include ".helper/iterator.hpp"

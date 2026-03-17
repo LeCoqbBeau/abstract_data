@@ -1,1 +1,2 @@
-.containers/queue.hpp
+#pragma once
+#include ".containers/queue.hpp"

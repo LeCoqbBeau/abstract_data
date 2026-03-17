@@ -33,6 +33,7 @@
 template <typename TypeParam>
 void printContainer(TypeParam CREF c, std::ostream REF os = std::cout)
 {
+	os << "{" << c.size() << "} > ";
 	for (typename TypeParam::const_iterator it = c.begin(); it != c.end(); ++it)
 		os << *it << " > ";
 	os << std::endl;

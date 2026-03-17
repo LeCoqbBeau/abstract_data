@@ -7,8 +7,6 @@
 #include "bonus/config.h"
 
 #include "HashmapsContainersTests/Tests.hpp"
-#include "../include/unordered_set.hpp"
-#include "../include/unordered_map.hpp"
 
 
 int main(int argc, char *argv[]) {

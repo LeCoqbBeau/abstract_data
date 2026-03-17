@@ -1,1 +1,2 @@
-.helper/binary_trees.hpp
+#pragma once
+#include ".helper/binary_trees.hpp"

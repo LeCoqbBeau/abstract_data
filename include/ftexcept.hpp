@@ -1,1 +1,2 @@
-.helper/ftexcept.hpp
+#pragma once
+#include ".helper/ftexcept.hpp"

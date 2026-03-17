@@ -354,7 +354,7 @@ void promote_heap_impl(
 	*(first + position) = value;
 }
 
-}
+} // namespace internal
 
 
 template <typename RandomAccessIterator, typename Distance, typename T>
@@ -672,7 +672,7 @@ mismatch(InputIt1 first1, InputIt1 last1, InputIt2 first2, InputIt2 last2, Binar
 
 
 template <class InputIt, class T>
-typename std::iterator_traits<InputIt>::difference_type
+typename ft::iterator_traits<InputIt>::difference_type
 count(InputIt first, InputIt last, T CREF value)
 {
 	typename iterator_traits<InputIt>::difference_type ret = 0;
@@ -684,7 +684,7 @@ count(InputIt first, InputIt last, T CREF value)
 
 
 template<class InputIt, class UnaryPred>
-typename std::iterator_traits<InputIt>::difference_type
+typename ft::iterator_traits<InputIt>::difference_type
 count_if(InputIt first, InputIt last, UnaryPred p)
 {
 	typename iterator_traits<InputIt>::difference_type ret = 0;
@@ -697,11 +697,10 @@ count_if(InputIt first, InputIt last, UnaryPred p)
 
 template<class ForwardIt1, class ForwardIt2>
 bool
-is_permutation(
-	ForwardIt1 first,
-	ForwardIt1 last,
-	ForwardIt2 d_first
-) {
+is_permutation(ForwardIt1 first, ForwardIt1 last, ForwardIt2 d_first)
+{
+	if (first == last)
+		return true;
 	pair<ForwardIt1, ForwardIt2> mismatch_result = ft::mismatch(first, last, d_first);
 	first = mismatch_result.first;
 	d_first = mismatch_result.second;

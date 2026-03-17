@@ -5,7 +5,7 @@
 #include "ftdef.hpp"
 #include "iterator.hpp"
 #include "type_traits.hpp"
-#include "doublyLinkedList.hpp"
+#include "doubly_linked_list.hpp"
 
 
 namespace ft {

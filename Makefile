@@ -30,8 +30,9 @@ GTEST_INCLUDE	=	$(GTEST_GTEST)include/
 GTEST_FILTER	=	*
 GTEST_REPEAT	=	1
 GTEST_SHUFFLE	=	#--gtest_shuffle=yes
-GTEST_FLAGS		=	--gtest_color=yes --gtest_filter=$(GTEST_FILTER) --gtest_repeat=$(GTEST_REPEAT) $(GTEST_SHUFFLE)
+GTEST_FLAGS		=	--gtest_color=yes --gtest_filter=$(GTEST_FILTER) --gtest_repeat=$(GTEST_REPEAT) $(GTEST_SHUFFLE) #--gtest_output=json:$_
 VALGRIND_FLAGS	=	--error-exitcode=1 --exit-on-first-error=yes --leak-check=full --show-leak-kinds=all --log-file=.valgrind -q
+CACHEGRIND_FLAGS=	-q --tool=cachegrind -q --cachegrind-out-file=cachegrind.out
 
 
 #-----------------------------------------------------------------------------------------------------------#
@@ -124,11 +125,9 @@ all: $(NAME) doc
 
 $(NAME): $(NAME_FT) $(NAME_STD)
 
-
 $(NAME_FT): $(OBJ_FT)
 	@$(CXX) $(CFLAGS) -o $(NAME_FT) $(OBJ_FT) $(GTEST_ALL_A)
 	@echo "\033[1;32m Executable" $(NAME_FT) "created" $(CLR)
-
 
 $(NAME_STD): $(OBJ_STD)
 	@$(CXX) $(CFLAGS) -o $(NAME_STD) $(OBJ_STD) $(GTEST_ALL_A)
@@ -137,11 +136,9 @@ $(NAME_STD): $(OBJ_STD)
 
 bonus: $(NAME_BONUS_FT) $(NAME_BONUS_STD)
 
-
 $(NAME_BONUS_FT): $(OBJ_BONUS_FT)
 	@$(CXX) $(CFLAGS_BONUS) -o $(NAME_BONUS_FT) $(OBJ_BONUS_FT) $(GTEST_ALL_A)
 	@echo "\033[1;32m Executable" $(NAME_BONUS_FT) "created" $(CLR)
-
 
 $(NAME_BONUS_STD): $(OBJ_BONUS_STD)
 	@$(CXX) $(CFLAGS_BONUS) -o $(NAME_BONUS_STD) $(OBJ_BONUS_STD) $(GTEST_ALL_A)
@@ -151,17 +148,19 @@ $(NAME_BONUS_STD): $(OBJ_BONUS_STD)
 clean: dclean gclean
 	@rm -rf $(OBJ_DIR)
 	@echo "\033[1;31m Deleted all object files" $(CLR)
-
+	@rm -rf "$(NAME_FT).json"
+	@rm -rf "$(NAME_STD).json"
+	@rm -rf "$(NAME_BONUS_FT).json"
+	@rm -rf "$(NAME_BONUS_STD).json"
+	@rm -rf cachegrind.out
 
 dclean:
 	@rm -rf $(DOXYGEN_SUBDIR)
 	@echo "\033[1;31m Deleted documentation" $(CLR)
 
-
 gclean:
 	@rm -rf $(GTEST_TAR)
 	@echo "\033[1;31m Deleted gtest tar" $(CLR)
-
 
 fclean: clean dclean gclean
 	@rm -f $(NAME_FT)
@@ -173,35 +172,58 @@ fclean: clean dclean gclean
 	@echo "\033[1;31m Deleted $(NAME_BONUS_FT)" $(CLR)
 	@echo "\033[1;31m Deleted $(NAME_BONUS_STD)" $(CLR)
 
-
 re: fclean all
 bre: fclean bonus
 
 
 ft: $(NAME_FT)
+	@rm -rf "$(NAME_FT).json"
 	./$(NAME_FT) $(GTEST_FLAGS)
 
 std: $(NAME_STD)
+	@rm -rf "$(NAME_STD).json"
 	./$(NAME_STD) $(GTEST_FLAGS)
 
 valft: $(NAME_FT)
+	@rm -rf "$(NAME_FT).json"
 	@valgrind $(VALGRIND_FLAGS) ./$(NAME_FT) $(GTEST_FLAGS)
 
 valstd: $(NAME_STD)
+	@rm -rf "$(NAME_STD).json"
 	@valgrind $(VALGRIND_FLAGS) ./$(NAME_STD) $(GTEST_FLAGS)
 
+cft: $(NAME_FT)
+	@rm -rf cachegrind.out
+	@valgrind $(CACHEGRIND_FLAGS) ./$(NAME_FT) $(GTEST_FLAGS)
+
+cstd: $(NAME_STD)
+	@rm -rf cachegrind.out
+	@valgrind $(CACHEGRIND_FLAGS) ./$(NAME_STD) $(GTEST_FLAGS)
 
 bft: $(NAME_BONUS_FT)
+	@rm -rf "$(NAME_BONUS_FT).json"
 	./$(NAME_BONUS_FT) $(GTEST_FLAGS)
 
 bstd: $(NAME_BONUS_STD)
+	@rm -rf "$(NAME_BONUS_STD).json"
 	./$(NAME_BONUS_STD) $(GTEST_FLAGS)
 
+valbft: $(NAME_BONUS_FT)
+	@rm -rf "$(NAME_BONUS_FT).json"
+	@valgrind $(VALGRIND_FLAGS) ./$(NAME_BONUS_FT) $(GTEST_FLAGS)
+
 valbstd: $(NAME_BONUS_STD)
+	@rm -rf "$(NAME_BONUS_STD).json"
 	@valgrind $(VALGRIND_FLAGS) ./$(NAME_BONUS_STD) $(GTEST_FLAGS)
 
-valbft: $(NAME_BONUS_FT)
-	@valgrind $(VALGRIND_FLAGS) ./$(NAME_BONUS_FT) $(GTEST_FLAGS)
+cbft: $(NAME_BONUS_FT)
+	@rm -rf cachegrind.out
+	@valgrind $(CACHEGRIND_FLAGS) ./$(NAME_BONUS_FT) $(GTEST_FLAGS)
+
+cbstd: $(NAME_BONUS_STD)
+	@rm -rf cachegrind.out
+	@valgrind $(CACHEGRIND_FLAGS) ./$(NAME_BONUS_STD) $(GTEST_FLAGS)
+
 
 
 $(DOXYGEN_AWESOME):

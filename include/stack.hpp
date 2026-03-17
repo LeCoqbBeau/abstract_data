@@ -1,1 +1,2 @@
-.containers/stack.hpp
+#pragma once
+#include ".containers/stack.hpp"

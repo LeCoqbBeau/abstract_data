@@ -31,10 +31,10 @@ struct bucket {
 	typedef _doublyLinkedList<Key>										node_type;
 
 	// Constructor
-	bucket() : _sentinel() { _sentinel.next() = &_sentinel; _sentinel.prev() = &_sentinel; }
+	bucket() : _size(0) { _sentinel.next() = &_sentinel; _sentinel.prev() = &_sentinel; }
 	template <typename Allocator>
 	bucket(bucket CREF rhs, Allocator allocator) { rhs.duplicate(this->_sentinel, allocator); }
-	~bucket() { if (_sentinel.next() != &_sentinel) exit(EXIT_FAILURE); }
+	~bucket() {}
 
 	// Iterators
 	iterator		begin();
@@ -69,12 +69,13 @@ struct bucket {
 
 	//	Attributes
 	base_type		_sentinel;
+	size_type		_size;
 };
 
 
 template <typename T, typename Ref, typename Ptr>
 struct hashmap_iterator
-	: iterator<bidirectional_iterator_tag, T, ptrdiff_t, Ptr, Ref>
+	: iterator<forward_iterator_tag, T, ptrdiff_t, Ptr, Ref>
 {
 	// Typedefs
 	typedef hashmap_iterator<T, Ref, Ptr>	this_type;
@@ -87,6 +88,7 @@ struct hashmap_iterator
 	typedef bucket<T>						bucket_type;
 
 	// Constructors
+	explicit	hashmap_iterator() : _curr(NULL), _bucket(NULL), _bucket_count(0), _bucket_idx(0) {}
 	explicit	hashmap_iterator(bucket_type *bucket, size_t bucket_count, size_t idx, base_type *current = NULL) {
 		_bucket = bucket;
 		_bucket_count = bucket_count;
@@ -101,9 +103,9 @@ struct hashmap_iterator
 
 	// In/Equality Operator
 	template <class U, class URef, class UPtr>
-	bool operator	== (hashmap_iterator<U, URef, UPtr> CREF rhs) { return _bucket == rhs._bucket && this->_curr == rhs._curr; }
+	bool operator	== (hashmap_iterator<U, URef, UPtr> CREF rhs) const { return _bucket == rhs._bucket && this->_curr == rhs._curr; }
 	template <class U, class URef, class UPtr>
-	bool operator	!= (hashmap_iterator<U, URef, UPtr> CREF rhs) { return _bucket != rhs._bucket || this->_curr != rhs._curr; }
+	bool operator	!= (hashmap_iterator<U, URef, UPtr> CREF rhs) const { return _bucket != rhs._bucket || this->_curr != rhs._curr; }
 
 	// Dereference Operator
 	reference	operator  * () { return FT_DLLNODE(_curr)->value; }
@@ -111,45 +113,27 @@ struct hashmap_iterator
 
 	// Shift Operators
 	this_type REF	operator ++ () {
+		if (!_curr) {
+			_getNextBucket();
+			return *this;
+		}
 		if (_bucket_idx == _bucket_count)
 			return *this;
 		_curr = _curr->next();
-		if (dynamic_cast<node_type*>(_curr) == NULL)
+		if (_curr == &_bucket[_bucket_idx]._sentinel)
 			_getNextBucket();
 		return *this;
 	}
 	this_type		operator ++ (int) { this_type tmp = *this; operator++(); return tmp; }
-	this_type REF	operator -- () {
-		if (_bucket_idx > _bucket_count) {
-			_bucket_idx = _bucket_count;
-			return *this;
-		}
-		_curr = _curr->prev();
-		if (dynamic_cast<node_type*>(_curr) == NULL)
-			_getPrevBucket();
-		return *this;
-	}
-	this_type		operator -- (int)	{ this_type tmp = *this; operator--(); return tmp; }
 
 	// Helper Function
 	void _getNextBucket() {
-		if (_curr != NULL)
+		if (_curr)
 			++_bucket_idx;
 		for (; _bucket_idx < _bucket_count; ++_bucket_idx) {
-			if (_bucket[_bucket_idx].begin() == _bucket[_bucket_idx].end())
+			if (_bucket[_bucket_idx]._size == 0)
 				continue;
-			_curr = _bucket[_bucket_idx].begin()._currentNode;
-			return;
-		}
-		_curr = NULL;
-	}
-	void _getPrevBucket() {
-		if (_curr != NULL)
-			--_bucket_idx;
-		for (; _bucket_idx < _bucket_count; --_bucket_idx) {
-			if (_bucket[_bucket_idx].begin() == _bucket[_bucket_idx].end())
-				continue;
-			_curr = _bucket[_bucket_idx].end()._currentNode->prev();
+			_curr = _bucket[_bucket_idx]._sentinel.next();
 			return;
 		}
 		_curr = NULL;
@@ -225,8 +209,8 @@ struct hashmap {
 		const_local_iterator		begin(size_type n) const;
 		const_iterator				cbegin() const;
 		const_local_iterator		cbegin(size_type n) const;
-		iterator					end();
 		const_iterator				end() const;
+		iterator					end();
 		local_iterator				end(size_type n);
 		const_local_iterator		end(size_type n) const;
 		const_iterator				cend() const;

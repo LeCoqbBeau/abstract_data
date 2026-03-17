@@ -1,1 +1,2 @@
-.helper/functional.hpp
+#pragma once
+#include ".helper/functional.hpp"

@@ -6,6 +6,12 @@
 #define HCT_TESTS_HPP
 
 
+#include "Constructors.tpp"
+#include "Iterators.tpp"
+#include "Modifiers.tpp"
+#include "LookUp.tpp"
+#include "Bucket.tpp"
+#include "HashPolicy.tpp"
 #include "OutOfClass.tpp"
 
 

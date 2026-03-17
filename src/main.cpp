@@ -3,11 +3,6 @@
 //
 
 
-#if (ENABLE_SEQUENCE == false && ENABLE_ASSOCIATIVE == false && ENABLE_ADAPTORS == false && ENABLE_GRID == false) || __cplusplus >= 201103L
-# include "main_bonus.cpp"
-#else
-
-
 #include "gtest/gtest.h"
 #include "mandatory/config.h"
 
@@ -23,21 +18,15 @@
 # include "AdaptorContainersTests/Tests.hpp"
 #endif
 
-#if ENABLE_GRID == false
+#if ENABLE_GRID == true
 # include "GridTests/Tests.hpp"
 #endif
-
-
-#include "Timer.h"
 
 
 int main(int argc, char *argv[]) {
 	(void)argc;
 	(void)argv;
 
-	Timer t;
 	::testing::InitGoogleTest(&argc, argv);
 	return RUN_ALL_TESTS();
 }
-
-#endif

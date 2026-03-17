@@ -1,1 +1,2 @@
-.helper/ftdef.hpp
+#pragma once
+#include ".helper/ftdef.hpp"

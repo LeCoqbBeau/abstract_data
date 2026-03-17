@@ -123,6 +123,9 @@ template <
 	protected:
 		// Attributes
 		hashmap_type	_hashmap;
+
+		// Helper function
+		static value_type	keyToValue(key_type CREF key) { return value_type(key, mapped_type()); }
 };
 
 
@@ -186,7 +189,7 @@ template <
 		const_local_iterator				cend(size_type n) const;
 
 		// Element Access
-		mapped_type REF		operator		[](key_type CREF key);
+		mapped_type REF			operator	[](key_type CREF key);
 		mapped_type REF						at(key_type CREF key);
 		mapped_type CREF					at(key_type CREF key) const;
 
@@ -229,6 +232,9 @@ template <
 	protected:
 		// Attributes
 		hashmap_type	_hashmap;
+
+		// Helper function
+		static value_type	keyToValue(key_type CREF key) { return value_type(key, mapped_type()); }
 };
 
 

@@ -1,1 +1,2 @@
-.containers/deque.hpp
+#pragma once
+#include ".containers/deque.hpp"

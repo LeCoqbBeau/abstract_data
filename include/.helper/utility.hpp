@@ -80,8 +80,8 @@ ft::pair<T1, T2>::pair(pair<U1, U2> CREF p)
 template <class T1, class T2>
 ft::pair<T1, T2> REF ft::pair<T1, T2>::operator = (pair CREF rhs) {
 	if (this != &rhs) {
-		const_cast<first_type REF>(first) = rhs.first;
-		const_cast<second_type REF>(second) = rhs.second;
+		first = rhs.first;
+		second = rhs.second;
 	}
 	return *this;
 }
@@ -91,8 +91,8 @@ template <class T1, class T2>
 template <class U1, class U2>
 ft::pair<T1, T2> REF ft::pair<T1, T2>::operator = (pair<U1, U2> CREF rhs) {
 	if (this != &rhs) {
-		const_cast<first_type REF>(first) = rhs.first;
-		const_cast<second_type REF>(second) = rhs.second;
+		first = rhs.first;
+		second = rhs.second;
 	}
 	return *this;
 }

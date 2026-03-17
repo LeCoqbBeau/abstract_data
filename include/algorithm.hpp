@@ -1,1 +1,2 @@
-.helper/algorithm.hpp
+#pragma once
+#include ".helper/algorithm.hpp"
