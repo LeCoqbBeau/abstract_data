@@ -49,7 +49,7 @@ SRC_NAME			=	main.cpp
 
 INCLUDES			=	-I$(INC) -I$(GTEST_INCLUDE)
 CFLAGS				=	$(INCLUDES) -Wall -Werror -Wextra -g -std=c++98 -MMD -MP
-CXX					=	clang++
+CXX					=	c++
 
 OBJ_DIR				=	.build/
 OBJ_FT_DIR			=	$(OBJ_DIR)ft/
