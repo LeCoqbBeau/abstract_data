@@ -231,6 +231,22 @@ class multimap
 };
 
 
+template <class Key, class T, class Compare, class Allocator>
+void
+swap(map<Key, T, Compare, Allocator> REF lhs, map<Key, T, Compare, Allocator> REF rhs)
+{
+	lhs.swap(rhs);
+}
+
+
+template <class Key, class T, class Compare, class Allocator>
+void
+swap(multimap<Key, T, Compare, Allocator> REF lhs, multimap<Key, T, Compare, Allocator> REF rhs)
+{
+	lhs.swap(rhs);
+}
+
+
 # define MAP_COMPARISON_OPERATOR(op)	template <class Key, class T, class Compare, class Allocator> bool operator op						\
 										(ft::map<Key, T, Compare, Allocator> CREF lhs, ft::map<Key, T, Compare, Allocator> CREF rhs)
 

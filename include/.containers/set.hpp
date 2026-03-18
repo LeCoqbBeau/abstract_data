@@ -180,11 +180,27 @@ class multiset
 };
 
 
-# define SET_COMPARISON_OPERATOR(op)	template <class T, class Container> bool operator op						\
-										(ft::set<T, Container> CREF lhs, ft::set<T, Container> CREF rhs)
+template <class T, class Compare, class Allocator>
+void
+swap(set<T, Compare, Allocator> REF lhs, set<T, Compare, Allocator> REF rhs)
+{
+	lhs.swap(rhs);
+}
 
-# define MSET_COMPARISON_OPERATOR(op)	template <class T, class Container> bool operator op						\
-										(ft::multiset<T, Container> CREF lhs, ft::multiset<T, Container> CREF rhs)
+
+template <class T, class Compare, class Allocator>
+void
+swap(multiset<T, Compare, Allocator> REF lhs, multiset<T, Compare, Allocator> REF rhs)
+{
+	lhs.swap(rhs);
+}
+
+
+# define SET_COMPARISON_OPERATOR(op)	template <class T, class Compare, class Allocator> bool operator op						\
+										(ft::set<T, Compare, Allocator> CREF lhs, ft::set<T, Compare, Allocator> CREF rhs)
+
+# define MSET_COMPARISON_OPERATOR(op)	template <class T, class Compare, class Allocator> bool operator op						\
+										(ft::multiset<T, Compare, Allocator> CREF lhs, ft::multiset<T, Compare, Allocator> CREF rhs)
 
 # define SETS_COMPARISON_OPERATOR(op, stmt) SET_COMPARISON_OPERATOR(op) {stmt;}; MSET_COMPARISON_OPERATOR(op) {stmt;};
 
