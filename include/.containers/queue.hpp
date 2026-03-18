@@ -6,6 +6,7 @@
 #define QUEUE_HPP
 
 #include "deque.hpp"
+#include "vector.hpp"
 #include "functional.hpp"
 
 namespace ft {
