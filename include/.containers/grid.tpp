@@ -36,8 +36,6 @@ ft::internal::gridIterator<T, Ref, Ptr, M, N>::operator	!= (this_type CREF rhs) 
 }
 
 // Dereference Operator
-
-
 template <typename T, typename Ref, typename Ptr, unsigned int M, unsigned int N>
 typename ft::internal::gridIterator<T, Ref, Ptr, M, N>::reference
 ft::internal::gridIterator<T, Ref, Ptr, M, N>::operator * ()
@@ -121,7 +119,7 @@ typename ft::internal::gridIterator<T, Ref, Ptr, M, N>::this_type
 ft::internal::gridIterator<T, Ref, Ptr, M, N>::operator -- (int)
 {
 	this_type tmp(*this);
-	this->operator++();
+	this->operator--();
 	return tmp;
 }
 

@@ -9,7 +9,7 @@
 #include ".helper/functional.hpp"
 #include ".helper/ftexcept.hpp"
 #include ".helper/utility.hpp"
-#include ".helper/doublyLinkedList.hpp"
+#include ".helper/doubly_linked_list.hpp"
 
 # define HASHMAP_INIT_SIZE 16
 

@@ -92,7 +92,7 @@ class grid
 		typedef T*													pointer;
 		typedef T const*											const_pointer;
 		typedef internal::gridIterator<T, T &, T*, M, N>			iterator;
-		typedef internal::gridIterator<T, T &, T const*, M, N>		const_iterator;
+		typedef internal::gridIterator<T, T const&, T const*, M, N>	const_iterator;
 		typedef reverse_iterator<iterator>							reverse_iterator;
 		typedef ft::reverse_iterator<const_iterator>				const_reverse_iterator;
 
