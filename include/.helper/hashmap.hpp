@@ -32,8 +32,7 @@ struct bucket {
 
 	// Constructor
 	bucket() : _size(0) { _sentinel.next() = &_sentinel; _sentinel.prev() = &_sentinel; }
-	template <typename Allocator>
-	bucket(bucket CREF rhs, Allocator allocator) { rhs.duplicate(this->_sentinel, allocator); }
+	bucket(bucket CREF) : _size(0) { _sentinel.next() = &_sentinel; _sentinel.prev() = &_sentinel; }
 	~bucket() {}
 
 	// Iterators

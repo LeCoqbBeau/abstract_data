@@ -694,7 +694,7 @@ ft::internal::hashmap<Key, Hash, KeyEqual, Allocator, extractKey, mutableIterato
 	array_type newBucketArray = _bucketAllocator().allocate(newSize);
 	// Rehash the new hashmap without any copy, we steal the nodes
 	for (size_type i = 0; i < newSize; ++i)
-		::new(static_cast<void*>(newBucketArray + i)) bucket_type; // :D
+		_allocator.construct(newBucketArray + i, bucket_type());
 	for (size_type i = 0; i < _bucketNum; ++i) {
 		base_type *bucketSentinel = &_bucketArray[i]._sentinel;
 		for (base_type *node = bucketSentinel->next(); node != bucketSentinel;) {
@@ -761,7 +761,7 @@ ft::internal::hashmap<Key, Hash, KeyEqual, Allocator, extractKey, mutableIterato
 {
 	array_type newArray = _bucketAllocator().allocate(n);
 	for (size_type i = 0; i < n; ++i)
-		::new(static_cast<void*>(newArray + i)) bucket_type; // horrible war crime I have to commit to default initialize my buckets
+		_bucketAllocator().construct(newArray + i, bucket_type());
 	ft::swap(_bucketArray, newArray);
 	_bucketNum = n;
 	_first = iterator(_bucketArray, _bucketNum, 0, NULL);
