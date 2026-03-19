@@ -88,7 +88,7 @@ class deque {
 		explicit							deque(allocator_type CREF allocator = allocator_type());
 		explicit							deque(size_type n, value_type CREF val = value_type(), allocator_type CREF allocator = allocator_type());
 		template <typename Iterator>		deque(Iterator first, Iterator last, allocator_type CREF allocator = allocator_type());
-		deque(deque CREF rhs);
+											deque(deque CREF rhs);
 		deque REF				operator	= (deque CREF rhs);
 		~deque();
 
@@ -172,7 +172,9 @@ class deque {
 
 
 template <typename T, typename Allocator>
-void swap(ft::deque<T, Allocator> REF x, ft::deque<T, Allocator> REF y) {
+void
+swap(ft::deque<T, Allocator> REF x, ft::deque<T, Allocator> REF y)
+{
 	x.swap(y);
 }
 

@@ -31,18 +31,16 @@ class queue {
 		typedef Container									container_type;
 		typedef typename container_type::value_type			value_type;
 		typedef typename container_type::size_type			size_type;
-		typedef typename container_type::reference			reference;
-		typedef typename container_type::const_reference	const_reference;
 
 		// Constructor
 		explicit			queue(container_type CREF container = container_type()) : c(container) {}
 		~queue() {}
 
 		// Element Access
-		reference			front()						{ return c.front(); }
-		const_reference		front() const				{ return c.front(); }
-		reference			back()						{ return c.back(); }
-		const_reference		back() const				{ return c.back(); }
+		value_type REF		front()						{ return c.front(); }
+		value_type CREF		front() const				{ return c.front(); }
+		value_type REF		back()						{ return c.back(); }
+		value_type CREF		back() const				{ return c.back(); }
 
 		// Capacity
 		bool				empty() const				{ return c.empty(); }
@@ -65,7 +63,7 @@ class queue {
 };
 
 
-template <class T, class Container = vector<T>,  class Compare = ft::less<typename Container::value_type> >
+template <class T, class Container = vector<T>, class Compare = ft::less<typename Container::value_type> >
 class priority_queue {
 	public:
 		// Typedefs
@@ -73,8 +71,6 @@ class priority_queue {
 		typedef Compare										value_compare;
 		typedef typename container_type::value_type			value_type;
 		typedef typename container_type::size_type			size_type;
-		typedef typename container_type::reference			reference;
-		typedef typename container_type::const_reference	const_reference;
 
 		// Constructor
 		explicit
@@ -99,7 +95,7 @@ class priority_queue {
 		}
 
 		// Element Access
-		const_reference				top() const					{ return c.front(); }
+		value_type CREF				top() const					{ return c.front(); }
 
 		// Capacity
 		bool						empty() const				{ return c.empty(); }

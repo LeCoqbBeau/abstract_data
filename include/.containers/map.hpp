@@ -64,7 +64,7 @@ class map
 		explicit							map(key_compare CREF comp = key_compare(), allocator_type CREF allocator = allocator_type());
 		template <typename InputIt>			map(InputIt first, InputIt last, key_compare CREF comp = key_compare(), allocator_type CREF allocator = allocator_type());
 											map(map CREF rhs);
-		map REF					operator	=(map CREF rhs);
+		map REF					operator	= (map CREF rhs);
 		~map();
 
 		// Iterators
@@ -176,7 +176,7 @@ class multimap
 		explicit							multimap(key_compare CREF comp = key_compare(), allocator_type CREF allocator = allocator_type());
 		template <typename InputIt>			multimap(InputIt first, InputIt last, key_compare CREF comp = key_compare(), allocator_type CREF allocator = allocator_type());
 											multimap(multimap CREF rhs);
-		multimap REF			operator	=(multimap CREF rhs);
+		multimap REF			operator	= (multimap CREF rhs);
 		~multimap();
 
 		// Iterators

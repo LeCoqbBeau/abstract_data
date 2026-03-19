@@ -1,6 +1,7 @@
 #ifndef LIST_HPP
 #define LIST_HPP
 
+
 #include "algorithm.hpp"
 #include "ftdef.hpp"
 #include "iterator.hpp"
@@ -32,7 +33,7 @@ class list {
 		explicit								list(allocator_type CREF alloc = allocator_type());
 		explicit								list(size_type n, value_type CREF val = value_type(), allocator_type CREF alloc = allocator_type());
 		template<class Iterator>				list(Iterator first, Iterator last, allocator_type CREF alloc = allocator_type());
-		list(list CREF x);
+												list(list CREF x);
 		list REF					operator	= (list CREF rhs);
 		~list();
 
@@ -122,7 +123,9 @@ class list {
 
 
 template <typename T, typename Allocator>
-void swap(list<T, Allocator> REF x, list<T, Allocator> REF y) {
+void
+swap(list<T, Allocator> REF x, list<T, Allocator> REF y)
+{
 	x.swap(y);
 }
 

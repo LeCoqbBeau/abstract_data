@@ -29,16 +29,14 @@ class stack {
 		typedef Container									container_type;
 		typedef typename container_type::value_type			value_type;
 		typedef typename container_type::size_type			size_type;
-		typedef typename container_type::reference			reference;
-		typedef typename container_type::const_reference	const_reference;
 
 		// Constructor
 		explicit stack(container_type CREF container = container_type()) : c(container) {}
 		~stack() {}
 
 		// Element Access
-		reference		top()						{ return c.back(); }
-		const_reference	top() const					{ return c.back(); }
+		value_type REF	top()						{ return c.back(); }
+		value_type CREF	top() const					{ return c.back(); }
 
 		// Capacity
 		bool			empty() const				{ return c.empty(); }

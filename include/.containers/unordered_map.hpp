@@ -122,10 +122,10 @@ template <
 
 	protected:
 		// Attributes
-		hashmap_type	_hashmap;
+		hashmap_type					_hashmap;
 
 		// Helper function
-		static value_type	keyToValue(key_type CREF key) { return value_type(key, mapped_type()); }
+		static value_type				keyToValue(key_type CREF key) { return value_type(key, mapped_type()); }
 };
 
 
@@ -231,10 +231,10 @@ template <
 
 	protected:
 		// Attributes
-		hashmap_type	_hashmap;
+		hashmap_type						_hashmap;
 
 		// Helper function
-		static value_type	keyToValue(key_type CREF key) { return value_type(key, mapped_type()); }
+		static value_type					keyToValue(key_type CREF key) { return value_type(key, mapped_type()); }
 };
 
 
